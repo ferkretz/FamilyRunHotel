@@ -1,0 +1,83 @@
+body {
+    padding-top: 44px;
+}
+@font-face {
+    font-family: 'URWChanceryL';
+    src:url('../fonts/URWChanceryL-MediItal.woff') format('woff'),
+        url('../fonts/URWChanceryL-MediItal.ttf') format('truetype'),
+        url('../fonts/URWChanceryL-MediItal.svg#URWChanceryL-MediItal') format('svg');
+}
+.navbar-default {
+    background-image: -webkit-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
+    background-image:    -moz-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
+    background-image:      -o-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
+    background-image: linear-gradient(to top, #ffdab6 0, #ffebd7 8px);
+    background-repeat: repeat-x;
+    box-shadow: 0px 1px 7px rgba(0, 0, 0, .3);
+}
+.navbar-inverse {
+    background-image: -webkit-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image:    -moz-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image:      -o-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image: linear-gradient(to top, #6d3702 0, #9d5401 20px);
+    background-repeat: repeat-x;
+    box-shadow: 0px 1px 7px rgba(0, 0, 0, .7);
+}
+.navbar-default .navbar-nav > li > a {
+    font-weight: bold;
+    text-shadow: 0px -1px 0px #fff3e8, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .3);
+}
+.navbar-inverse .navbar-nav > li > a {
+    font-weight: bold;
+    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+}
+.navbar .navbar-brand {
+    padding: 10px;
+    font-size: 23px;
+    font-family: 'URWChanceryL';
+    font-weight: bold;
+}
+.navbar-default .navbar-brand {
+    text-shadow: 0px -1px 0px #fff3e8, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .3);
+}
+.navbar-inverse .navbar-brand {
+    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+}
+.header-inverse {
+    float: none;
+    display: flex;
+    align-items: center;
+    background-image: -webkit-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image:    -moz-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image:      -o-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
+    background-image: linear-gradient(to top, #6d3702 0, #9d5401 20px);
+    background-repeat: repeat-x;
+    box-shadow: 0px 1px 7px rgba(0, 0, 0, .7);
+    border-radius: 30px;
+    margin: 15px;
+}
+.header-inverse #clock {
+    margin: 15px;
+    background-image: url(/img/clock-background.png);
+}
+.header-inverse .title {
+    font-family: 'URWChanceryL';
+    font-weight: bold;
+    color: #eb9844;
+    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+    text-align: center;
+}
+.header-inverse .title {
+    font-size: 48px;
+    line-height: 40px;
+}
+.header-inverse .date {
+    font-size: 22px;
+    line-height: 40px;
+}
+@media (max-width: 767px) {
+    .header {
+        display: none;
+    }
+}
+

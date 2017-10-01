@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-use Application\Service\OptionManager;
 
 class NavBar extends AbstractHelper {
 
@@ -11,7 +10,7 @@ class NavBar extends AbstractHelper {
      * Menu items array.
      * @var array
      */
-    protected $items = [];
+    protected $navBarElements;
 
     /**
      * Active item's ID.
@@ -19,24 +18,8 @@ class NavBar extends AbstractHelper {
      */
     protected $activeItemId = '';
 
-    /**
-     * Entity manager.
-     * @var OtionManager
-     */
-    protected $optionManager;
-
-    public function __construct(OptionManager $optionManager,
-                                $items = array()) {
-        $this->optionManager = $optionManager;
-        $this->items = $items;
-    }
-
-    /**
-     * Sets menu items.
-     * @param array $items Menu items.
-     */
-    public function setItems($items) {
-        $this->items = $items;
+    public function __construct($navBarElements) {
+        $this->navBarElements = $navBarElements;
     }
 
     /**
@@ -52,15 +35,9 @@ class NavBar extends AbstractHelper {
      * @return string HTML code of the menu.
      */
     public function render() {
-        // empty content
-        if (count($this->items) == 0) {
-            return '';
-        }
+        $escapeHtml = $this->getView()->plugin('escapeHtml');
 
-        // brand name or 'FamilyRunHotel'
-        $brandName = $this->optionManager->findByName('brand_name', 'FamilyRunHotel');
-
-        $result = '<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">'
+        $result = '<nav class="navbar navbar-' . $escapeHtml($this->navBarElements['options']['navbar_style']) . ' navbar-fixed-top" role="navigation">'
                 . '<div class="container" >'
                 . '<div class="navbar-header">'
                 . '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">'
@@ -69,18 +46,18 @@ class NavBar extends AbstractHelper {
                 . '<span class="icon-bar"></span>'
                 . '<span class="icon-bar"></span>'
                 . '</button>'
-                . '<a class="navbar-brand" href="#">' . $brandName . '</a>'
+                . '<a class="navbar-brand" href="' . $escapeHtml($this->navBarElements['options']['brand_link']) . '">' . $escapeHtml($this->navBarElements['options']['brand_name']) . '</a>'
                 . '</div>'
                 . '<div id="navbar" class="collapse navbar-collapse">'
                 . '<ul class="nav navbar-nav">';
-        foreach ($this->items as $item) {
+        foreach ($this->navBarElements['menu_items'] as $item) {
             if (!isset($item['float']) || $item['float'] == 'left') {
                 $result .= $this->renderItem($item);
             }
         }
         $result .= '</ul>'
                 . '<ul class="nav navbar-nav navbar-right">';
-        foreach ($this->items as $item) {
+        foreach ($this->navBarElements['menu_items'] as $item) {
             if (isset($item['float']) && $item['float'] == 'right') {
                 $result .= $this->renderItem($item);
             }
@@ -117,7 +94,7 @@ class NavBar extends AbstractHelper {
                     . '</a>'
                     . '<ul class="dropdown-menu">';
             foreach ($dropdownItems as $item) {
-                if (count($item) == 0) {
+                if (isset($item['separator']) && $item['separator'] == TRUE) {
                     $result .= '<li role="separator" class="divider"></li>';
                 } else {
                     $link = isset($item['link']) ? $item['link'] : '#';

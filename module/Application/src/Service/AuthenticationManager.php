@@ -5,7 +5,7 @@ namespace Application\Service;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
 use Zend\Session\SessionManager;
-use Application\Service\CapabilityManager;
+use Administration\Service\CapabilityManager;
 
 class AuthenticationManager {
 
@@ -18,25 +18,25 @@ class AuthenticationManager {
      * Authentication service.
      * @var AuthenticationService
      */
-    private $authenticationService;
+    protected $authenticationService;
 
     /**
      * Session manager.
      * @var SessionManager
      */
-    private $sessionManager;
+    protected $sessionManager;
 
     /**
      * Capability manager.
      * @var CapabilityManager
      */
-    private $capabilityManager;
+    protected $capabilityManager;
 
     /**
      * Contents of the 'access_filter' config key.
      * @var array
      */
-    private $config;
+    protected $config;
 
     public function __construct(AuthenticationService $authenticationService,
                                 SessionManager $sessionManager,

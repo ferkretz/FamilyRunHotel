@@ -9,6 +9,7 @@
 namespace Application;
 
 use Zend\Router\Http\Literal;
+use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
@@ -24,7 +25,37 @@ return [
                     ],
                 ],
             ],
-            'login' => [
+            'home-rooms' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/rooms',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action' => 'rooms',
+                    ],
+                ],
+            ],
+            'home-visitors-book' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/visitors-book',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action' => 'visitorsBook',
+                    ],
+                ],
+            ],
+            'auth-register' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/register',
+                    'defaults' => [
+                        'controller' => Controller\AuthenticationController::class,
+                        'action' => 'register',
+                    ],
+                ],
+            ],
+            'auth-login' => [
                 'type' => Literal::class,
                 'options' => [
                     'route' => '/login',
@@ -34,7 +65,7 @@ return [
                     ],
                 ],
             ],
-            'logout' => [
+            'auth-logout' => [
                 'type' => Literal::class,
                 'options' => [
                     'route' => '/logout',
@@ -44,13 +75,23 @@ return [
                     ],
                 ],
             ],
-            'not-authorized' => [
+            'auth-not-authorized' => [
                 'type' => Literal::class,
                 'options' => [
                     'route' => '/not-authorized',
                     'defaults' => [
                         'controller' => Controller\AuthenticationController::class,
                         'action' => 'notAuthorized',
+                    ],
+                ],
+            ],
+            'auth-reset-password' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/reset-password',
+                    'defaults' => [
+                        'controller' => Controller\AuthenticationController::class,
+                        'action' => 'resetPassword',
                     ],
                 ],
             ],
@@ -75,6 +116,11 @@ return [
             [
                 'type' => 'phpArray',
                 'base_dir' => __DIR__ . '/../language',
+                'pattern' => 'zend.%s.php',
+            ],
+            [
+                'type' => 'phpArray',
+                'base_dir' => __DIR__ . '/../language',
                 'pattern' => '%s.php',
             ],
             [
@@ -89,25 +135,27 @@ return [
             \Zend\Authentication\AuthenticationService::class => Service\Factory\AuthenticationServiceFactory::class,
             Service\AuthenticationAdapter::class => Service\Factory\AuthenticationAdapterFactory::class,
             Service\AuthenticationManager::class => Service\Factory\AuthenticationManagerFactory::class,
-            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
-            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
-            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
-            Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
-            Service\CapabilityManager::class => Service\Factory\CapabilityManagerFactory::class,
-            Service\NavManager::class => Service\Factory\NavManagerFactory::class,
+            Service\NavBarManager::class => Service\Factory\NavBarManagerFactory::class,
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\AuthenticationController::class => Controller\Factory\AuthenticationControllerFactory::class,
             Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
-            Controller\ImageController::class => Controller\Factory\ImageControllerFactory::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'factories' => [
+            Controller\Plugin\TranslatorPlugin::class => Controller\Plugin\Factory\TranslatorPluginFactory::class,
+        ],
+        'aliases' => [
+            'translator' => Controller\Plugin\TranslatorPlugin::class,
         ],
     ],
     'access_filter' => [
         'controllers' => [
             Controller\IndexController::class => [
-                ['actions' => ['index'], 'allow' => '*']
+                ['actions' => ['index', 'rooms', 'visitorsBook'], 'allow' => '*']
             ],
         ]
     ],
@@ -133,6 +181,7 @@ return [
         'exception_template' => 'error/index',
         'template_map' => [
             'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
+            'paginator/paginator' => __DIR__ . '/../view/paginator/paginator.phtml',
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
             'error/404' => __DIR__ . '/../view/error/404.phtml',
             'error/index' => __DIR__ . '/../view/error/index.phtml',

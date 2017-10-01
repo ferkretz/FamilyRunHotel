@@ -1,6 +1,23 @@
 body {
     padding-top: 44px;
 }
+a {
+    text-decoration: none !important;
+    border-bottom: 1px dotted;
+}
+a:active,
+a:hover {
+    border-bottom: 1px solid;
+}
+.navbar a {
+    border-bottom: 0;
+}
+.overflow-auto {
+    overflow: auto;
+}
+.nobottom {
+    margin-bottom: 0;
+}
 @font-face {
     font-family: 'URWChanceryL';
     src:url('../fonts/URWChanceryL-MediItal.woff') format('woff'),
@@ -11,73 +28,78 @@ body {
     background-image: -webkit-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
     background-image:    -moz-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
     background-image:      -o-linear-gradient(bottom, #ffdab6 0, #ffebd7 15px);
-    background-image: linear-gradient(to top, #ffdab6 0, #ffebd7 8px);
+    background-image: linear-gradient(to top, #ffdab6 0, #ffebd7 15px);
     background-repeat: repeat-x;
     box-shadow: 0px 1px 7px rgba(0, 0, 0, .3);
 }
 .navbar-inverse {
-    background-image: -webkit-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image:    -moz-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image:      -o-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image: linear-gradient(to top, #6d3702 0, #9d5401 20px);
+    background-image: -webkit-linear-gradient(bottom, #9a4b01 0, #c66700 15px);
+    background-image:    -moz-linear-gradient(bottom, #9a4b01 0, #c66700 15px);
+    background-image:      -o-linear-gradient(bottom, #9a4b01 0, #c66700 15px);
+    background-image: linear-gradient(to top, #9a4b01 0, #c66700 15px);
     background-repeat: repeat-x;
     box-shadow: 0px 1px 7px rgba(0, 0, 0, .7);
 }
 .navbar-default .navbar-nav > li > a {
     font-weight: bold;
-    text-shadow: 0px -1px 0px #fff3e8, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .3);
+    text-shadow: 0px -1px 0px #f5cba0, 0px 1px 0px #a55102, 2px 2px 12px rgba(0, 0, 0, .5);
 }
 .navbar-inverse .navbar-nav > li > a {
     font-weight: bold;
-    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 2px 2px 12px rgba(0, 0, 0, .8);
 }
 .navbar .navbar-brand {
-    padding: 10px;
+    line-height: 15px;
     font-size: 23px;
     font-family: 'URWChanceryL';
     font-weight: bold;
 }
 .navbar-default .navbar-brand {
-    text-shadow: 0px -1px 0px #fff3e8, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .3);
+    text-shadow: -1px -1px 0px #f5cba0, 0px 1px 0px #a55102, 2px 2px 12px rgba(0, 0, 0, .5);
 }
 .navbar-inverse .navbar-brand {
-    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 2px 2px 12px rgba(0, 0, 0, .8);
 }
-.header-inverse {
-    float: none;
+.header {
+    margin-top: 20px;
     display: flex;
     align-items: center;
-    background-image: -webkit-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image:    -moz-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image:      -o-linear-gradient(bottom, #6d3702 0, #9d5401 15px);
-    background-image: linear-gradient(to top, #6d3702 0, #9d5401 20px);
-    background-repeat: repeat-x;
-    box-shadow: 0px 1px 7px rgba(0, 0, 0, .7);
-    border-radius: 30px;
-    margin: 15px;
 }
-.header-inverse #clock {
-    margin: 15px;
+.header #clock {
     background-image: url(/img/clock-background.png);
+    border-radius: 56px;
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, .5);
 }
-.header-inverse .title {
-    font-family: 'URWChanceryL';
+.header .title {
+    margin: 0 15px;
     font-weight: bold;
-    color: #eb9844;
-    text-shadow: 0px -1px 0px #ffdab6, 0px 1px 0px #6d3702, 1px 1px 2px rgba(0, 0, 0, .7);
+    letter-spacing: 1px;
+    color: #e18528;
     text-align: center;
+    /*line-height: 40px;*/
+    font-family: 'URWChanceryL';
+    text-shadow: -1px -1px 0px #f5cba0, 1px 1px 0px #a55102, 2px 2px 12px rgba(0, 0, 0, .5);
 }
-.header-inverse .title {
-    font-size: 48px;
-    line-height: 40px;
+.header .brand {
+    line-height: 52px;
+    font-size: 46px;
 }
-.header-inverse .date {
-    font-size: 22px;
-    line-height: 40px;
+.header .date {
+    line-height: 36px;
+    font-size: 24px;
+}
+.google-map {
+    width: 100%;
+    height: 450px;
 }
 @media (max-width: 767px) {
     .header {
         display: none;
+    }
+}
+@media (max-width: 767px) {
+    .google-map {
+        height:250px;
     }
 }
 

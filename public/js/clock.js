@@ -25,13 +25,13 @@ function drawTime(ctx, radius) {
     hour = (hour * Math.PI / 6) +
             (minute * Math.PI / (6 * 60)) +
             (second * Math.PI / (360 * 60));
-    drawHand(ctx, hour, radius * 0.5, radius * 0.07, '#4E1919', 0);
+    drawHand(ctx, hour, radius * 0.5, radius * 0.07, '#6d3702', 0);
     //minute
     minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
-    drawHand(ctx, minute, radius * 0.65, radius * 0.07, '#4E1919', 0);
+    drawHand(ctx, minute, radius * 0.65, radius * 0.07, '#6d3702', 0);
     // second
     second = (second * Math.PI / 30);
-    drawHand(ctx, second, radius * 0.8, radius * 0.03, '#BB2711', radius * 0.06);
+    drawHand(ctx, second, radius * 0.8, radius * 0.03, '#ec3f00', radius * 0.06);
     ctx.arc(0, 0, radius * 0.08, 0, 2 * Math.PI);
     ctx.fill();
 }

@@ -3,8 +3,8 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use Administration\Service\OptionManager;
 use Application\Controller\IndexController;
-use Application\Service\OptionManager;
 
 class Header extends AbstractHelper {
 
@@ -18,41 +18,57 @@ class Header extends AbstractHelper {
      * Controller.
      * @var string
      */
-    protected $controller;
+    protected $controllerName;
+
+    /**
+     * Action.
+     * @var string
+     */
+    protected $actionName;
 
     public function __construct(OptionManager $optionManager,
-                                $controller) {
+                                $controllerName,
+                                $actionName) {
         $this->optionManager = $optionManager;
-        $this->controller = $controller;
+        $this->controllerName = $controllerName;
+        $this->actionName = $actionName;
     }
 
     /**
      * Renders the header.
      * @return string HTML code of the menu.
      */
-    public function render() {   
+    public function render() {
         // everywhere or only index page?
         $showHeaderEveryWhere = $this->optionManager->findByName('show_header_everywhere', 'FALSE');
         if ($showHeaderEveryWhere == 'FALSE') {
-            if ($this->controller != IndexController::class) {
+            if ($this->controllerName != IndexController::class || $this->actionName != 'index') {
                 return '';
             }
         }
 
+        $escapeHtml = $this->getView()->plugin('escapeHtml');
+
         // date formatter by default locale
         $dateFormatter = \IntlDateFormatter::create(\Locale::getDefault(), \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
+        $date = $dateFormatter->format(new \DateTime());
+
         // brand name or 'FamilyRunHotel'
         $brandName = $this->optionManager->findByName('brand_name', 'FamilyRunHotel');
 
-        $result = '<div class="header header-inverse col-sm-12 center-block">'
-                . '<canvas id="clock" width="112" height="112"></canvas>'
+        $result = '<div class="well header">'
+                . '<canvas id="clock" width="100" height="100"></canvas>'
                 . '<div class="title">'
-                . '<div class="brand" href="#">' . $brandName . '</div>'
-                . '<div class="date">' . $dateFormatter->format(new \DateTime()) . '</div>'
+                . '<div class="brand" href="#">' . $escapeHtml($brandName) . '</div>'
+                . '<div class="date">' . $escapeHtml($date) . '</div>'
                 . '</div>'
                 . '</div>';
 
         return $result;
+    }
+
+    protected function translate($message) {
+        return $this->translator->translate($message);
     }
 
 }

@@ -24,4 +24,5 @@ return [
     'Zend\Session',
     'Zend\Log',
     'Application',
+    'Administration',
 ];

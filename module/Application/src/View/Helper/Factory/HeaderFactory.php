@@ -4,7 +4,7 @@ namespace Application\View\Helper\Factory;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Service\OptionManager;
+use Administration\Service\OptionManager;
 use Application\View\Helper\Header;
 
 class HeaderFactory implements FactoryInterface {
@@ -13,9 +13,17 @@ class HeaderFactory implements FactoryInterface {
                              $requestedName,
                              array $options = null) {
         $optionManager = $container->get(OptionManager::class);
-        $controller = $container->get('application')->getMvcEvent()->getRouteMatch()->getParam('controller', NULL);
 
-        return new Header($optionManager, $controller);
+        $routeMatch = $container->get('application')->getMvcEvent()->getRouteMatch();
+        if ($routeMatch == NULL) {
+            return new Header($optionManager, NULL, NULL);
+        }
+
+        $controllerName = $routeMatch->getParam('controller', NULL);
+        $actionName = $routeMatch->getParam('action', null);
+        $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
+
+        return new Header($optionManager, $controllerName, $actionName);
     }
 
 }

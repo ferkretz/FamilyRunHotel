@@ -6,8 +6,8 @@ use Interop\Container\ContainerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Session\SessionManager;
+use Administration\Service\CapabilityManager;
 use Application\Service\AuthenticationManager;
-use Application\Service\CapabilityManager;
 
 class AuthenticationManagerFactory implements FactoryInterface {
 

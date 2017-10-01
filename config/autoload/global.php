@@ -16,9 +16,25 @@ use Zend\Session\Validator\HttpUserAgent;
 use Zend\Session\Validator\RemoteAddr;
 
 return [
+    // Language configuration. Available, and listable language..
+    'language_config' => [
+        'supported' => [
+            [
+                'locale' => 'hu',
+                'name' => 'Hungarian'
+            ],
+        ],
+        // recommend not to change, if you want multilingual page
+        'fallback' => [
+            'locale' => 'en',
+            'name' => 'English'
+        ],
+    ],
     // Session configuration.
     'session_config' => [
+        // one hour coockie time
         'cookie_lifetime' => 60 * 60 * 1,
+        // a month
         'gc_maxlifetime' => 60 * 60 * 24 * 30,
     ],
     // Session manager configuration.
@@ -34,7 +50,8 @@ return [
     ],
     // Capability configuration.
     'capability_config' => [
-        'admin' => ['user.admin']
+        'admin' => ['admin'],
+        'user' => []
     ],
     // File upload configuration.
     'upload_config' => [

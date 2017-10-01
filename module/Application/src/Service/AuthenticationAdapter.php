@@ -5,7 +5,7 @@ namespace Application\Service;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
-use Application\Service\UserManager;
+use Administration\Service\UserManager;
 
 class AuthenticationAdapter implements AdapterInterface {
 
@@ -13,19 +13,19 @@ class AuthenticationAdapter implements AdapterInterface {
      * User email.
      * @var string
      */
-    private $email;
+    protected $email;
 
     /**
      * Password
      * @var string
      */
-    private $password;
+    protected $password;
 
     /**
      * Entity manager.
      * @var UserManager
      */
-    private $userManager;
+    protected $userManager;
 
     public function __construct(UserManager $userManager) {
         $this->userManager = $userManager;

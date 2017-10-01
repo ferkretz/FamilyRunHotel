@@ -4,8 +4,8 @@ namespace Application\Service\Factory;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Administration\Service\UserManager;
 use Application\Service\AuthenticationAdapter;
-use Application\Service\UserManager;
 
 class AuthenticationAdapterFactory implements FactoryInterface {
 

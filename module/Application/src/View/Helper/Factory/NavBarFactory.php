@@ -4,8 +4,7 @@ namespace Application\View\Helper\Factory;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Service\NavManager;
-use Application\Service\OptionManager;
+use Application\Service\NavBarManager;
 use Application\View\Helper\NavBar;
 
 class NavBarFactory implements FactoryInterface {
@@ -13,11 +12,10 @@ class NavBarFactory implements FactoryInterface {
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = null) {
-        $navManager = $container->get(NavManager::class);
-        $items = $navManager->getMenuItems();
-        $optionManager = $container->get(OptionManager::class);
+        $navBarManager = $container->get(NavBarManager::class);
+        $navBarElements = $navBarManager->getDefaultNavBarElements();
 
-        return new NavBar($optionManager, $items);
+        return new NavBar($navBarElements);
     }
 
 }

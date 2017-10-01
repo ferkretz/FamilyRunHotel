@@ -5,9 +5,9 @@ namespace Application\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Administration\Service\UserManager;
 use Application\Controller\AuthenticationController;
 use Application\Service\AuthenticationManager;
-use Application\Service\UserManager;
 
 class AuthenticationControllerFactory implements FactoryInterface {
 

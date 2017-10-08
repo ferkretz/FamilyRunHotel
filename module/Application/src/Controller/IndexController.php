@@ -41,11 +41,11 @@ class IndexController extends AbstractActionController {
     }
 
     public function roomsAction() {
-
+        
     }
 
     public function visitorsBookAction() {
-
+        
     }
 
     protected function translate($message) {

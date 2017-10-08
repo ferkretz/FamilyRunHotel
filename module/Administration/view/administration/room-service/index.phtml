@@ -1,4 +1,85 @@
 <?php
 $this->headTitle('Services');
+
+$form->setAttributes([
+    "onsubmit" => "return confirm($this->escapeHtml($this->translate('Do you really want to delete these services?')))",
+]);
+$orders = [
+    'id' => 'ASC',
+    'price' => 'ASC',
+    'summary' => 'ASC',
+];
+$orders[$orderBy] = $order == 'ASC' ? 'DESC' : 'ASC';
+$sortIcons = [
+    'id' => '',
+    'price' => '',
+    'summary' => '',
+];
+$sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
+
+<div class="page-header">
+    <h1 id="services"><?= $this->escapeHtml($this->translate('Services')) ?></h1>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 center-block" style="float:none">
+        <div class="well nobottom">
+            <?= $this->form()->openTag($form) ?>
+            <div class="overflow-auto">
+                <p>
+                    <a class="btn btn-default btn-sm" href="<?= $this->url('admin-services', ['action' => 'add']) ?>" style="white-space: nowrap">
+                        <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new services')) ?>
+                    </a>
+                    <span class="btn btn-default btn-sm" onclick="(function () {
+                                $('input[name=\'services&#x5B;&#x5D;\']').click();
+                            })()">
+                        <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
+                    </span>
+                    <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
+                        <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+                    </button>
+                </p>
+                <table id="myTable" class="table table-hover nobottom">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>
+                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-services', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
+                                    <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
+                                </a>
+                            </th>
+                            <th>
+                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-services', [], ['query' => ['orderBy' => 'summary', 'order' => $orders['summary']]]) ?>">
+                                    <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['summary'] ?>"></span>
+                                </a>
+                            </th>
+                            <th>
+                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-services', [], ['query' => ['orderBy' => 'price', 'order' => $orders['price']]]) ?>">
+                                    <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['price'] ?>"></span>
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($roomServices as $index => $roomService) { ?>
+                            <tr class="active" data-lnk="<?= $this->url('admin-services', ['action' => 'edit', 'id' => $roomService->getId()]) ?>" style="cursor:pointer">
+                                <td class="td-checkbox" data-select="true" data-button="#remove-submit">
+                                    <label>
+                                        <input class="icon-checkbox" type="checkbox" name="services&#x5B;&#x5D;" value="<?= $index ?>">
+                                    </label>
+                                </td>
+                                <td><?= $this->escapeHtml($roomService->getId()) ?></td>
+                                <td><?= $this->escapeHtml($roomService->getSummary()) ?></td>
+                                <td><?= $this->escapeHtml($roomService->getPrice()) ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+            <?= $this->form()->closeTag() ?>
+        </div>
+        <?= $this->paginationControl($roomServices, 'Sliding', 'paginator/paginator', ['route' => 'admin-services', 'requiredQuery' => $requiredQuery]) ?>
+    </div>
+</div>
 

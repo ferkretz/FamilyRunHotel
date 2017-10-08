@@ -8,11 +8,11 @@ use Zend\View\Model\ViewModel;
 class PictureController extends AbstractActionController {
 
     public function __construct() {
-
+        
     }
 
     public function indexAction() {
-
+        
     }
 
     protected function translate($message) {

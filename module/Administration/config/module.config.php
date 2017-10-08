@@ -36,10 +36,11 @@ return [
             'admin-services' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/services[/:action][/:id]',
+                    'route' => '/admin/services[/:action][/:id][/:translation]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
+                        'translation' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\RoomServiceController::class,
@@ -93,13 +94,14 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
-            Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
-            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
-            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
-            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
-            Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
             Service\CapabilityManager::class => Service\Factory\CapabilityManagerFactory::class,
+            Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
+            Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
+            Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
+            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
+            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
+            Service\RoomServiceQueryManager::class => Service\Factory\RoomServiceQueryManagerFactory::class,
+            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
             Service\UserQueryManager::class => Service\Factory\UserQueryManagerFactory::class,
         ],
     ],
@@ -107,8 +109,8 @@ return [
         'factories' => [
             Controller\DashboardController::class => Controller\Factory\DashboardControllerFactory::class,
             Controller\PictureController::class => Controller\Factory\PictureControllerFactory::class,
-            Controller\RoomServiceController::class => Controller\Factory\RoomServiceControllerFactory::class,
             Controller\RoomController::class => Controller\Factory\RoomControllerFactory::class,
+            Controller\RoomServiceController::class => Controller\Factory\RoomServiceControllerFactory::class,
             Controller\UserController::class => Controller\Factory\UserControllerFactory::class,
         ],
     ],
@@ -120,14 +122,14 @@ return [
             Controller\PictureController::class => [
                 ['actions' => ['index'], 'allow' => '+admin']
             ],
-            Controller\RoomServiceController::class => [
-                ['actions' => ['index'], 'allow' => '+admin']
-            ],
             Controller\RoomController::class => [
                 ['actions' => ['index'], 'allow' => '+admin']
             ],
+            Controller\RoomServiceController::class => [
+                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
+            ],
             Controller\UserController::class => [
-                ['actions' => ['index'], 'allow' => '+admin']
+                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
             ],
         ]
     ],

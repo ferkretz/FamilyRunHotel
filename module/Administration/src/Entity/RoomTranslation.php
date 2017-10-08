@@ -34,16 +34,6 @@ class RoomTranslation {
 
     /**
      * @ORM\Column(
-     *      name="currency",
-     *      type="string",
-     *      length=20,
-     *      nullable=false
-     * )
-     */
-    protected $currency;
-
-    /**
-     * @ORM\Column(
      *      name="summary",
      *      type="string",
      *      length=60,
@@ -82,10 +72,6 @@ class RoomTranslation {
         return $this->locale;
     }
 
-    public function getCurrency() {
-        return $this->currency;
-    }
-
     public function getSummary() {
         return $this->summary;
     }
@@ -104,10 +90,6 @@ class RoomTranslation {
 
     public function setLocale($locale) {
         $this->locale = $locale;
-    }
-
-    public function setCurrency($currency) {
-        $this->currency = $currency;
     }
 
     public function setSummary($summary) {

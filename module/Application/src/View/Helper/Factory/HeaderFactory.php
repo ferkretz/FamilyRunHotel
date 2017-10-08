@@ -11,7 +11,7 @@ class HeaderFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $optionManager = $container->get(OptionManager::class);
 
         $routeMatch = $container->get('application')->getMvcEvent()->getRouteMatch();
@@ -20,7 +20,7 @@ class HeaderFactory implements FactoryInterface {
         }
 
         $controllerName = $routeMatch->getParam('controller', NULL);
-        $actionName = $routeMatch->getParam('action', null);
+        $actionName = $routeMatch->getParam('action', NULL);
         $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
 
         return new Header($optionManager, $controllerName, $actionName);

@@ -26,13 +26,18 @@ class RoomServiceManager {
         return $this->entityManager->getRepository(RoomService::class)->matching($query->getCriteria());
     }
 
-    public function save(RoomService $service) {
-        $this->entityManager->persist($service);
+    public function add(RoomService $roomService) {
+        $this->entityManager->persist($roomService);
         $this->entityManager->flush();
     }
 
-    public function remove($id) {
-        $this->entityManager->remove($id);
+    public function update() {
+        $this->entityManager->flush();
+    }
+
+    public function remove(RoomService $roomService) {
+        $this->entityManager->remove($roomService);
+        $this->entityManager->flush();
     }
 
 }

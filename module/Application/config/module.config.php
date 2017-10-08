@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 return [
     'router' => [
         'routes' => [
+            /* index */
             'home' => [
                 'type' => Literal::class,
                 'options' => [
@@ -111,24 +112,9 @@ return [
             ]
         ]
     ],
-    'translator' => [
-        'translation_file_patterns' => [
-            [
-                'type' => 'phpArray',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern' => 'zend.%s.php',
-            ],
-            [
-                'type' => 'phpArray',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern' => '%s.php',
-            ],
-            [
-                'type' => 'gettext',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern' => '%s.mo',
-            ],
-        ],
+    // Language configuration.
+    'language_config' => [
+        'languages_dir' => __DIR__ . '/../language/',
     ],
     'service_manager' => [
         'factories' => [
@@ -136,6 +122,7 @@ return [
             Service\AuthenticationAdapter::class => Service\Factory\AuthenticationAdapterFactory::class,
             Service\AuthenticationManager::class => Service\Factory\AuthenticationManagerFactory::class,
             Service\NavBarManager::class => Service\Factory\NavBarManagerFactory::class,
+            Service\Localizator::class => Service\Factory\LocalizatorFactory::class,
         ],
     ],
     'controllers' => [
@@ -174,8 +161,8 @@ return [
         ]
     ],
     'view_manager' => [
-        'display_not_found_reason' => true,
-        'display_exceptions' => true,
+        'display_not_found_reason' => TRUE,
+        'display_exceptions' => TRUE,
         'doctype' => 'HTML5',
         'not_found_template' => 'error/404',
         'exception_template' => 'error/index',

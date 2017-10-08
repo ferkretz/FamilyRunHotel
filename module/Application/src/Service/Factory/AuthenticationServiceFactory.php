@@ -13,7 +13,7 @@ class AuthenticationServiceFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $sessionManager = $container->get(SessionManager::class);
         $authenticationStorage = new SessionStorage('Zend_Auth', 'session', $sessionManager);
         $authenticationAdapter = $container->get(AuthenticationAdapter::class);

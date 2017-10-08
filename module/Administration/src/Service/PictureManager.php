@@ -26,13 +26,18 @@ class PictureManager {
         return $this->entityManager->getRepository(Picture::class)->matching($query->getCriteria());
     }
 
-    public function save(Picture $picture) {
+    public function add(Picture $picture) {
         $this->entityManager->persist($picture);
         $this->entityManager->flush();
     }
 
-    public function remove($id) {
-        $this->entityManager->remove($id);
+    public function update() {
+        $this->entityManager->flush();
+    }
+
+    public function remove(Picture $picture) {
+        $this->entityManager->remove($picture);
+        $this->entityManager->flush();
     }
 
 }

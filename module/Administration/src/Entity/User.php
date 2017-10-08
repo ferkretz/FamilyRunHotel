@@ -4,6 +4,7 @@ namespace Administration\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Zend\Crypt\Password\Bcrypt;
 
 /**
  * @ORM\Entity
@@ -126,6 +127,44 @@ class User {
 
     public function __construct() {
         $this->reservations = new ArrayCollection();
+    }
+
+    public function getData() {
+        return get_object_vars($this);
+    }
+
+    public function setData($data) {
+        if (isset($data['id'])) {
+            $this->id = $data['id'];
+        }
+        if (isset($data['email'])) {
+            $this->email = $data['email'];
+        }
+        if (isset($data['password'])) {
+            $bcrypt = new Bcrypt();
+            $this->password = $bcrypt->create($data['password']);
+        }
+        if (isset($data['displayName'])) {
+            $this->displayName = $data['displayName'];
+        }
+        if (isset($data['realName'])) {
+            $this->realName = $data['realName'];
+        }
+        if (isset($data['address'])) {
+            $this->address = $data['address'];
+        }
+        if (isset($data['phone'])) {
+            $this->phone = $data['phone'];
+        }
+        if (isset($data['registered'])) {
+            $this->registered = $data['registered'];
+        }
+        if (isset($data['role'])) {
+            $this->role = $data['role'];
+        }
+        if (isset($data['activationKey'])) {
+            $this->activationKey = $data['activationKey'];
+        }
     }
 
     public function getId() {

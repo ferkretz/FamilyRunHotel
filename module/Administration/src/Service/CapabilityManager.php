@@ -35,14 +35,14 @@ class CapabilityManager {
     }
 
     public function userCan(User $user,
-                            $capability) {
-        return in_array($capability, $this->config[$user->getRole()]);
+                            $capability): bool {
+        return in_array($capability, $this->config[$user->getRole()]['capabilities']);
     }
 
-    public function currentUserCan($capability) {
+    public function currentUserCan($capability): bool {
         $identity = $this->authenticationService->getIdentity();
         if ($identity == NULL) {
-            return false;
+            return FALSE;
         }
 
         $user = $this->userManager->findByEmail($identity);

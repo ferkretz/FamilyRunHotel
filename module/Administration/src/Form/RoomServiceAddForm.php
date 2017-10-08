@@ -1,17 +1,18 @@
 <?php
 
-namespace Application\Form;
+namespace Administration\Form;
 
 use Zend\Filter;
 use Zend\Form\Form;
 use Zend\Form\Element;
 use Zend\InputFilter\InputFilter;
 use Zend\Validator;
+use Zend\I18n\Validator as I18nValidator;
 
-class LoginForm extends Form {
+class RoomServiceAddForm extends Form {
 
     public function __construct() {
-        parent::__construct('login-form');
+        parent::__construct('room-service-form');
 
         $this->setAttributes([
             'method', 'post',
@@ -23,55 +24,52 @@ class LoginForm extends Form {
     }
 
     protected function addElements() {
-        $this->add([
-            'type' => Element\Email::class,
-            'name' => 'email',
-            'options' => [
-                'label' => 'Email address / login',
-                'label_attributes' => ['class' => 'control-label'],
-            ],
-            'attributes' => [
-                'class' => 'form-control',
-                'autofocus' => TRUE,
-            ],
-        ]);
+        $localeInfo = localeconv();
 
         $this->add([
-            'type' => Element\Password::class,
-            'name' => 'password',
+            'type' => Element\Text::class,
+            'name' => 'summary',
             'options' => [
-                'label' => 'Password',
+                'label' => 'Summary',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
-            'type' => Element\Checkbox::class,
-            'name' => 'remember_me',
+            'type' => Element\Text::class,
+            'name' => 'price',
             'options' => [
-                'label' => 'Remember me',
+                'label' => 'Price',
+                'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
-                'class' => 'icon-checkbox',
-                'id' => 'remember_me',
+                'class' => 'form-control',
+                'onchange' => 'formatFloatInput(this,"' . $localeInfo['decimal_point'] . '")',
             ],
         ]);
-
         $this->add([
-            'type' => Element\Hidden::class,
-            'name' => 'redirect_url'
-        ]);
-
-        $this->add([
-            'type' => Element\Csrf::class,
-            'name' => 'csrf',
+            'type' => Element\Text::class,
+            'name' => 'currency',
             'options' => [
-                'csrf_options' => [
-                    'timeout' => 600,
-                ],
+                'label' => 'Currency name',
+                'label_attributes' => ['class' => 'control-label'],
+            ],
+            'attributes' => [
+                'class' => 'form-control',
+                'value' => trim($localeInfo['int_curr_symbol']),
+            ],
+        ]);
+        $this->add([
+            'type' => Element\Textarea::class,
+            'name' => 'description',
+            'options' => [
+                'label' => 'Description',
+                'label_attributes' => ['class' => 'control-label'],
+            ],
+            'attributes' => [
+                'class' => 'form-control',
             ],
         ]);
 
@@ -79,7 +77,7 @@ class LoginForm extends Form {
             'type' => Element\Submit::class,
             'name' => 'submit',
             'attributes' => [
-                'value' => 'Sign in',
+                'value' => 'Add',
                 'id' => 'submit',
             ],
         ]);
@@ -90,7 +88,7 @@ class LoginForm extends Form {
         $this->setInputFilter($inputFilter);
 
         $inputFilter->add([
-            'name' => 'email',
+            'name' => 'summary',
             'required' => TRUE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
@@ -100,22 +98,6 @@ class LoginForm extends Form {
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
-                        'max' => 160,
-                    ],
-                ],
-                ['name' => Validator\EmailAddress::class],
-            ],
-        ]);
-
-        $inputFilter->add([
-            'name' => 'password',
-            'required' => TRUE,
-            'validators' => [
-                ['name' => Validator\NotEmpty::class],
-                [
-                    'name' => Validator\StringLength::class,
-                    'options' => [
-                        'min' => 0,
                         'max' => 60,
                     ],
                 ],
@@ -123,20 +105,7 @@ class LoginForm extends Form {
         ]);
 
         $inputFilter->add([
-            'name' => 'remember_me',
-            'required' => FALSE,
-            'validators' => [
-                [
-                    'name' => Validator\InArray::class,
-                    'options' => [
-                        'haystack' => [0, 1],
-                    ],
-                ],
-            ],
-        ]);
-
-        $inputFilter->add([
-            'name' => 'redirect_url',
+            'name' => 'price',
             'required' => FALSE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
@@ -145,8 +114,44 @@ class LoginForm extends Form {
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
-                        'min' => 0,
-                        'max' => 2048,
+                        'max' => 20,
+                    ],
+                ],
+                [
+                    'name' => I18nValidator\IsFloat::class,
+                ],
+            ],
+        ]);
+
+        $inputFilter->add([
+            'name' => 'currency',
+            'required' => TRUE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\StringLength::class,
+                    'options' => [
+                        'max' => 10,
+                    ],
+                ],
+            ],
+        ]);
+
+        $inputFilter->add([
+            'name' => 'description',
+            'required' => FALSE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\StringLength::class,
+                    'options' => [
+                        'max' => 1024,
                     ],
                 ],
             ],

@@ -10,12 +10,11 @@ namespace Application;
 
 use Zend\Session\SessionManager;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\I18n\Translator;
 use Zend\Mvc\MvcEvent;
-use Zend\Validator\AbstractValidator;
 use Administration\Service\OptionManager;
 use Application\Controller\AuthenticationController;
 use Application\Service\AuthenticationManager;
+use Application\Service\Localizator;
 
 class Module {
 
@@ -25,47 +24,15 @@ class Module {
         return include __DIR__ . '/../config/module.config.php';
     }
 
-    private function findPreferredLocale($headers,
-                                         $languageConfig) {
-        $fallbackLocale = $languageConfig['fallback']['locale'];
-
-        if ($headers->has('Accept-Language')) {
-            $acceptLocales = $headers->get('Accept-Language')->getPrioritized();
-            $supportedArrays = $languageConfig['supported'];
-
-            foreach ($acceptLocales as $acceptLocale) {
-                foreach ($supportedArrays as $supportedArray) {
-                    $supportedLocale = $supportedArray['locale'];
-                    if (substr($acceptLocale->typeString, 0, strlen($supportedLocale)) === $supportedLocale) {
-                        return $supportedLocale;
-                    }
-                }
-                if (substr($acceptLocale->typeString, 0, strlen($fallbackLocale)) === $fallbackLocale) {
-                    return $fallbackLocale;
-                }
-            }
-        }
-
-        return $fallbackLocale;
-    }
-
     public function onBootstrap(MvcEvent $event) {
         $application = $event->getApplication();
-
-        // Get acceptable language from browser, and choose a language from 'language_config'.
-        $headers = $application->getRequest()->getHeaders();
-
-        // Set preferred locale.
-        $languageConfig = $application->getConfig()['language_config'];
-        $locale = $this->findPreferredLocale($headers, $languageConfig);
-        \Locale::setDefault($locale);
 
         $serviceManager = $application->getServiceManager();
         $sessionManager = $serviceManager->get(SessionManager::class);
 
-        $translator = $serviceManager->get(Translator::class);
-        AbstractValidator::setDefaultTranslator($translator);
-
+        // Localize
+        $localizator = $serviceManager->get(Localizator::class);
+        
         // Load brandname from database ('FamilyRunHotel' is the default).
         $viewModel = $event->getViewModel();
         $optionManager = $serviceManager->get(OptionManager::class);
@@ -79,8 +46,8 @@ class Module {
 
     public function onDispatch(MvcEvent $event) {
         $controller = $event->getTarget();
-        $controllerName = $event->getRouteMatch()->getParam('controller', null);
-        $actionName = $event->getRouteMatch()->getParam('action', null);
+        $controllerName = $event->getRouteMatch()->getParam('controller', NULL);
+        $actionName = $event->getRouteMatch()->getParam('action', NULL);
 
         $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
 
@@ -91,10 +58,10 @@ class Module {
 
             if ($result == AuthenticationManager::AUTHENTICATION_REQUIRED) {
                 $uri = $event->getApplication()->getRequest()->getUri();
-                $uri->setScheme(null)
-                        ->setHost(null)
-                        ->setPort(null)
-                        ->setUserInfo(null);
+                $uri->setScheme(NULL)
+                        ->setHost(NULL)
+                        ->setPort(NULL)
+                        ->setUserInfo(NULL);
                 $redirectUrl = $uri->toString();
 
                 return $controller->redirect()->toRoute('auth-login', [], ['query' => ['redirectUrl' => $redirectUrl]]);

@@ -11,7 +11,7 @@ class AuthenticationAdapterFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $userManager = $container->get(UserManager::class);
 
         return new AuthenticationAdapter($userManager);

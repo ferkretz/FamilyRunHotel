@@ -29,13 +29,18 @@ class OptionManager {
         return $option == NULL ? $defaultValue : $option->getValue();
     }
 
-    public function save(Option $option) {
+    public function add(Option $option) {
         $this->entityManager->persist($option);
         $this->entityManager->flush();
     }
 
-    public function remove($id) {
-        $this->entityManager->remove($id);
+    public function update() {
+        $this->entityManager->flush();
+    }
+
+    public function remove(Option $option) {
+        $this->entityManager->remove($option);
+        $this->entityManager->flush();
     }
 
 }

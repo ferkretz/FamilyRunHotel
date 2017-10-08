@@ -16,19 +16,10 @@ use Zend\Session\Validator\HttpUserAgent;
 use Zend\Session\Validator\RemoteAddr;
 
 return [
-    // Language configuration. Available, and listable language..
+    // Language config.
     'language_config' => [
-        'supported' => [
-            [
-                'locale' => 'hu',
-                'name' => 'Hungarian'
-            ],
-        ],
-        // recommend not to change, if you want multilingual page
-        'fallback' => [
-            'locale' => 'en',
-            'name' => 'English'
-        ],
+        // recommend not to change, if you want multilingual page because of original english messages
+        'fallback_locale' => 'en_US', 
     ],
     // Session configuration.
     'session_config' => [
@@ -50,8 +41,14 @@ return [
     ],
     // Capability configuration.
     'capability_config' => [
-        'admin' => ['admin'],
-        'user' => []
+        'admin' => [
+            'summary' => 'Administrator',
+            'capabilities' => ['admin']
+        ],
+        'user' => [
+            'summary' => 'General user',
+            'capabilities' => [],
+        ],
     ],
     // File upload configuration.
     'upload_config' => [

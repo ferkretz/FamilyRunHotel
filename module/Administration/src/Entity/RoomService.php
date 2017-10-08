@@ -85,6 +85,38 @@ class RoomService {
         $this->rooms = new ArrayCollection();
     }
 
+    public function getData($locale = FALSE) {
+        $data = get_object_vars($this);
+
+        if ($this->translations[$locale]) {
+            $data = array_merge($data, $this->translations[$locale]->getData());
+        }
+
+        return $data;
+    }
+
+    public function setData($data) {
+        if (isset($data['id'])) {
+            $this->id = $data['id'];
+        }
+        if (isset($data['price'])) {
+            $this->price = $data['price'];
+        }
+        if (isset($data['currency'])) {
+            $this->currency = $data['currency'];
+        }
+        if (isset($data['summary'])) {
+            $this->summary = $data['summary'];
+        }
+        if (isset($data['description'])) {
+            $this->description = $data['description'];
+        }
+        if (isset($data['translationSummary'])) {
+            $translation = $this->getTranslation($data['translationLocale'], TRUE);
+            $translation->setData($data);
+        }
+    }
+
     public function getId() {
         return $this->id;
     }
@@ -105,8 +137,15 @@ class RoomService {
         return $this->description;
     }
 
-    public function getTranslation($locale) {
-        return $this->translations[$locale];
+    public function getTranslation($locale,
+                                   $create = FALSE) {
+        if ($create && !$this->translations[$locale]) {
+            $translation = new RoomServiceTranslation();
+            $translation->setRoomService($this);
+            $this->translations[$locale] = $translation;
+        }
+
+        return $this->translations[$locale] ?? NULL;
     }
 
     public function getTranslations() {
@@ -135,14 +174,6 @@ class RoomService {
 
     public function setDescription($description) {
         $this->description = $description;
-    }
-
-    public function setTranslation(RoomServiceTranslation $translation) {
-        $this->translations[$translation->getLocale()] = $translation;
-    }
-
-    public function setTranslations(ArrayCollection $translations) {
-        $this->translations = $translations;
     }
 
     public function addRoom(Room $room) {

@@ -42,9 +42,9 @@ class AuthenticationAdapter implements AdapterInterface {
     public function authenticate() {
         $user = $this->userManager->findByEmail($this->email);
 
-        if ($user == null) {
+        if ($user == NULL) {
             return new Result(
-                    Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Invalid credentials.']);
+                    Result::FAILURE_IDENTITY_NOT_FOUND, NULL, ['Invalid credentials.']);
         }
 
         $bcrypt = new Bcrypt();
@@ -56,7 +56,7 @@ class AuthenticationAdapter implements AdapterInterface {
         }
 
         return new Result(
-                Result::FAILURE_CREDENTIAL_INVALID, null, ['Invalid credentials.']);
+                Result::FAILURE_CREDENTIAL_INVALID, NULL, ['Invalid credentials.']);
     }
 
 }

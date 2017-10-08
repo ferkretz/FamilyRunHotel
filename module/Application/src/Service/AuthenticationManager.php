@@ -51,7 +51,7 @@ class AuthenticationManager {
     public function login($email,
                           $password,
                           $rememberMe) {
-        if ($this->authenticationService->getIdentity() != null) {
+        if ($this->authenticationService->getIdentity() != NULL) {
             throw new \Exception('Already logged in');
         }
 
@@ -68,7 +68,7 @@ class AuthenticationManager {
     }
 
     public function logout() {
-        if ($this->authenticationService->getIdentity() == null) {
+        if ($this->authenticationService->getIdentity() == NULL) {
             throw new \Exception('The user is not logged in');
         }
 

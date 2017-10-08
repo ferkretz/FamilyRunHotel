@@ -12,7 +12,7 @@ class CapabilityManagerFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $userManager = $container->get(UserManager::class);
         $authenticationService = $container->get(AuthenticationService::class);
         $config = $container->get('Config');

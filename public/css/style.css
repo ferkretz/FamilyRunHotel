@@ -1,6 +1,47 @@
 body {
     padding-top: 44px;
 }
+.icon-checkbox {
+    float: left;
+    width: 20px;
+    height: 20px;
+    background: #ffebd7;
+    border-radius: 2px;
+    border: 1px solid #ceb7a0;
+    box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.3);
+    margin: 0px 5px 0px -20px;
+    overflow: hidden;
+}
+.icon-checkbox input {
+    display: none;
+}
+.icon-checkbox.checked span {
+    display: block;
+    padding: 2px;
+    font-size: 90%;
+}
+.icon-checkbox:hover {
+    background-color: #fff3e8;
+}
+.icon-checkbox.checked {
+    background: #ffd2a4;
+    border: 1px groove #cc843b;
+}
+.icon-checkbox.checked:hover {
+    background-color: #ffe1c3;
+}
+.td-checkbox {
+    width: 0px;
+    padding: 7px !important;
+    vertical-align:middle !important;
+}
+.td-checkbox label {
+    margin: 0;
+    vertical-align:middle !important;
+}
+.td-checkbox label div {
+    margin: 0;
+}
 a {
     text-decoration: none !important;
     border-bottom: 1px dotted;
@@ -17,6 +58,18 @@ a:hover {
 }
 .nobottom {
     margin-bottom: 0;
+}
+.form-group.required .control-label:after {
+    content:"*";
+    color:red;
+}
+.form-horizontal .form-group.right .control-label {
+    float: right;
+}
+@media (max-width: 767px) {
+    .form-horizontal .form-group.right .control-label {
+        float: none;
+    }
 }
 @font-face {
     font-family: 'URWChanceryL';

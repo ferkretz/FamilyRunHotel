@@ -41,7 +41,7 @@ class Option {
     protected $value;
 
     public function __construct() {
-
+        
     }
 
     function getId() {

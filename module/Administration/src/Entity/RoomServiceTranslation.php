@@ -34,16 +34,6 @@ class RoomServiceTranslation {
 
     /**
      * @ORM\Column(
-     *      name="currency",
-     *      type="string",
-     *      length=20,
-     *      nullable=false
-     * )
-     */
-    protected $currency;
-
-    /**
-     * @ORM\Column(
      *      name="summary",
      *      type="string",
      *      length=60,
@@ -74,16 +64,36 @@ class RoomServiceTranslation {
      */
     protected $roomService;
 
+    public function getData() {
+        $data['translationId'] = $this->id;
+        $data['translationLocale'] = $this->locale;
+        $data['translationSummary'] = $this->summary;
+        $data['translationDescription'] = $this->description;
+
+        return $data;
+    }
+
+    public function setData($data) {
+        if (isset($data['translationId'])) {
+            $this->id = $data['translationId'];
+        }
+        if (isset($data['translationLocale'])) {
+            $this->locale = $data['translationLocale'];
+        }
+        if (isset($data['translationSummary'])) {
+            $this->summary = $data['translationSummary'];
+        }
+        if (isset($data['translationDescription'])) {
+            $this->description = $data['translationDescription'];
+        }
+    }
+
     public function getId() {
         return $this->id;
     }
 
     public function getLocale() {
         return $this->locale;
-    }
-
-    public function getCurrency() {
-        return $this->currency;
     }
 
     public function getSummary() {
@@ -104,10 +114,6 @@ class RoomServiceTranslation {
 
     public function setLocale($locale) {
         $this->locale = $locale;
-    }
-
-    public function setCurrency($currency) {
-        $this->currency = $currency;
     }
 
     public function setSummary($summary) {

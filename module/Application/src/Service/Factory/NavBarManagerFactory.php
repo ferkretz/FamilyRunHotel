@@ -14,7 +14,7 @@ class NavBarManagerFactory {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $optionManager = $container->get(OptionManager::class);
         $authenticationService = $container->get(AuthenticationService::class);
         $viewHelperManager = $container->get('ViewHelperManager');

@@ -11,7 +11,7 @@ class NavBarFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
-                             array $options = null) {
+                             array $options = NULL) {
         $navBarManager = $container->get(NavBarManager::class);
         $navBarElements = $navBarManager->getDefaultNavBarElements();
 

@@ -49,7 +49,7 @@ class AuthenticationController extends AbstractActionController {
     }
 
     public function registerAction() {
-
+        
     }
 
     public function loginAction() {
@@ -79,7 +79,7 @@ class AuthenticationController extends AbstractActionController {
 
                     if (!empty($redirectUrl)) {
                         $uri = new Uri($redirectUrl);
-                        if (!$uri->isValid() || $uri->getHost() != null) {
+                        if (!$uri->isValid() || $uri->getHost() != NULL) {
                             throw new \Exception('Incorrect redirect URL: ' . $redirectUrl);
                         }
                     }
@@ -90,10 +90,10 @@ class AuthenticationController extends AbstractActionController {
                         $this->redirect()->toUrl($redirectUrl);
                     }
                 } else {
-                    $isLoginError = true;
+                    $isLoginError = TRUE;
                 }
             } else {
-                $isLoginError = true;
+                $isLoginError = TRUE;
             }
         }
 
@@ -117,6 +117,7 @@ class AuthenticationController extends AbstractActionController {
     }
 
     public function resetPasswordAction() {
+        
     }
 
 }

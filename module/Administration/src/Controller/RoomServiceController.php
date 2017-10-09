@@ -54,6 +54,12 @@ class RoomServiceController extends AbstractActionController {
 
         foreach ($paginator as $roomService) {
             $roomServiceIds[] = $roomService->getId();
+
+            $translationArr = [];
+            foreach ($roomService->getTranslations() as $translation) {
+                $translationArr[] = \Locale::getDisplayName($translation->getLocale());
+            }
+            $translationList[$roomService->getId()] = implode(', ', $translationArr);
         }
         $form = new RoomServiceIndexForm($roomServiceIds);
 
@@ -82,6 +88,7 @@ class RoomServiceController extends AbstractActionController {
         return new ViewModel([
             'form' => $form,
             'roomServices' => $paginator,
+            'translationList' => $translationList,
             'orderBy' => $this->roomServiceQueryManager->getOrderBy(),
             'order' => $this->roomServiceQueryManager->getOrder(),
             'requiredQuery' => ['orderBy' => $this->roomServiceQueryManager->getOrderBy(), 'order' => $this->roomServiceQueryManager->getOrder()],

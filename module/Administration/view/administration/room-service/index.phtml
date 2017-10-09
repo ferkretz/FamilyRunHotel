@@ -8,12 +8,14 @@ $orders = [
     'id' => 'ASC',
     'price' => 'ASC',
     'summary' => 'ASC',
+    'transCount' => 'ASC',
 ];
 $orders[$orderBy] = $order == 'ASC' ? 'DESC' : 'ASC';
 $sortIcons = [
     'id' => '',
     'price' => '',
     'summary' => '',
+    'transCount' => '',
 ];
 $sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
@@ -59,6 +61,11 @@ $sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
                                     <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['price'] ?>"></span>
                                 </a>
                             </th>
+                            <th>
+                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-services', [], ['query' => ['orderBy' => 'transCount', 'order' => $orders['transCount']]]) ?>">
+                                    <?= $this->escapeHtml($this->translate('Translations')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['transCount'] ?>"></span>
+                                </a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,6 +79,20 @@ $sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
                                 <td><?= $this->escapeHtml($roomService->getId()) ?></td>
                                 <td><?= $this->escapeHtml($roomService->getSummary()) ?></td>
                                 <td><?= $this->escapeHtml($roomService->getPrice()) ?></td>
+                                <td>
+                                    <?= $this->escapeHtml($roomService->getTransCount()) ?>
+                                    <?php
+                                    $translations = $this->translationList[$roomService->getId()];
+                                    if (strlen($translations)) {
+                                        if (strlen($translations) > 30) {
+                                            $subTranslations = ' (' . substr($translations, 0, 30) . '...)';
+                                        } else {
+                                            $subTranslations = ' (' . substr($translations, 0, 30) . ')';
+                                        }
+                                        echo $this->escapeHtml($subTranslations);
+                                    }
+                                    ?>
+                                </td>
                             </tr>
                         <?php } ?>
                     </tbody>

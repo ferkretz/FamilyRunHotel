@@ -1,11 +1,11 @@
-<?php $this->headTitle(sprintf('Edit %s', $this->translate('service'))) ?>
+<?php $this->headTitle(sprintf('Edit %s', $this->translate('room'))) ?>
 
 <div class="row" style="padding-top: 15px;">
     <div class="col-md-8 center-block" style="float:none">
         <div class="well">
             <?= $this->form()->openTag($form) ?>
             <fieldset>
-                <legend><?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('service')))) ?></legend>
+                <legend><?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('room')))) ?></legend>
 
                 <div class="form-group right required">
                     <div class="col-sm-3"><?= $this->formLabel($form->get('summary')) ?></div>
@@ -50,7 +50,7 @@
                 </div>
 
                 <?php
-                $url = $this->url('admin-services', ['action' => 'edit', 'id' => $id, 'translation' => 'none']);
+                $url = $this->url('admin-rooms', ['action' => 'edit', 'id' => $id, 'translation' => 'none']);
                 $form->get('translationLocale')->setAttributes([
                     'value' => $translation,
                     'onchange' => 'document.location.href=("' . $url . '").replace("none", this.value)'
@@ -101,7 +101,7 @@
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-9">
                         <button class="btn btn-primary" type="submit" name="edit">
-                            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('service')))) ?>
+                            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('room')))) ?>
                         </button>
                     </div>
                 </div>

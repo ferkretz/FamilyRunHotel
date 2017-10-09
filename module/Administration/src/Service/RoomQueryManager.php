@@ -10,6 +10,8 @@ class RoomQueryManager extends AbstractQueryManager {
 
     const ORDER_BY_ID = 'id';
     const ORDER_BY_PRICE = 'price';
+    const ORDER_BY_SUMMARY = 'summary';
+    const ORDER_BY_TRANS_COUNT = 'transCount';
 
     protected $minPrice;
     protected $maxPrice;
@@ -58,7 +60,7 @@ class RoomQueryManager extends AbstractQueryManager {
     }
 
     public function setOrderBy($orderBy) {
-        $this->orderBy = in_array($orderBy, [self::ORDER_BY_ID, self::ORDER_BY_PRICE]) ? $orderBy : NULL;
+        $this->orderBy = in_array($orderBy, [self::ORDER_BY_ID, self::ORDER_BY_PRICE, self::ORDER_BY_SUMMARY, self::ORDER_BY_TRANS_COUNT]) ? $orderBy : NULL;
     }
 
 }

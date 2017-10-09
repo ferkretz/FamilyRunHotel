@@ -51,10 +51,11 @@ return [
             'admin-rooms' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/rooms[/:action][/:id]',
+                    'route' => '/admin/rooms[/:action][/:id][/:translation]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
+                        'translation' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\RoomController::class,
@@ -99,6 +100,7 @@ return [
             Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
             Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
             Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
+            Service\RoomQueryManager::class => Service\Factory\RoomQueryManagerFactory::class,
             Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
             Service\RoomServiceQueryManager::class => Service\Factory\RoomServiceQueryManagerFactory::class,
             Service\UserManager::class => Service\Factory\UserManagerFactory::class,
@@ -123,7 +125,7 @@ return [
                 ['actions' => ['index'], 'allow' => '+admin']
             ],
             Controller\RoomController::class => [
-                ['actions' => ['index'], 'allow' => '+admin']
+                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
             ],
             Controller\RoomServiceController::class => [
                 ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']

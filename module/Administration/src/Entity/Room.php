@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="Room")
+ * @ORM\Table(name="Rooms")
  */
 class Room {
 
@@ -62,10 +62,22 @@ class Room {
     protected $description;
 
     /**
+     * @ORM\Column(
+     *      name="transCount",
+     *      type="integer",
+     *      length=10,
+     *      options={"unsigned":true}
+     * )
+     */
+    protected $transCount;
+
+    /**
      * @ORM\OneToMany(
      *      targetEntity="RoomTranslation",
      *      mappedBy="room",
      *      indexBy="locale",
+     *      fetch="EXTRA_LAZY",
+     *      orphanRemoval=true,
      *      cascade={"all","merge","persist","refresh","remove"}
      * )
      * @ORM\OrderBy({"locale"="ASC"})
@@ -114,6 +126,39 @@ class Room {
         $this->translations = new ArrayCollection();
         $this->services = new ArrayCollection();
         $this->pictures = new ArrayCollection();
+        $this->transCount = 0;
+    }
+
+    public function getData($locale = FALSE) {
+        $data = get_object_vars($this);
+
+        if ($this->translations[$locale]) {
+            $data = array_merge($data, $this->translations[$locale]->getData());
+        }
+
+        return $data;
+    }
+
+    public function setData($data) {
+        if (isset($data['id'])) {
+            $this->id = $data['id'];
+        }
+        if (isset($data['price'])) {
+            $this->price = $data['price'];
+        }
+        if (isset($data['currency'])) {
+            $this->currency = $data['currency'];
+        }
+        if (isset($data['summary'])) {
+            $this->summary = $data['summary'];
+        }
+        if (isset($data['description'])) {
+            $this->description = $data['description'];
+        }
+        if (isset($data['translationSummary'])) {
+            $translation = $this->getTranslation($data['translationLocale'], TRUE);
+            $translation->setData($data);
+        }
     }
 
     public function getId() {
@@ -136,22 +181,6 @@ class Room {
         return $this->description;
     }
 
-    public function getTranslation($locale) {
-        return $this->translations[$locale];
-    }
-
-    public function getTranslations() {
-        return $this->translations;
-    }
-
-    public function getServices() {
-        return $this->services;
-    }
-
-    public function getPictures() {
-        return $this->pictures;
-    }
-
     public function setId($id) {
         $this->id = $id;
     }
@@ -172,12 +201,53 @@ class Room {
         $this->description = $description;
     }
 
-    public function setTranslation(RoomTranslation $translation) {
-        $this->translations[$translation->getLocale()] = $translation;
+    public function getTransCount() {
+        return $this->transCount;
     }
 
-    public function setTranslations(ArrayCollection $translations) {
-        $this->translations = $translations;
+    public function getTranslation($locale,
+                                   $create = FALSE) {
+        if (!isset($this->translations[$locale])) {
+            return $create ? $this->createTranslation($locale) : FALSE;
+        }
+
+        return $this->translations[$locale];
+    }
+
+    public function createTranslation($locale) {
+        if (isset($this->translations[$locale])) {
+            return FALSE;
+        }
+
+        $translation = new RoomServiceTranslation();
+        $translation->setRoomService($this);
+        $this->translations[$locale] = $translation;
+        $this->transCount = $this->translations->count();
+
+        return $translation;
+    }
+
+    public function removeTranslation($locale) {
+        if (!isset($this->translations[$locale])) {
+            return FALSE;
+        }
+
+        $this->translations->remove($locale);
+        $this->transCount = $this->translations->count();
+
+        return TRUE;
+    }
+
+    public function getTranslations() {
+        return $this->translations;
+    }
+
+    public function getServices() {
+        return $this->services;
+    }
+
+    public function getPictures() {
+        return $this->pictures;
     }
 
     public function addRoomService(RoomService $roomService) {

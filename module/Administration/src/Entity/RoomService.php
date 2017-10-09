@@ -62,10 +62,22 @@ class RoomService {
     protected $description;
 
     /**
+     * @ORM\Column(
+     *      name="transCount",
+     *      type="integer",
+     *      length=10,
+     *      options={"unsigned":true}
+     * )
+     */
+    protected $transCount;
+
+    /**
      * @ORM\OneToMany(
      *      targetEntity="RoomServiceTranslation",
      *      mappedBy="roomService",
      *      indexBy="locale",
+     *      fetch="EXTRA_LAZY",
+     *      orphanRemoval=true,
      *      cascade={"all","merge","persist","refresh","remove"}
      * )
      * @ORM\OrderBy({"locale"="ASC"})
@@ -83,6 +95,7 @@ class RoomService {
     public function __construct() {
         $this->translations = new ArrayCollection();
         $this->rooms = new ArrayCollection();
+        $this->transCount = 0;
     }
 
     public function getData($locale = FALSE) {
@@ -137,25 +150,6 @@ class RoomService {
         return $this->description;
     }
 
-    public function getTranslation($locale,
-                                   $create = FALSE) {
-        if ($create && !$this->translations[$locale]) {
-            $translation = new RoomServiceTranslation();
-            $translation->setRoomService($this);
-            $this->translations[$locale] = $translation;
-        }
-
-        return $this->translations[$locale] ?? NULL;
-    }
-
-    public function getTranslations() {
-        return $this->translations;
-    }
-
-    public function getRooms() {
-        return $this->rooms;
-    }
-
     public function setId($id) {
         $this->id = $id;
     }
@@ -174,6 +168,51 @@ class RoomService {
 
     public function setDescription($description) {
         $this->description = $description;
+    }
+
+    public function getTransCount() {
+        return $this->transCount;
+    }
+
+    public function getTranslation($locale,
+                                   $create = FALSE) {
+        if (!isset($this->translations[$locale])) {
+            return $create ? $this->createTranslation($locale) : FALSE;
+        }
+
+        return $this->translations[$locale];
+    }
+
+    public function createTranslation($locale) {
+        if (isset($this->translations[$locale])) {
+            return FALSE;
+        }
+
+        $translation = new RoomServiceTranslation();
+        $translation->setRoomService($this);
+        $this->translations[$locale] = $translation;
+        $this->transCount = $this->translations->count();
+
+        return $translation;
+    }
+
+    public function removeTranslation($locale) {
+        if (!isset($this->translations[$locale])) {
+            return FALSE;
+        }
+
+        $this->translations->remove($locale);
+        $this->transCount = $this->translations->count();
+
+        return TRUE;
+    }
+
+    public function getTranslations() {
+        return $this->translations;
+    }
+
+    public function getRooms() {
+        return $this->rooms;
     }
 
     public function addRoom(Room $room) {

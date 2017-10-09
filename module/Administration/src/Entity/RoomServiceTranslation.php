@@ -53,8 +53,7 @@ class RoomServiceTranslation {
     /**
      * @ORM\ManyToOne(
      *      targetEntity="RoomService",
-     *      inversedBy="translations",
-     *      cascade={"all","merge","persist","refresh","remove"}
+     *      inversedBy="translations"
      * )
      * @ORM\JoinColumn(
      *      name="roomServiceId",

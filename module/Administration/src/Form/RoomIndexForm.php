@@ -23,7 +23,6 @@ class RoomIndexForm extends Form {
                 'value_options' => $roomIds
             ]
         ]);
-
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',

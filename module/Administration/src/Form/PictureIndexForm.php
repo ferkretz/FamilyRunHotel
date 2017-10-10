@@ -5,24 +5,25 @@ namespace Administration\Form;
 use Zend\Form\Form;
 use Zend\Form\Element;
 
-class RoomServiceIndexForm extends Form {
+class PictureIndexForm extends Form {
 
-    public function __construct($roomServiceIds) {
-        parent::__construct('room-service-form');
+    public function __construct($pictureIds) {
+        parent::__construct('picture-form');
 
         $this->setAttribute('method', 'post');
 
-        $this->addElements($roomServiceIds);
+        $this->addElements($pictureIds);
     }
 
-    protected function addElements($roomServiceIds) {
+    protected function addElements($pictureIds) {
         $this->add([
             'type' => Element\MultiCheckbox::class,
-            'name' => 'roomServices',
+            'name' => 'pictures',
             'options' => [
-                'value_options' => $roomServiceIds
+                'value_options' => $pictureIds
             ]
         ]);
+
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',

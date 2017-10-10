@@ -40,10 +40,10 @@ return [
         'type' => SessionArrayStorage::class
     ],
     // Capability configuration.
-    'capability_config' => [
+    'role_config' => [
         'admin' => [
             'summary' => 'Administrator',
-            'capabilities' => ['admin']
+            'capabilities' => ['admin'],
         ],
         'user' => [
             'summary' => 'General user',

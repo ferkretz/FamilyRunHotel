@@ -36,7 +36,7 @@ class Module {
         // Load brandname from database ('FamilyRunHotel' is the default).
         $viewModel = $event->getViewModel();
         $optionManager = $serviceManager->get(OptionManager::class);
-        $viewModel->brandName = $optionManager->findByName('brand_name', 'FamilyRunHotel');
+        $viewModel->brandName = $optionManager->findByName('brandName', 'FamilyRunHotel');
 
         // Controller setup
         $eventManager = $event->getApplication()->getEventManager();

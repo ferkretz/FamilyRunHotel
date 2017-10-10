@@ -54,19 +54,21 @@ class Picture {
 
     /**
      * @ORM\Column(
-     *      name="filename",
-     *      type="string",
-     *      length=60,
-     *      nullable=false
+     *      name="transCount",
+     *      type="integer",
+     *      length=10,
+     *      options={"unsigned":true}
      * )
      */
-    protected $filename;
+    protected $transCount;
 
     /**
      * @ORM\OneToMany(
      *      targetEntity="PictureTranslation",
      *      mappedBy="picture",
      *      indexBy="locale",
+     *      fetch="EXTRA_LAZY",
+     *      orphanRemoval=true,
      *      cascade={"all","merge","persist","refresh","remove"}
      * )
      * @ORM\OrderBy({"locale"="ASC"})
@@ -84,6 +86,7 @@ class Picture {
     public function __construct() {
         $this->translations = new ArrayCollection();
         $this->rooms = new ArrayCollection();
+        $this->transCount = 0;
     }
 
     public function getId() {
@@ -100,18 +103,6 @@ class Picture {
 
     public function getSummary() {
         return $this->summary;
-    }
-
-    public function getFilename() {
-        return $this->filename;
-    }
-
-    public function getTranslation($locale) {
-        return $this->translations[$locale];
-    }
-
-    public function getTranslations() {
-        return $this->translations;
     }
 
     public function getRooms() {
@@ -134,16 +125,38 @@ class Picture {
         $this->summary = $summary;
     }
 
-    public function setFilename($filename) {
-        $this->filename = $filename;
+    public function getTransCount() {
+        return $this->transCount;
     }
 
-    public function setTranslation(PictureTranslation $translation) {
-        $this->translations[$translation->getLocale()] = $translation;
+    public function getTranslation($locale) {
+        return $this->translations->get($locale);
     }
 
-    public function setTranslations(ArrayCollection $translations) {
-        $this->translations = $translations;
+    public function setTranslation($locale,
+                                   PictureTranslation $translation) {
+        $newTranslation = $this->translations->get($locale);
+
+        if (!$newTranslation) {
+            $newTranslation = new PictureTranslation();
+            $newTranslation->setPicture($this);
+            $newTranslation->setLocale($locale);
+            $this->translations->set($locale, $newTranslation);
+            $this->transCount = $this->translations->count();
+        }
+
+        $newTranslation->setSummary($translation->getSummary());
+    }
+
+    public function removeTranslation($locale) {
+        if (isset($this->translations[$locale])) {
+            unset($this->translations[$locale]);
+            $this->transCount = $this->translations->count();
+        }
+    }
+
+    public function getTranslations() {
+        return $this->translations;
     }
 
     public function addRoom(Room $room) {

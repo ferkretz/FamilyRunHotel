@@ -5,31 +5,45 @@ $this->headTitle('Home');
 <div class="panel panel-default" style="margin-top: 15px;">
     <div class="panel-heading"><?= $this->escapeHtml($this->translate('Contact information:')) ?></div>
     <div class="panel-body">
-        <?php if (count($hotel)) { ?>
+        <?php if ($address || $email || $phone) { ?>
             <ul style="list-style-type: none;padding: 0">
-                <?= $hotel['address'] ? '<li><span class="glyphicon glyphicon-home"></span> ' . $this->escapeHtml($hotel['address']) . '</li>' : '' ?>
-                <?= $hotel['email'] ? '<li><span class="glyphicon glyphicon-envelope"></span> ' . $this->escapeHtml($hotel['email']) . '</li>' : '' ?>
-                <?= $hotel['phone'] ? '<li><span class="glyphicon glyphicon-phone-alt"></span> ' . $this->escapeHtml($hotel['phone']) . '</li>' : '' ?>
+                <?php if ($address) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-home"></span> <?= $this->escapeHtml($address) ?>
+                    </li>
+                <?php } ?>
+                <?php if ($email) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-envelope"></span> <?= $this->escapeHtml($email) ?>
+                    </li>
+                <?php } ?>
+                <?php if ($phone) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-phone-alt"></span> <?= $this->escapeHtml($phone) ?>
+                    </li>
+                <?php } ?>
             </ul>
         <?php } ?>
-        <?php if ($googleMap) { ?>
-            <!--<div id="map" class="google-map"></div>-->
+        <?php if ($latitude && $longitude && $zoom) { ?>
+            <div id="map" class="google-map"></div>
         <?php } ?>
     </div>
 </div>
-<script>
-    function initMap() {
-        var uluru = {lat: <?= $this->escapeHtml($googleMap['lat']) ?>, lng: <?= $this->escapeHtml($googleMap['lng']) ?>};
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: <?= $this->escapeHtml($googleMap['zoom']) ?>,
-            center: uluru
-        });
-        var marker = new google.maps.Marker({
-            position: uluru,
-            map: map
-        });
-    }
-</script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?callback=initMap">
-</script>
+<?php if ($latitude && $longitude && $zoom) { ?>
+    <script>
+        function initMap() {
+            var uluru = {lat: <?= $this->escapeHtml($latitude) ?>, lng: <?= $this->escapeHtml($longitude) ?>};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: <?= $this->escapeHtml($zoom) ?>,
+                center: uluru
+            });
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+        }
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?callback=initMap">
+    </script>
+<?php } ?>

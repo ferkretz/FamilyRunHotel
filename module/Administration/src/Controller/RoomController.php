@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 use Administration\Entity\Room;
+use Administration\Entity\RoomTranslation;
 use Administration\Form\RoomAddForm;
 use Administration\Form\RoomEditForm;
 use Administration\Form\RoomIndexForm;
@@ -52,6 +53,8 @@ class RoomController extends AbstractActionController {
         $paginator->setDefaultItemCountPerPage(5);
         $paginator->setCurrentPageNumber($page);
 
+        $roomIds = [];
+        $translationList = [];
         foreach ($paginator as $room) {
             $roomIds[] = $room->getId();
 
@@ -96,14 +99,13 @@ class RoomController extends AbstractActionController {
     }
 
     public function editAction() {
-        $localeInfo = localeconv();
-        $locales = $this->localizator->getSupportedLocales();
-        $form = new RoomEditForm($locales);
+        $form = new RoomEditForm($this->localizator->getSupportedLocaleNames());
 
         $id = $this->params()->fromRoute('id', -1);
-        $translation = $this->params()->fromRoute('translation', 'none');
+        $translationLocale = $this->params()->fromRoute('translationLocale', 'none');
+        $supportedLocales = array_merge(['none'], $this->localizator->getSupportedLocales());
         $room = $this->roomManager->findById($id);
-        if ($room == NULL) {
+        if ($room == NULL || !in_array($translationLocale, $supportedLocales)) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
@@ -112,33 +114,49 @@ class RoomController extends AbstractActionController {
             $data = $this->params()->fromPost();
 
             $form->setData($data);
-            if ($translation != 'none') {
+            if ($translationLocale != 'none') {
                 $form->getInputFilter()->get('translationSummary')->setRequired(TRUE);
             }
 
             if ($form->isValid()) {
-                $data['price'] = str_replace($localeInfo['decimal_point'], '.', $data['price']);
-                $room->setData($data);
+                $room->setSummary($data['summary']);
+                $room->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
+                $room->setCurrency($data['currency']);
+                $room->setDescription($data['description']);
+                if ($translationLocale != 'none') {
+                    $translation = new RoomTranslation();
+                    $translation->setSummary($data['translationSummary']);
+                    $translation->setDescription($data['translationDescription']);
+                    $room->setTranslation($translationLocale, $translation);
+                }
                 $this->roomManager->update();
             }
         } else {
-            $data = $room->getData($translation);
-            $data['price'] = number_format($data['price'], 2, $localeInfo['decimal_point'], '');
+            $data['summary'] = $room->getSummary();
+            $data['price'] = number_format($room->getPrice(), 2, localeconv()['decimal_point'], '');
+            $data['currency'] = $room->getCurrency();
+            $data['description'] = $room->getDescription();
+            if ($translationLocale != 'none') {
+                $translation = $room->getTranslation($translationLocale);
+                if ($translation) {
+                    $data['translationSummary'] = $translation->getSummary();
+                    $data['translationDescription'] = $translation->getDescription();
+                }
+            }
             $form->setData($data);
         }
 
         return new ViewModel([
             'id' => $id,
-            'translation' => $translation,
-            'translationName' => \Locale::getDisplayName($translation),
-            'fallbackLocaleName' => current($this->localizator->getFallbackLocale()),
+            'translationLocale' => $translationLocale,
+            'translationName' => \Locale::getDisplayName($translationLocale),
+            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
             'form' => $form,
         ]);
     }
 
     public function addAction() {
         $form = new RoomAddForm();
-
         $room = new Room();
 
         if ($this->getRequest()->isPost()) {
@@ -146,7 +164,10 @@ class RoomController extends AbstractActionController {
             $form->setData($data);
 
             if ($form->isValid()) {
-                $room->setData($data);
+                $room->setSummary($data['summary']);
+                $room->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
+                $room->setCurrency($data['currency']);
+                $room->setDescription($data['description']);
                 $this->roomManager->add($room);
 
                 return $this->redirect()->toRoute('admin-rooms');
@@ -154,7 +175,7 @@ class RoomController extends AbstractActionController {
         }
 
         return new ViewModel([
-            'fallbackLocaleName' => current($this->localizator->getFallbackLocale()),
+            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
             'form' => $form,
         ]);
     }

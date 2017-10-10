@@ -21,22 +21,26 @@ class CapabilityManager {
     protected $authenticationService;
 
     /**
-     * Contents of the 'capability_config' config key.
+     * Contents of the 'role_config' config key.
      * @var array
      */
-    protected $config;
+    protected $roleConfig;
 
     public function __construct(UserManager $userManager,
                                 AuthenticationService $authenticationService,
-                                $config) {
+                                $roleConfig) {
         $this->userManager = $userManager;
         $this->authenticationService = $authenticationService;
-        $this->config = $config;
+        $this->roleConfig = $roleConfig;
     }
 
     public function userCan(User $user,
                             $capability): bool {
-        return in_array($capability, $this->config[$user->getRole()]['capabilities']);
+        if (!isset($this->roleConfig[$user->getRole()]['capabilities'])) {
+            return FALSE;
+        }
+
+        return in_array($capability, $this->roleConfig[$user->getRole()]['capabilities']);
     }
 
     public function currentUserCan($capability): bool {

@@ -43,5 +43,5 @@ class UserManager {
         $this->entityManager->remove($user);
         $this->entityManager->flush();
     }
-    
+
 }

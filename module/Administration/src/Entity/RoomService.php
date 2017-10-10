@@ -98,38 +98,6 @@ class RoomService {
         $this->transCount = 0;
     }
 
-    public function getData($locale = FALSE) {
-        $data = get_object_vars($this);
-
-        if ($this->translations[$locale]) {
-            $data = array_merge($data, $this->translations[$locale]->getData());
-        }
-
-        return $data;
-    }
-
-    public function setData($data) {
-        if (isset($data['id'])) {
-            $this->id = $data['id'];
-        }
-        if (isset($data['price'])) {
-            $this->price = $data['price'];
-        }
-        if (isset($data['currency'])) {
-            $this->currency = $data['currency'];
-        }
-        if (isset($data['summary'])) {
-            $this->summary = $data['summary'];
-        }
-        if (isset($data['description'])) {
-            $this->description = $data['description'];
-        }
-        if (isset($data['translationSummary'])) {
-            $translation = $this->getTranslation($data['translationLocale'], TRUE);
-            $translation->setData($data);
-        }
-    }
-
     public function getId() {
         return $this->id;
     }
@@ -174,37 +142,31 @@ class RoomService {
         return $this->transCount;
     }
 
-    public function getTranslation($locale,
-                                   $create = FALSE) {
-        if (!isset($this->translations[$locale])) {
-            return $create ? $this->createTranslation($locale) : FALSE;
-        }
-
-        return $this->translations[$locale];
+    public function getTranslation($locale) {
+        return $this->translations->get($locale);
     }
 
-    public function createTranslation($locale) {
-        if (isset($this->translations[$locale])) {
-            return FALSE;
+    public function setTranslation($locale,
+                                   RoomServiceTranslation $translation) {
+        $newTranslation = $this->translations->get($locale);
+
+        if (!$newTranslation) {
+            $newTranslation = new RoomServiceTranslation();
+            $newTranslation->setRoom($this);
+            $newTranslation->setLocale($locale);
+            $this->translations->set($locale, $newTranslation);
+            $this->transCount = $this->translations->count();
         }
 
-        $translation = new RoomServiceTranslation();
-        $translation->setRoomService($this);
-        $this->translations[$locale] = $translation;
-        $this->transCount = $this->translations->count();
-
-        return $translation;
+        $newTranslation->setSummary($translation->getSummary());
+        $newTranslation->setDescription($translation->getDescription());
     }
 
     public function removeTranslation($locale) {
-        if (!isset($this->translations[$locale])) {
-            return FALSE;
+        if (isset($this->translations[$locale])) {
+            unset($this->translations[$locale]);
+            $this->transCount = $this->translations->count();
         }
-
-        $this->translations->remove($locale);
-        $this->transCount = $this->translations->count();
-
-        return TRUE;
     }
 
     public function getTranslations() {

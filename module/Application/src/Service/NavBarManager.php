@@ -73,7 +73,7 @@ class NavBarManager {
         $url = $this->urlHelper;
 
         if (!isset($options['brand_name'])) {
-            $options['brand_name'] = $this->optionManager->findByName('brand_name', 'FamilyRunHotel');
+            $options['brand_name'] = $this->optionManager->findByName('brandName', 'FamilyRunHotel');
         }
         if (!isset($options['brand_link'])) {
             $options['brand_link'] = $url('home');

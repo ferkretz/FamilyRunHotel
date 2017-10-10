@@ -50,9 +50,9 @@
                 </div>
 
                 <?php
-                $url = $this->url('admin-rooms', ['action' => 'edit', 'id' => $id, 'translation' => 'none']);
+                $url = $this->url('admin-rooms', ['action' => 'edit', 'id' => $id, 'translationLocale' => 'none']);
                 $form->get('translationLocale')->setAttributes([
-                    'value' => $translation,
+                    'value' => $translationLocale,
                     'onchange' => 'document.location.href=("' . $url . '").replace("none", this.value)'
                 ]);
                 ?>
@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <?php if ($translation != 'none') { ?>
+                <?php if ($translationLocale != 'none') { ?>
                     <div class="form-group right required">
                         <div class="col-sm-3"><?= $this->formLabel($form->get('translationSummary')) ?></div>
                         <div class="col-sm-9"><?= $this->formElement($form->get('translationSummary')) ?></div>
@@ -97,15 +97,15 @@
                         </div>
                     </div>
                 <?php } ?>
-
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button class="btn btn-primary" type="submit" name="edit">
-                            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('room')))) ?>
-                        </button>
-                    </div>
-                </div>
             </fieldset>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button class="btn btn-primary" type="submit" name="edit">
+                        <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Edit %s', $this->translate('room')))) ?>
+                    </button>
+                </div>
+            </div>
             <?= $this->form()->closeTag() ?>
         </div>
     </div>

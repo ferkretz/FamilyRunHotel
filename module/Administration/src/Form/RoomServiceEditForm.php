@@ -11,7 +11,7 @@ use Zend\I18n\Validator as I18nValidator;
 
 class RoomServiceEditForm extends Form {
 
-    public function __construct($locales) {
+    public function __construct($localeNames) {
         parent::__construct('room-service-form');
 
         $this->setAttributes([
@@ -19,13 +19,11 @@ class RoomServiceEditForm extends Form {
             'class' => 'form-horizontal',
         ]);
 
-        $this->addElements($locales);
-        $this->addInputFilter($locales);
+        $this->addElements($localeNames);
+        $this->addInputFilter($localeNames);
     }
 
-    protected function addElements($locales) {
-        $localeInfo = localeconv();
-
+    protected function addElements($localeNames) {
         $this->add([
             'type' => Element\Text::class,
             'name' => 'summary',
@@ -46,7 +44,7 @@ class RoomServiceEditForm extends Form {
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'onchange' => 'formatFloatInput(this,"' . $localeInfo['decimal_point'] . '")',
+                'onchange' => 'formatFloatInput(this,"' . localeconv()['decimal_point'] . '")',
             ],
         ]);
         $this->add([
@@ -58,7 +56,7 @@ class RoomServiceEditForm extends Form {
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'value' => trim($localeInfo['int_curr_symbol']),
+                'value' => trim(localeconv()['int_curr_symbol']),
             ],
         ]);
         $this->add([
@@ -72,14 +70,13 @@ class RoomServiceEditForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Select::class,
             'name' => 'translationLocale',
             'options' => [
                 'label' => 'Translation',
                 'label_attributes' => ['class' => 'control-label'],
-                'value_options' => array_merge(['none' => 'Select a language to translate'], $locales),
+                'value_options' => array_merge(['none' => 'Select a language to translate'], $localeNames),
             ],
             'attributes' => [
                 'class' => 'form-control',
@@ -107,7 +104,6 @@ class RoomServiceEditForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',
@@ -138,7 +134,6 @@ class RoomServiceEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'price',
             'required' => FALSE,
@@ -157,7 +152,6 @@ class RoomServiceEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'currency',
             'required' => TRUE,
@@ -174,7 +168,6 @@ class RoomServiceEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'description',
             'required' => FALSE,
@@ -191,7 +184,6 @@ class RoomServiceEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'translationSummary',
             'required' => FALSE,
@@ -208,7 +200,6 @@ class RoomServiceEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'translationDescription',
             'required' => FALSE,

@@ -15,28 +15,21 @@ class IndexController extends AbstractActionController {
     }
 
     public function indexAction() {
-        $googleMap = $this->optionManager->findByName('google_map');
-        if ($googleMap) {
-            $googleMap = unserialize($googleMap);
-        }
+        $address = $this->optionManager->findByName('address');
+        $email = $this->optionManager->findByName('email');
+        $phone = $this->optionManager->findByName('phone');
 
-        $hotel = [];
-        $address = $this->optionManager->findByName('hotel_address');
-        if ($address) {
-            $hotel['address'] = $address;
-        }
-        $email = $this->optionManager->findByName('hotel_email');
-        if ($email) {
-            $hotel['email'] = $email;
-        }
-        $phone = $this->optionManager->findByName('hotel_phone');
-        if ($phone) {
-            $hotel['phone'] = $phone;
-        }
+        $latitude = $this->optionManager->findByName('latitude');
+        $longitude = $this->optionManager->findByName('longitude');
+        $zoom = $this->optionManager->findByName('zoom');
 
         return new ViewModel([
-            'googleMap' => $googleMap,
-            'hotel' => $hotel,
+            'address' => $address,
+            'email' => $email,
+            'phone' => $phone,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'zoom' => $zoom,
         ]);
     }
 

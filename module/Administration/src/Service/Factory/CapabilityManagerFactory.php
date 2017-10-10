@@ -16,13 +16,9 @@ class CapabilityManagerFactory implements FactoryInterface {
         $userManager = $container->get(UserManager::class);
         $authenticationService = $container->get(AuthenticationService::class);
         $config = $container->get('Config');
-        if (isset($config['capability_config'])) {
-            $config = $config['capability_config'];
-        } else {
-            $config = [];
-        }
+        $roleConfig = $config['role_config'] ?? [];
 
-        return new CapabilityManager($userManager, $authenticationService, $config);
+        return new CapabilityManager($userManager, $authenticationService, $roleConfig);
     }
 
 }

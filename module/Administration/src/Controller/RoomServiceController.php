@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 use Administration\Entity\RoomService;
+use Administration\Entity\RoomServiceTranslation;
 use Administration\Form\RoomServiceAddForm;
 use Administration\Form\RoomServiceEditForm;
 use Administration\Form\RoomServiceIndexForm;
@@ -52,6 +53,8 @@ class RoomServiceController extends AbstractActionController {
         $paginator->setDefaultItemCountPerPage(5);
         $paginator->setCurrentPageNumber($page);
 
+        $roomServiceIds = [];
+        $translationList = [];
         foreach ($paginator as $roomService) {
             $roomServiceIds[] = $roomService->getId();
 
@@ -96,14 +99,13 @@ class RoomServiceController extends AbstractActionController {
     }
 
     public function editAction() {
-        $localeInfo = localeconv();
-        $locales = $this->localizator->getSupportedLocales();
-        $form = new RoomServiceEditForm($locales);
+        $form = new RoomServiceEditForm($this->localizator->getSupportedLocaleNames());
 
         $id = $this->params()->fromRoute('id', -1);
-        $translation = $this->params()->fromRoute('translation', 'none');
+        $translationLocale = $this->params()->fromRoute('translationLocale', 'none');
+        $supportedLocales = array_merge(['none'], $this->localizator->getSupportedLocales());
         $roomService = $this->roomServiceManager->findById($id);
-        if ($roomService == NULL) {
+        if ($roomService == NULL || !in_array($translationLocale, $supportedLocales)) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
@@ -112,33 +114,49 @@ class RoomServiceController extends AbstractActionController {
             $data = $this->params()->fromPost();
 
             $form->setData($data);
-            if ($translation != 'none') {
+            if ($translationLocale != 'none') {
                 $form->getInputFilter()->get('translationSummary')->setRequired(TRUE);
             }
 
             if ($form->isValid()) {
-                $data['price'] = str_replace($localeInfo['decimal_point'], '.', $data['price']);
-                $roomService->setData($data);
+                $roomService->setSummary($data['summary']);
+                $roomService->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
+                $roomService->setCurrency($data['currency']);
+                $roomService->setDescription($data['description']);
+                if ($translationLocale != 'none') {
+                    $translation = new RoomServiceTranslation();
+                    $translation->setSummary($data['translationSummary']);
+                    $translation->setDescription($data['translationDescription']);
+                    $roomService->setTranslation($translationLocale, $translation);
+                }
                 $this->roomServiceManager->update();
             }
         } else {
-            $data = $roomService->getData($translation);
-            $data['price'] = number_format($data['price'], 2, $localeInfo['decimal_point'], '');
+            $data['summary'] = $roomService->getSummary();
+            $data['price'] = number_format($roomService->getPrice(), 2, localeconv()['decimal_point'], '');
+            $data['currency'] = $roomService->getCurrency();
+            $data['description'] = $roomService->getDescription();
+            if ($translationLocale != 'none') {
+                $translation = $roomService->getTranslation($translationLocale);
+                if ($translation) {
+                    $data['translationSummary'] = $translation->getSummary();
+                    $data['translationDescription'] = $translation->getDescription();
+                }
+            }
             $form->setData($data);
         }
 
         return new ViewModel([
             'id' => $id,
-            'translation' => $translation,
-            'translationName' => \Locale::getDisplayName($translation),
-            'fallbackLocaleName' => current($this->localizator->getFallbackLocale()),
+            'translationLocale' => $translationLocale,
+            'translationName' => \Locale::getDisplayName($translationLocale),
+            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
             'form' => $form,
         ]);
     }
 
     public function addAction() {
         $form = new RoomServiceAddForm();
-
         $roomService = new RoomService();
 
         if ($this->getRequest()->isPost()) {
@@ -146,7 +164,10 @@ class RoomServiceController extends AbstractActionController {
             $form->setData($data);
 
             if ($form->isValid()) {
-                $roomService->setData($data);
+                $roomService->setSummary($data['summary']);
+                $roomService->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
+                $roomService->setCurrency($data['currency']);
+                $roomService->setDescription($data['description']);
                 $this->roomServiceManager->add($roomService);
 
                 return $this->redirect()->toRoute('admin-services');
@@ -154,7 +175,7 @@ class RoomServiceController extends AbstractActionController {
         }
 
         return new ViewModel([
-            'fallbackLocaleName' => current($this->localizator->getFallbackLocale()),
+            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
             'form' => $form,
         ]);
     }

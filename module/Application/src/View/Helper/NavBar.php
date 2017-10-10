@@ -37,7 +37,7 @@ class NavBar extends AbstractHelper {
     public function render() {
         $escapeHtml = $this->getView()->plugin('escapeHtml');
 
-        $result = '<nav class="navbar navbar-' . $escapeHtml($this->navBarElements['options']['navbar_style']) . ' navbar-fixed-top" role="navigation">'
+        $result = '<nav class="navbar navbar-' . $escapeHtml($this->navBarElements['options']['navbarStyle']) . ' navbar-fixed-top" role="navigation">'
                 . '<div class="container" >'
                 . '<div class="navbar-header">'
                 . '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">'
@@ -46,7 +46,7 @@ class NavBar extends AbstractHelper {
                 . '<span class="icon-bar"></span>'
                 . '<span class="icon-bar"></span>'
                 . '</button>'
-                . '<a class="navbar-brand" href="' . $escapeHtml($this->navBarElements['options']['brand_link']) . '">' . $escapeHtml($this->navBarElements['options']['brand_name']) . '</a>'
+                . '<a class="navbar-brand" href="' . $escapeHtml($this->navBarElements['options']['brandLink']) . '">' . $escapeHtml($this->navBarElements['options']['brandName']) . '</a>'
                 . '</div>'
                 . '<div id="navbar" class="collapse navbar-collapse">'
                 . '<ul class="nav navbar-nav">';

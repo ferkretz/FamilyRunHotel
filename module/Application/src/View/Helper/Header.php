@@ -40,7 +40,7 @@ class Header extends AbstractHelper {
      */
     public function render() {
         // everywhere or only index page?
-        $showHeaderEveryWhere = $this->optionManager->findByName('show_header_everywhere', 'FALSE');
+        $showHeaderEveryWhere = $this->optionManager->findByName('showHeaderEverywhere', 'FALSE');
         if ($showHeaderEveryWhere == 'FALSE') {
             if ($this->controllerName != IndexController::class || $this->actionName != 'index') {
                 return '';
@@ -54,7 +54,7 @@ class Header extends AbstractHelper {
         $date = $dateFormatter->format(new \DateTime());
 
         // brand name or 'FamilyRunHotel'
-        $brandName = $this->optionManager->findByName('brand_name', 'FamilyRunHotel');
+        $brandName = $this->optionManager->findByName('brandName', 'FamilyRunHotel');
 
         $result = '<div class="well header">'
                 . '<canvas id="clock" width="100" height="100"></canvas>'

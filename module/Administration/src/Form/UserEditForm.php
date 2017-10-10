@@ -91,7 +91,6 @@ class UserEditForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Password::class,
             'name' => 'password',
@@ -103,7 +102,6 @@ class UserEditForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',
@@ -135,7 +133,6 @@ class UserEditForm extends Form {
                 ['name' => Validator\EmailAddress::class],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'realName',
             'required' => TRUE,
@@ -152,7 +149,6 @@ class UserEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'displayName',
             'required' => FALSE,
@@ -168,7 +164,6 @@ class UserEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'address',
             'required' => TRUE,
@@ -185,7 +180,6 @@ class UserEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'phone',
             'required' => TRUE,
@@ -202,7 +196,6 @@ class UserEditForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'password',
             'required' => FALSE,

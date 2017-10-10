@@ -56,6 +56,7 @@ class UserController extends AbstractActionController {
         $paginator->setDefaultItemCountPerPage(5);
         $paginator->setCurrentPageNumber($page);
 
+        $userIds = [];
         foreach ($paginator as $user) {
             $userIds[] = $user->getId();
         }
@@ -107,16 +108,27 @@ class UserController extends AbstractActionController {
             $form->setData($data);
 
             if ($form->isValid()) {
-                if (empty($data['password'])) {
-                    unset($data['password']);
+                $user->setEmail($data['email']);
+                $user->setRealName($data['realName']);
+                $user->setDisplayName($data['displayName']);
+                $user->setAddress($data['address']);
+                $user->setPhone($data['phone']);
+                $user->setRole($data['role']);
+                if (!empty($data['password'])) {
+                    $bcrypt = new Bcrypt();
+                    $user->setPassword($bcrypt->create($data['password']));
                 }
-                $user->setData($data);
                 $this->userManager->update();
 
                 return $this->redirect()->toRoute('admin-users');
             }
         } else {
-            $data = $user->getData();
+            $data['email'] = $user->getEmail();
+            $data['realName'] = $user->getRealName();
+            $data['diaplayName'] = $user->getDisplayName();
+            $data['address'] = $user->getAddress();
+            $data['phone'] = $user->getPhone();
+            $data['role'] = $user->getRole();
             $form->setData($data);
         }
 
@@ -135,10 +147,16 @@ class UserController extends AbstractActionController {
             $form->setData($data);
 
             if ($form->isValid()) {
-                if (empty($data['password'])) {
-                    unset($data['password']);
+                $user->setEmail($data['email']);
+                $user->setRealName($data['realName']);
+                $user->setDisplayName($data['displayName']);
+                $user->setAddress($data['address']);
+                $user->setPhone($data['phone']);
+                $user->setRole($data['role']);
+                if (!empty($data['password'])) {
+                    $bcrypt = new Bcrypt();
+                    $user->setPassword($bcrypt->create($data['password']));
                 }
-                $user->setData($data);
                 $user->setRegistered(new \DateTime(NULL, new \DateTimeZone("UTC")));
                 $this->userManager->add($user);
 

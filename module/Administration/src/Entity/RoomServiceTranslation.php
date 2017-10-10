@@ -63,30 +63,6 @@ class RoomServiceTranslation {
      */
     protected $roomService;
 
-    public function getData() {
-        $data['translationId'] = $this->id;
-        $data['translationLocale'] = $this->locale;
-        $data['translationSummary'] = $this->summary;
-        $data['translationDescription'] = $this->description;
-
-        return $data;
-    }
-
-    public function setData($data) {
-        if (isset($data['translationId'])) {
-            $this->id = $data['translationId'];
-        }
-        if (isset($data['translationLocale'])) {
-            $this->locale = $data['translationLocale'];
-        }
-        if (isset($data['translationSummary'])) {
-            $this->summary = $data['translationSummary'];
-        }
-        if (isset($data['translationDescription'])) {
-            $this->description = $data['translationDescription'];
-        }
-    }
-
     public function getId() {
         return $this->id;
     }

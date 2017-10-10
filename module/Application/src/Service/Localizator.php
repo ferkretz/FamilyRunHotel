@@ -30,6 +30,10 @@ class Localizator {
     }
 
     function getAcceptedLocales() {
+        return $this->acceptedLocales;
+    }
+
+    function getAcceptedLocaleNames() {
         $locales = [];
 
         foreach ($this->acceptedLocales as $acceptedLocale) {
@@ -40,6 +44,10 @@ class Localizator {
     }
 
     function getFallbackLocale() {
+        return $this->supportedLocales[0];
+    }
+
+    function getFallbackLocaleName() {
         $locale = [];
 
         $locale[$this->supportedLocales[0]] = \Locale::getDisplayName($this->supportedLocales[0]);
@@ -48,6 +56,10 @@ class Localizator {
     }
 
     function getSupportedLocales($includeFallback = FALSE) {
+        return array_slice($this->supportedLocales, $includeFallback ? 0 : 1);
+    }
+
+    function getSupportedLocaleNames($includeFallback = FALSE) {
         $locales = [];
 
         foreach (array_slice($this->supportedLocales, $includeFallback ? 0 : 1) as $supportedLocale) {

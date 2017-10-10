@@ -22,10 +22,11 @@ return [
             'admin-pictures' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/pictures[/:action][/:id]',
+                    'route' => '/admin/pictures[/:action][/:id][/:translationLocale]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
+                        'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\PictureController::class,
@@ -36,11 +37,11 @@ return [
             'admin-services' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/services[/:action][/:id][/:translation]',
+                    'route' => '/admin/services[/:action][/:id][/:translationLocale]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
-                        'translation' => '[a-zA-Z][a-zA-Z_-]*',
+                        'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\RoomServiceController::class,
@@ -51,11 +52,11 @@ return [
             'admin-rooms' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/rooms[/:action][/:id][/:translation]',
+                    'route' => '/admin/rooms[/:action][/:id][/:translationLocale]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
-                        'translation' => '[a-zA-Z][a-zA-Z_-]*',
+                        'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\RoomController::class,
@@ -99,6 +100,7 @@ return [
             Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
             Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
             Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
+            Service\PictureQueryManager::class => Service\Factory\PictureQueryManagerFactory::class,
             Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
             Service\RoomQueryManager::class => Service\Factory\RoomQueryManagerFactory::class,
             Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
@@ -122,7 +124,7 @@ return [
                 ['actions' => ['index'], 'allow' => '+admin']
             ],
             Controller\PictureController::class => [
-                ['actions' => ['index'], 'allow' => '+admin']
+                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
             ],
             Controller\RoomController::class => [
                 ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']

@@ -9,10 +9,10 @@ use Zend\InputFilter\InputFilter;
 use Zend\Validator;
 use Zend\I18n\Validator as I18nValidator;
 
-class RoomAddForm extends Form {
+class DashboardIndexForm extends Form {
 
     public function __construct() {
-        parent::__construct('room-form');
+        parent::__construct('dashboard-form');
 
         $this->setAttributes([
             'method', 'post',
@@ -26,9 +26,20 @@ class RoomAddForm extends Form {
     protected function addElements() {
         $this->add([
             'type' => Element\Text::class,
-            'name' => 'summary',
+            'name' => 'brandName',
             'options' => [
-                'label' => 'Summary',
+                'label' => 'Brand name',
+                'label_attributes' => ['class' => 'control-label'],
+            ],
+            'attributes' => [
+                'class' => 'form-control',
+            ],
+        ]);
+        $this->add([
+            'type' => Element\Email::class,
+            'name' => 'email',
+            'options' => [
+                'label' => 'Email address',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
@@ -37,9 +48,31 @@ class RoomAddForm extends Form {
         ]);
         $this->add([
             'type' => Element\Text::class,
-            'name' => 'price',
+            'name' => 'address',
             'options' => [
-                'label' => 'Price',
+                'label' => 'Address',
+                'label_attributes' => ['class' => 'control-label'],
+            ],
+            'attributes' => [
+                'class' => 'form-control',
+            ],
+        ]);
+        $this->add([
+            'type' => Element\Tel::class,
+            'name' => 'phone',
+            'options' => [
+                'label' => 'Phone numbers',
+                'label_attributes' => ['class' => 'control-label'],
+            ],
+            'attributes' => [
+                'class' => 'form-control',
+            ],
+        ]);
+        $this->add([
+            'type' => Element\Text::class,
+            'name' => 'latitude',
+            'options' => [
+                'label' => 'Latitude coord.',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
@@ -49,21 +82,21 @@ class RoomAddForm extends Form {
         ]);
         $this->add([
             'type' => Element\Text::class,
-            'name' => 'currency',
+            'name' => 'longitude',
             'options' => [
-                'label' => 'Currency name',
+                'label' => 'Longitude coord.',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'value' => trim(localeconv()['int_curr_symbol']),
+                'onchange' => 'formatFloatInput(this,"' . localeconv()['decimal_point'] . '")',
             ],
         ]);
         $this->add([
-            'type' => Element\Textarea::class,
-            'name' => 'description',
+            'type' => Element\Text::class,
+            'name' => 'zoom',
             'options' => [
-                'label' => 'Description',
+                'label' => 'Zoom',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
@@ -74,7 +107,7 @@ class RoomAddForm extends Form {
             'type' => Element\Submit::class,
             'name' => 'submit',
             'attributes' => [
-                'value' => 'Add',
+                'value' => 'Save',
                 'id' => 'submit',
             ],
         ]);
@@ -85,7 +118,7 @@ class RoomAddForm extends Form {
         $this->setInputFilter($inputFilter);
 
         $inputFilter->add([
-            'name' => 'summary',
+            'name' => 'brandName',
             'required' => TRUE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
@@ -95,58 +128,93 @@ class RoomAddForm extends Form {
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
-                        'max' => 60,
+                        'max' => 30,
                     ],
                 ],
             ],
         ]);
         $inputFilter->add([
-            'name' => 'price',
+            'name' => 'email',
+            'required' => TRUE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\StringLength::class,
+                    'options' => [
+                        'max' => 160,
+                    ],
+                ],
+                ['name' => Validator\EmailAddress::class],
+            ],
+        ]);
+        $inputFilter->add([
+            'name' => 'address',
+            'required' => TRUE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\StringLength::class,
+                    'options' => [
+                        'max' => 160,
+                    ],
+                ],
+            ],
+        ]);
+        $inputFilter->add([
+            'name' => 'phone',
+            'required' => TRUE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\StringLength::class,
+                    'options' => [
+                        'max' => 30,
+                    ],
+                ],
+            ],
+        ]);
+        $inputFilter->add([
+            'name' => 'latitude',
             'required' => FALSE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
             ],
             'validators' => [
-                [
-                    'name' => Validator\StringLength::class,
-                    'options' => [
-                        'max' => 20,
-                    ],
-                ],
                 [
                     'name' => I18nValidator\IsFloat::class,
                 ],
             ],
         ]);
         $inputFilter->add([
-            'name' => 'currency',
-            'required' => TRUE,
-            'filters' => [
-                ['name' => Filter\StringTrim::class],
-            ],
-            'validators' => [
-                ['name' => Validator\NotEmpty::class],
-                [
-                    'name' => Validator\StringLength::class,
-                    'options' => [
-                        'max' => 10,
-                    ],
-                ],
-            ],
-        ]);
-        $inputFilter->add([
-            'name' => 'description',
+            'name' => 'longitude',
             'required' => FALSE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
                 [
-                    'name' => Validator\StringLength::class,
-                    'options' => [
-                        'max' => 1024,
-                    ],
+                    'name' => I18nValidator\IsFloat::class,
+                ],
+            ],
+        ]);
+        $inputFilter->add([
+            'name' => 'zoom',
+            'required' => FALSE,
+            'filters' => [
+                ['name' => Filter\StringTrim::class],
+            ],
+            'validators' => [
+                [
+                    'name' => I18nValidator\IsInt::class,
                 ],
             ],
         ]);

@@ -76,15 +76,15 @@
                         <?= $this->formElementErrors($form->get('password'), ['class' => 'help-block']) ?>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button class="btn btn-primary" type="submit" name="add">
-                            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Add new %s', $this->translate('user')))) ?>
-                        </button>
-                    </div>
-                </div>
             </fieldset>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button class="btn btn-primary" type="submit" name="add">
+                        <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Add new %s', $this->translate('user')))) ?>
+                    </button>
+                </div>
+            </div>
             <?= $this->form()->closeTag() ?>
         </div>
     </div>

@@ -23,7 +23,6 @@ class UserIndexForm extends Form {
                 'value_options' => $userIds
             ]
         ]);
-
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',

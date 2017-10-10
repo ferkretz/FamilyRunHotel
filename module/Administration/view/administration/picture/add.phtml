@@ -1,0 +1,42 @@
+<?php $this->headTitle(sprintf('Add new %s', $this->translate('picture'))) ?>
+
+<div class="row" style="padding-top: 15px;">
+    <div class="col-md-8 center-block" style="float:none">
+        <div class="well">
+            <?= $this->form()->openTag($form) ?>
+            <fieldset>
+                <legend><?= $this->escapeHtml($this->translate(sprintf('Add new %s', $this->translate('picture')))) ?></legend>
+
+                <div class="form-group right required">
+                    <div class="col-sm-3"><?= $this->formLabel($form->get('summary')) ?></div>
+                    <div class="col-sm-9"><?= $this->formElement($form->get('summary')) ?></div>
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <div class="help-block nobottom">
+                            <?= $this->escapeHtml($this->translate(sprintf('Original "%s" summary.', $fallbackLocaleName))) ?>
+                        </div>
+                    </div>
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <?= $this->formElementErrors($form->get('summary'), ['class' => 'help-block']) ?>
+                    </div>
+                </div>
+
+                <div class="form-group right required">
+                    <div class="col-sm-3"><?= $this->formLabel($form->get('license')) ?></div>
+                    <div class="col-sm-9"><?= $this->formElement($form->get('license')) ?></div>
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <?= $this->formElementErrors($form->get('license'), ['class' => 'help-block']) ?>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button class="btn btn-primary" type="submit" name="add">
+                        <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Add new %s', $this->translate('picture')))) ?>
+                    </button>
+                </div>
+            </div>
+            <?= $this->form()->closeTag() ?>
+        </div>
+    </div>
+</div>

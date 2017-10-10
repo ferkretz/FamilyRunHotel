@@ -7,23 +7,22 @@ use Zend\Form\Form;
 use Zend\Form\Element;
 use Zend\InputFilter\InputFilter;
 use Zend\Validator;
-use Zend\I18n\Validator as I18nValidator;
 
-class RoomAddForm extends Form {
+class PictureEditForm extends Form {
 
-    public function __construct() {
-        parent::__construct('room-form');
+    public function __construct($localeNames) {
+        parent::__construct('picture-form');
 
         $this->setAttributes([
             'method', 'post',
             'class' => 'form-horizontal',
         ]);
 
-        $this->addElements();
-        $this->addInputFilter();
+        $this->addElements($localeNames);
+        $this->addInputFilter($localeNames);
     }
 
-    protected function addElements() {
+    protected function addElements($localeNames) {
         $this->add([
             'type' => Element\Text::class,
             'name' => 'summary',
@@ -37,33 +36,33 @@ class RoomAddForm extends Form {
         ]);
         $this->add([
             'type' => Element\Text::class,
-            'name' => 'price',
+            'name' => 'license',
             'options' => [
-                'label' => 'Price',
+                'label' => 'License',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'onchange' => 'formatFloatInput(this,"' . localeconv()['decimal_point'] . '")',
+                'value' => 'CC-BY-NC-ND-4.0',
+            ],
+        ]);
+        $this->add([
+            'type' => Element\Select::class,
+            'name' => 'translationLocale',
+            'options' => [
+                'label' => 'Translation',
+                'label_attributes' => ['class' => 'control-label'],
+                'value_options' => array_merge(['none' => 'Select a language to translate'], $localeNames),
+            ],
+            'attributes' => [
+                'class' => 'form-control',
             ],
         ]);
         $this->add([
             'type' => Element\Text::class,
-            'name' => 'currency',
+            'name' => 'translationSummary',
             'options' => [
-                'label' => 'Currency name',
-                'label_attributes' => ['class' => 'control-label'],
-            ],
-            'attributes' => [
-                'class' => 'form-control',
-                'value' => trim(localeconv()['int_curr_symbol']),
-            ],
-        ]);
-        $this->add([
-            'type' => Element\Textarea::class,
-            'name' => 'description',
-            'options' => [
-                'label' => 'Description',
+                'label' => 'Summary',
                 'label_attributes' => ['class' => 'control-label'],
             ],
             'attributes' => [
@@ -74,7 +73,7 @@ class RoomAddForm extends Form {
             'type' => Element\Submit::class,
             'name' => 'submit',
             'attributes' => [
-                'value' => 'Add',
+                'value' => 'Edit',
                 'id' => 'submit',
             ],
         ]);
@@ -101,25 +100,7 @@ class RoomAddForm extends Form {
             ],
         ]);
         $inputFilter->add([
-            'name' => 'price',
-            'required' => FALSE,
-            'filters' => [
-                ['name' => Filter\StringTrim::class],
-            ],
-            'validators' => [
-                [
-                    'name' => Validator\StringLength::class,
-                    'options' => [
-                        'max' => 20,
-                    ],
-                ],
-                [
-                    'name' => I18nValidator\IsFloat::class,
-                ],
-            ],
-        ]);
-        $inputFilter->add([
-            'name' => 'currency',
+            'name' => 'license',
             'required' => TRUE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
@@ -129,13 +110,13 @@ class RoomAddForm extends Form {
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
-                        'max' => 10,
+                        'max' => 60,
                     ],
                 ],
             ],
         ]);
         $inputFilter->add([
-            'name' => 'description',
+            'name' => 'translationSummary',
             'required' => FALSE,
             'filters' => [
                 ['name' => Filter\StringTrim::class],
@@ -145,7 +126,7 @@ class RoomAddForm extends Form {
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
-                        'max' => 1024,
+                        'max' => 60,
                     ],
                 ],
             ],

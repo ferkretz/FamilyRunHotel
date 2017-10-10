@@ -24,8 +24,6 @@ class RoomServiceAddForm extends Form {
     }
 
     protected function addElements() {
-        $localeInfo = localeconv();
-
         $this->add([
             'type' => Element\Text::class,
             'name' => 'summary',
@@ -46,7 +44,7 @@ class RoomServiceAddForm extends Form {
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'onchange' => 'formatFloatInput(this,"' . $localeInfo['decimal_point'] . '")',
+                'onchange' => 'formatFloatInput(this,"' . localeconv()['decimal_point'] . '")',
             ],
         ]);
         $this->add([
@@ -58,7 +56,7 @@ class RoomServiceAddForm extends Form {
             ],
             'attributes' => [
                 'class' => 'form-control',
-                'value' => trim($localeInfo['int_curr_symbol']),
+                'value' => trim(localeconv()['int_curr_symbol']),
             ],
         ]);
         $this->add([
@@ -72,7 +70,6 @@ class RoomServiceAddForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Submit::class,
             'name' => 'submit',
@@ -103,7 +100,6 @@ class RoomServiceAddForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'price',
             'required' => FALSE,
@@ -122,7 +118,6 @@ class RoomServiceAddForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'currency',
             'required' => TRUE,
@@ -139,7 +134,6 @@ class RoomServiceAddForm extends Form {
                 ],
             ],
         ]);
-
         $inputFilter->add([
             'name' => 'description',
             'required' => FALSE,

@@ -3,49 +3,23 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-use Administration\Service\OptionManager;
-use Application\Controller\IndexController;
+use Application\Model\HeaderData;
 
 class Header extends AbstractHelper {
 
-    /**
-     * Entity manager.
-     * @var OtionManager
-     */
-    protected $optionManager;
+    public function __invoke(HeaderData $headerData = NULL) {
+        if ($headerData) {
+            return $this->render($headerData);
+        }
 
-    /**
-     * Controller.
-     * @var string
-     */
-    protected $controllerName;
-
-    /**
-     * Action.
-     * @var string
-     */
-    protected $actionName;
-
-    public function __construct(OptionManager $optionManager,
-                                $controllerName,
-                                $actionName) {
-        $this->optionManager = $optionManager;
-        $this->controllerName = $controllerName;
-        $this->actionName = $actionName;
+        return $this;
     }
 
-    /**
-     * Renders the header.
-     * @return string HTML code of the menu.
-     */
-    public function render() {
-        // everywhere or only index page?
-        $showHeaderEveryWhere = $this->optionManager->findByName('showHeaderEverywhere', 'FALSE');
-        if ($showHeaderEveryWhere == 'FALSE') {
-            if ($this->controllerName != IndexController::class || $this->actionName != 'index') {
-                return '';
-            }
+    public function render(HeaderData $headerData) {
+        if (!$headerData->getVisible()) {
+            return '';
         }
+        $headerData->setVisible(FALSE);
 
         $escapeHtml = $this->getView()->plugin('escapeHtml');
 
@@ -53,22 +27,15 @@ class Header extends AbstractHelper {
         $dateFormatter = \IntlDateFormatter::create(\Locale::getDefault(), \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
         $date = $dateFormatter->format(new \DateTime());
 
-        // brand name or 'FamilyRunHotel'
-        $brandName = $this->optionManager->findByName('brandName', 'FamilyRunHotel');
-
-        $result = '<div class="well header">'
+        $html = '<div class="well header">'
                 . '<canvas id="clock" width="100" height="100"></canvas>'
                 . '<div class="title">'
-                . '<div class="brand" href="#">' . $escapeHtml($brandName) . '</div>'
+                . '<div class="brand" href="#">' . $escapeHtml($headerData->getBrandName()) . '</div>'
                 . '<div class="date">' . $escapeHtml($date) . '</div>'
                 . '</div>'
                 . '</div>';
 
-        return $result;
-    }
-
-    protected function translate($message) {
-        return $this->translator->translate($message);
+        return $html;
     }
 
 }

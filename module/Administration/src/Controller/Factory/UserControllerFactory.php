@@ -6,7 +6,8 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Administration\Controller\UserController;
 use Administration\Service\UserQueryManager;
-use Administration\Service\UserManager;
+use Application\Service\SiteOptionManager;
+use Application\Service\UserManager;
 
 class UserControllerFactory implements FactoryInterface {
 
@@ -15,16 +16,17 @@ class UserControllerFactory implements FactoryInterface {
                              array $options = NULL) {
         $userQueryManager = $container->get(UserQueryManager::class);
         $userManager = $container->get(UserManager::class);
+        $optionManager = $container->get(SiteOptionManager::class);
         $config = $container->get('Config');
-        if (isset($config['capability_config'])) {
-            foreach ($config['capability_config'] as $key => $value) {
+        if (isset($config['role_config'])) {
+            foreach ($config['role_config'] as $key => $value) {
                 $roles[$key] = $value['summary'];
             }
         } else {
             $roles = [];
         }
 
-        return new UserController($userQueryManager, $userManager, $roles);
+        return new UserController($userQueryManager, $userManager, $optionManager, $roles);
     }
 
 }

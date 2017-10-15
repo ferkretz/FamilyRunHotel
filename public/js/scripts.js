@@ -134,10 +134,10 @@ $(function () {
         ctx.rotate(-pos);
     }
 });
-Number.prototype.formatFloat = function (d) {
-    return this.toFixed(2).replace('.', d);
+Number.prototype.formatFloat = function (d, p = 2) {
+    return this.toFixed(p).replace('.', d);
 };
-function formatFloatInput(i, d) {
+function formatFloatInput(i, d, p = 2) {
     var f = parseFloat(i.value.replace(d, '.'));
-    i.value = f.formatFloat(d);
+    i.value = f.formatFloat(d, p);
 }

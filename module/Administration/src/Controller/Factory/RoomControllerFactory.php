@@ -6,8 +6,9 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Administration\Controller\RoomController;
 use Administration\Service\RoomQueryManager;
-use Administration\Service\RoomManager;
 use Application\Service\Localizator;
+use Application\Service\RoomManager;
+use Application\Service\SiteOptionManager;
 
 class RoomControllerFactory implements FactoryInterface {
 
@@ -17,8 +18,9 @@ class RoomControllerFactory implements FactoryInterface {
         $roomQueryManager = $container->get(RoomQueryManager::class);
         $roomManager = $container->get(RoomManager::class);
         $localizator = $container->get(Localizator::class);
+        $optionManager = $container->get(SiteOptionManager::class);
 
-        return new RoomController($roomQueryManager, $roomManager, $localizator);
+        return new RoomController($roomQueryManager, $roomManager, $localizator, $optionManager);
     }
 
 }

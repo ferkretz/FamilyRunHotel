@@ -7,14 +7,15 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Entity\Picture;
-use Administration\Entity\PictureTranslation;
 use Administration\Form\PictureAddForm;
 use Administration\Form\PictureEditForm;
 use Administration\Form\PictureIndexForm;
 use Administration\Service\PictureQueryManager;
-use Administration\Service\PictureManager;
+use Application\Entity\Picture;
+use Application\Entity\PictureTranslation;
 use Application\Service\Localizator;
+use Application\Service\PictureManager;
+use Application\Service\SiteOptionManager;
 
 class PictureController extends AbstractActionController {
 
@@ -31,12 +32,20 @@ class PictureController extends AbstractActionController {
     protected $pictureManager;
     protected $localizator;
 
+    /**
+     * Picture manager.
+     * @var OptionManager
+     */
+    protected $optionManager;
+
     public function __construct(PictureQueryManager $pictureQueryManager,
                                 PictureManager $pictureManager,
-                                Localizator $localizator) {
+                                Localizator $localizator,
+                                SiteOptionManager $optionManager) {
         $this->pictureQueryManager = $pictureQueryManager;
         $this->pictureManager = $pictureManager;
         $this->localizator = $localizator;
+        $this->optionManager = $optionManager;
     }
 
     public function indexAction() {
@@ -82,10 +91,15 @@ class PictureController extends AbstractActionController {
                     throw new \Exception('There are no pictures to delete.');
                 }
 
-                return $this->redirect()->toRoute('admin-pictures');
+                return $this->redirect()->toRoute('administrationPicture');
             } else {
                 throw new \Exception(current($form->getMessages()['pictures'][0]));
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationPicture');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([
@@ -140,6 +154,11 @@ class PictureController extends AbstractActionController {
             $form->setData($data);
         }
 
+        $this->layout()->navBarData->setActiveItemId('administrationPicture');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
+        }
+
         return new ViewModel([
             'id' => $id,
             'translationLocale' => $translationLocale,
@@ -163,8 +182,13 @@ class PictureController extends AbstractActionController {
                 $picture->setUploaded(new \DateTime(NULL, new \DateTimeZone("UTC")));
                 $this->pictureManager->add($picture);
 
-                return $this->redirect()->toRoute('admin-pictures');
+                return $this->redirect()->toRoute('administrationPicture', ['action' => 'edit', 'id' => $picture->getId()]);
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationPicture');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([

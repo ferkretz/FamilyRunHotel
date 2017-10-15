@@ -19,7 +19,7 @@ class UserAddForm extends Form {
         ]);
 
         $this->addElements($roles);
-        $this->addInputFilter($roles);
+        $this->addInputFilter();
     }
 
     protected function addElements($roles) {
@@ -111,7 +111,7 @@ class UserAddForm extends Form {
         ]);
     }
 
-    private function addInputFilter($roles) {
+    private function addInputFilter() {
         $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
 

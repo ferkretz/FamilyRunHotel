@@ -7,12 +7,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Entity\User;
 use Administration\Form\UserAddForm;
 use Administration\Form\UserEditForm;
 use Administration\Form\UserIndexForm;
 use Administration\Service\UserQueryManager;
-use Administration\Service\UserManager;
+use Application\Entity\User;
+use Application\Service\UserManager;
+use Application\Service\SiteOptionManager;
 
 class UserController extends AbstractActionController {
 
@@ -29,6 +30,12 @@ class UserController extends AbstractActionController {
     protected $userManager;
 
     /**
+     * Picture manager.
+     * @var OptionManager
+     */
+    protected $optionManager;
+
+    /**
      * Roles from the 'capability_config' config key.
      * @var array
      */
@@ -36,9 +43,11 @@ class UserController extends AbstractActionController {
 
     public function __construct(UserQueryManager $userQueryManager,
                                 UserManager $userManager,
+                                SiteOptionManager $optionManager,
                                 $roles) {
         $this->userQueryManager = $userQueryManager;
         $this->userManager = $userManager;
+        $this->optionManager = $optionManager;
         $this->roles = $roles;
     }
 
@@ -78,10 +87,15 @@ class UserController extends AbstractActionController {
                     throw new \Exception('There are no users to delete.');
                 }
 
-                return $this->redirect()->toRoute('admin-users');
+                return $this->redirect()->toRoute('administrationUser');
             } else {
                 throw new \Exception(current($form->getMessages()['users'][0]));
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationUser');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([
@@ -110,7 +124,9 @@ class UserController extends AbstractActionController {
             if ($form->isValid()) {
                 $user->setEmail($data['email']);
                 $user->setRealName($data['realName']);
-                $user->setDisplayName($data['displayName']);
+                if (!empty($data['displayName'])) {
+                    $user->setDisplayName($data['displayName']);
+                }
                 $user->setAddress($data['address']);
                 $user->setPhone($data['phone']);
                 $user->setRole($data['role']);
@@ -119,8 +135,6 @@ class UserController extends AbstractActionController {
                     $user->setPassword($bcrypt->create($data['password']));
                 }
                 $this->userManager->update();
-
-                return $this->redirect()->toRoute('admin-users');
             }
         } else {
             $data['email'] = $user->getEmail();
@@ -130,6 +144,11 @@ class UserController extends AbstractActionController {
             $data['phone'] = $user->getPhone();
             $data['role'] = $user->getRole();
             $form->setData($data);
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationUser');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([
@@ -160,8 +179,13 @@ class UserController extends AbstractActionController {
                 $user->setRegistered(new \DateTime(NULL, new \DateTimeZone("UTC")));
                 $this->userManager->add($user);
 
-                return $this->redirect()->toRoute('admin-users');
+                return $this->redirect()->toRoute('administrationUser', ['action' => 'edit', 'id' => $user->getId()]);
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationUser');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([

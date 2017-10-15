@@ -21,72 +21,71 @@ $sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
 
 <div class="page-header">
-    <h1 id="users"><?= $this->escapeHtml($this->translate('Users')) ?></h1>
+    <h1 id="users">
+        <span class="glyphicon glyphicon-user"></span> <?= $this->escapeHtml($this->translate('Users')) ?>
+    </h1>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 center-block" style="float:none">
-        <div class="well nobottom">
-            <?= $this->form()->openTag($form) ?>
-            <div class="overflow-auto">
-                <p>
-                    <a class="btn btn-default btn-sm" href="<?= $this->url('admin-users', ['action' => 'add']) ?>" style="white-space: nowrap">
-                        <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new user')) ?>
-                    </a>
-                    <span class="btn btn-default btn-sm" onclick="(function () {
+<div class="well nobottom">
+    <?= $this->form()->openTag($form) ?>
+    <div class="overflow-auto">
+        <p>
+            <a class="btn btn-default btn-sm" href="<?= $this->url('administrationUser', ['action' => 'add']) ?>" style="white-space: nowrap">
+                <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new user')) ?>
+            </a>
+            <span class="btn btn-default btn-sm" onclick="(function () {
                                 $('input[name=\'users&#x5B;&#x5D;\']').click();
                             })()">
-                        <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
-                    </span>
-                    <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
-                        <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
-                    </button>
-                </p>
-                <table id="myTable" class="table table-hover nobottom">
-                    <thead>
-                        <tr>
-                            <th>&nbsp;</th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-users', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
-                                    <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
-                                </a>
-                            </th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-users', [], ['query' => ['orderBy' => 'realName', 'order' => $orders['realName']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Name')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['realName'] ?>"></span>
-                                </a>
-                            </th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-users', [], ['query' => ['orderBy' => 'email', 'order' => $orders['email']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Email')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['email'] ?>"></span>
-                                </a>
-                            </th>
-                            <th style="white-space: nowrap">
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-users', [], ['query' => ['orderBy' => 'role', 'order' => $orders['role']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Role')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['role'] ?>"></span>
-                                </a>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $index => $user) { ?>
-                            <tr class="active" data-lnk="<?= $this->url('admin-users', ['action' => 'edit', 'id' => $user->getId()]) ?>" style="cursor:pointer">
-                                <td class="td-checkbox" data-select="true" data-button="#remove-submit">
-                                    <label>
-                                        <input class="icon-checkbox" type="checkbox" name="users&#x5B;&#x5D;" value="<?= $index ?>">
-                                    </label>
-                                </td>
-                                <td><?= $this->escapeHtml($user->getId()) ?></td>
-                                <td><?= $this->escapeHtml($user->getRealName()) ?></td>
-                                <td><?= $this->escapeHtml($user->getEmail()) ?></td>
-                                <td><?= $this->escapeHtml($user->getRole()) ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
-            <?= $this->form()->closeTag() ?>
-        </div>
-        <?= $this->paginationControl($users, 'Sliding', 'paginator/paginator', ['route' => 'admin-users', 'requiredQuery' => $requiredQuery]) ?>
+                <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </span>
+            <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
+                <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+            </button>
+        </p>
+        <table id="myTable" class="table table-hover nobottom">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationUser', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
+                            <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationUser', [], ['query' => ['orderBy' => 'realName', 'order' => $orders['realName']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Name')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['realName'] ?>"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationUser', [], ['query' => ['orderBy' => 'email', 'order' => $orders['email']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Email')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['email'] ?>"></span>
+                        </a>
+                    </th>
+                    <th style="white-space: nowrap">
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationUser', [], ['query' => ['orderBy' => 'role', 'order' => $orders['role']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Role')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['role'] ?>"></span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $index => $user) { ?>
+                    <tr class="active" data-lnk="<?= $this->url('administrationUser', ['action' => 'edit', 'id' => $user->getId()]) ?>" style="cursor:pointer">
+                        <td class="td-checkbox" data-select="true" data-button="#remove-submit">
+                            <label>
+                                <input class="icon-checkbox" type="checkbox" name="users&#x5B;&#x5D;" value="<?= $index ?>">
+                            </label>
+                        </td>
+                        <td><?= $this->escapeHtml($user->getId()) ?></td>
+                        <td><?= $this->escapeHtml($user->getRealName()) ?></td>
+                        <td><?= $this->escapeHtml($user->getEmail()) ?></td>
+                        <td><?= $this->escapeHtml($user->getRole()) ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     </div>
+    <?= $this->form()->closeTag() ?>
 </div>
+
+<?= $this->paginationControl($users, 'Sliding', 'paginator/paginator', ['route' => 'administrationUser', 'requiredQuery' => $requiredQuery]) ?>

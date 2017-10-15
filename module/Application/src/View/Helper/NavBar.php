@@ -3,41 +3,22 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use Application\Model\NavBarData;
 
 class NavBar extends AbstractHelper {
 
-    /**
-     * Menu items array.
-     * @var array
-     */
-    protected $navBarElements;
+    public function __invoke(NavBarData $navBarData = NULL) {
+        if ($navBarData) {
+            return $this->render($navBarData);
+        }
 
-    /**
-     * Active item's ID.
-     * @var string
-     */
-    protected $activeItemId = '';
-
-    public function __construct($navBarElements) {
-        $this->navBarElements = $navBarElements;
+        return $this;
     }
 
-    /**
-     * Sets ID of the active items.
-     * @param string $activeItemId
-     */
-    public function setActiveItemId($activeItemId) {
-        $this->activeItemId = $activeItemId;
-    }
-
-    /**
-     * Renders the navigation bar.
-     * @return string HTML code of the menu.
-     */
-    public function render() {
+    public function render(NavBarData $navBarData) {
         $escapeHtml = $this->getView()->plugin('escapeHtml');
 
-        $result = '<nav class="navbar navbar-' . $escapeHtml($this->navBarElements['options']['navbarStyle']) . ' navbar-fixed-top" role="navigation">'
+        $html = '<nav class="navbar navbar-' . $escapeHtml($navBarData->getStyle()) . ' navbar-fixed-top" role="navigation">'
                 . '<div class="container" >'
                 . '<div class="navbar-header">'
                 . '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">'
@@ -46,78 +27,81 @@ class NavBar extends AbstractHelper {
                 . '<span class="icon-bar"></span>'
                 . '<span class="icon-bar"></span>'
                 . '</button>'
-                . '<a class="navbar-brand" href="' . $escapeHtml($this->navBarElements['options']['brandLink']) . '">' . $escapeHtml($this->navBarElements['options']['brandName']) . '</a>'
+                . '<a class="navbar-brand" href="' . $escapeHtml($navBarData->getBrandLink()) . '">' . $escapeHtml($navBarData->getBrandName()) . '</a>'
                 . '</div>'
                 . '<div id="navbar" class="collapse navbar-collapse">'
                 . '<ul class="nav navbar-nav">';
-        foreach ($this->navBarElements['menu_items'] as $item) {
+        foreach ($navBarData->getMenuItems() as $item) {
             if (!isset($item['float']) || $item['float'] == 'left') {
-                $result .= $this->renderItem($item);
+                $html .= $this->renderItem($item);
             }
         }
-        $result .= '</ul>'
+        $html .= '</ul>'
                 . '<ul class="nav navbar-nav navbar-right">';
-        foreach ($this->navBarElements['menu_items'] as $item) {
+        foreach ($navBarData->getMenuItems() as $item) {
             if (isset($item['float']) && $item['float'] == 'right') {
-                $result .= $this->renderItem($item);
+                $html .= $this->renderItem($item);
             }
         }
-        $result .= '</ul>'
+        $html .= '</ul>'
                 . '</div>'
                 . '</div>'
                 . '</nav>';
 
-        return $result;
+        return $html;
     }
 
-    /**
-     * Renders an item.
-     * @param array $item The menu item info.
-     * @return string HTML code of the item.
-     */
     protected function renderItem($item) {
-        $id = isset($item['id']) ? $item['id'] : '';
-        $isActive = ($id == $this->activeItemId);
-        $label = isset($item['label']) ? $item['label'] : '';
-
-        $result = '';
+        if (!isset($item['grant']) || !$item['grant']) {
+            return '';
+        }
+        if (!isset($item['id'])) {
+            return '';
+        }
+        if ((!isset($item['label'])) && (!isset($item['glyphicon']))) {
+            return '';
+        }
 
         $escapeHtml = $this->getView()->plugin('escapeHtml');
+        $label = isset($item['label']) ? $escapeHtml($item['label']) : '';
+        $glyphicon = isset($item['glyphicon']) ? '<span class="glyphicon glyphicon-' . $escapeHtml($item['glyphicon']) . '"></span> ' : '';
+
+        $html = '';
 
         if (isset($item['dropdown'])) {
-            $glyphicon = isset($item['glyphicon']) ? '<span class="glyphicon glyphicon-' . $escapeHtml($item['glyphicon']) . '"></span> ' : '';
             $dropdownItems = $item['dropdown'];
 
-            $result .= '<li class="dropdown ' . ($isActive ? 'active' : '') . '">'
+            $html .= '<li class="dropdown ' . (isset($item['active']) ? 'active' : '') . '">'
                     . '<a href="#" class="dropdown-toggle" data-toggle="dropdown">'
-                    . $glyphicon . $escapeHtml($label) . ' <b class="caret"></b>'
+                    . $glyphicon . $label . ' <b class="caret"></b>'
                     . '</a>'
                     . '<ul class="dropdown-menu">';
             foreach ($dropdownItems as $item) {
-                if (isset($item['separator']) && $item['separator'] == TRUE) {
-                    $result .= '<li role="separator" class="divider"></li>';
+                if (isset($item['separator'])) {
+                    $html .= '<li role="separator" class="divider"></li>';
                 } else {
-                    $link = isset($item['link']) ? $item['link'] : '#';
-                    $label = isset($item['label']) ? $item['label'] : '';
+                    $link = isset($item['link']) ? $escapeHtml($item['link']) : '#';
+                    $label = isset($item['label']) ? $escapeHtml($item['label']) : '';
                     $glyphicon = isset($item['glyphicon']) ? '<span class="glyphicon glyphicon-' . $escapeHtml($item['glyphicon']) . '"></span> ' : '';
 
-                    $result .= '<li>'
-                            . '<a href="' . $escapeHtml($link) . '">' . $glyphicon . $escapeHtml($label) . '</a>'
+                    $html .= (isset($item['active']) ? '<li class="active">' : '<li>')
+                            . '<a href="' . $link . '">' . $glyphicon . $label . '</a>'
                             . '</li>';
                 }
             }
-            $result .= '</ul>'
+            $html .= '</ul>'
                     . '</li>';
         } else {
-            $link = isset($item['link']) ? $item['link'] : '#';
+            $link = isset($item['link']) ? $escapeHtml($item['link']) : '#';
+            $label = isset($item['label']) ? $escapeHtml($item['label']) : '';
             $glyphicon = isset($item['glyphicon']) ? '<span class="glyphicon glyphicon-' . $escapeHtml($item['glyphicon']) . '"></span> ' : '';
 
-            $result .= $isActive ? '<li class="active">' : '<li>'
-                    . '<a href="' . $escapeHtml($link) . '">' . $glyphicon . $escapeHtml($label) . '</a>'
+            $html .= (isset($item['active']) ? '<li class="active">' : '<li>')
+                    . '<a href="' . $link . '">' . $glyphicon . $label . '</a>'
                     . '</li>';
         }
 
-        return $result;
+        return $html;
     }
 
 }

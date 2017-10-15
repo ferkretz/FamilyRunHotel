@@ -8,95 +8,14 @@
 
 namespace Application;
 
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
-    'router' => [
-        'routes' => [
-            /* index */
-            'home' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'index',
-                    ],
-                ],
-            ],
-            'home-rooms' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/rooms',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'rooms',
-                    ],
-                ],
-            ],
-            'home-visitors-book' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/visitors-book',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'visitorsBook',
-                    ],
-                ],
-            ],
-            'auth-register' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/register',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'register',
-                    ],
-                ],
-            ],
-            'auth-login' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/login',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'login',
-                    ],
-                ],
-            ],
-            'auth-logout' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/logout',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'logout',
-                    ],
-                ],
-            ],
-            'auth-not-authorized' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/not-authorized',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'notAuthorized',
-                    ],
-                ],
-            ],
-            'auth-reset-password' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/reset-password',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'resetPassword',
-                    ],
-                ],
-            ],
-        ],
+    'site_options' => [
+        'brandname' => 'Family-run Hotel',
+        'navBarStyle' => 'default',
+        'headerShow' => 'home',
+        'theme' => 'coffee',
     ],
     'doctrine' => [
         'driver' => [
@@ -112,23 +31,22 @@ return [
             ]
         ]
     ],
-    // Language configuration.
     'language_config' => [
         'languages_dir' => __DIR__ . '/../language/',
     ],
     'service_manager' => [
         'factories' => [
-            \Zend\Authentication\AuthenticationService::class => Service\Factory\AuthenticationServiceFactory::class,
-            Service\AuthenticationAdapter::class => Service\Factory\AuthenticationAdapterFactory::class,
-            Service\AuthenticationManager::class => Service\Factory\AuthenticationManagerFactory::class,
-            Service\NavBarManager::class => Service\Factory\NavBarManagerFactory::class,
+            Model\HeaderData::class => Service\Factory\HeaderDataFactory::class,
+            Model\NavBarData::class => Service\Factory\NavBarDataFactory::class,
+            Service\CapabilityManager::class => Service\Factory\CapabilityManagerFactory::class,
+            Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
             Service\Localizator::class => Service\Factory\LocalizatorFactory::class,
-        ],
-    ],
-    'controllers' => [
-        'factories' => [
-            Controller\AuthenticationController::class => Controller\Factory\AuthenticationControllerFactory::class,
-            Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
+            Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
+            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
+            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
+            Service\SiteOptionManager::class => Service\Factory\SiteOptionManagerFactory::class,
+            Service\ThemeSelector::class => Service\Factory\ThemeSelectorFactory::class,
+            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -148,14 +66,16 @@ return [
     ],
     'view_helpers' => [
         'factories' => [
-            View\Helper\NavBar::class => View\Helper\Factory\NavBarFactory::class,
-            View\Helper\Header::class => View\Helper\Factory\HeaderFactory::class,
+        //View\Helper\NavBar2::class => View\Helper\Factory\NavBarFactory::class,
+        //View\Helper\Header::class => View\Helper\Factory\HeaderFactory::class,
         ],
         'aliases' => [
-            'header' => View\Helper\Header::class,
-            'navBar' => View\Helper\NavBar::class,
+        //'header' => View\Helper\Header::class,
+        //'navBar' => View\Helper\NavBar::class,
         ],
         'invokables' => [
+            'header' => View\Helper\Header::class,
+            'navBar' => View\Helper\NavBar::class,
             'languages' => \Zend\Http\Request::class,
             'translate' => \Zend\I18n\View\Helper\Translate::class
         ]

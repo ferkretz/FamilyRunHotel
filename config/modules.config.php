@@ -23,6 +23,9 @@ return [
     'DoctrineORMModule',
     'Zend\Session',
     'Zend\Log',
-    'Application',
     'Administration',
+    'Application',
+    'Authentication',
+    'Home',
+    'Profile',
 ];

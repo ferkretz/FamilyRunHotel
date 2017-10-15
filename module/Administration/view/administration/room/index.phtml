@@ -21,86 +21,84 @@ $sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
 
 <div class="page-header">
-    <h1 id="rooms"><?= $this->escapeHtml($this->translate('Rooms')) ?></h1>
+    <h1 id="rooms">
+        <span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>
+    </h1>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 center-block" style="float:none">
-        <div class="well nobottom">
-            <?= $this->form()->openTag($form) ?>
-            <div class="overflow-auto">
-                <p>
-                    <a class="btn btn-default btn-sm" href="<?= $this->url('admin-rooms', ['action' => 'add']) ?>" style="white-space: nowrap">
-                        <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new rooms')) ?>
-                    </a>
-                    <span class="btn btn-default btn-sm" onclick="(function () {
+<div class="well nobottom">
+    <?= $this->form()->openTag($form) ?>
+    <div class="overflow-auto">
+        <p>
+            <a class="btn btn-default btn-sm" href="<?= $this->url('administrationRoom', ['action' => 'add']) ?>" style="white-space: nowrap">
+                <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new rooms')) ?>
+            </a>
+            <span class="btn btn-default btn-sm" onclick="(function () {
                                 $('input[name=\'rooms&#x5B;&#x5D;\']').click();
                             })()">
-                        <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
-                    </span>
-                    <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
-                        <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
-                    </button>
-                </p>
-                <table id="myTable" class="table table-hover nobottom">
-                    <thead>
-                        <tr>
-                            <th>&nbsp;</th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-rooms', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
-                                    <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
-                                </a>
-                            </th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-rooms', [], ['query' => ['orderBy' => 'summary', 'order' => $orders['summary']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['summary'] ?>"></span>
-                                </a>
-                            </th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-rooms', [], ['query' => ['orderBy' => 'price', 'order' => $orders['price']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['price'] ?>"></span>
-                                </a>
-                            </th>
-                            <th>
-                                <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('admin-rooms', [], ['query' => ['orderBy' => 'transCount', 'order' => $orders['transCount']]]) ?>">
-                                    <?= $this->escapeHtml($this->translate('Translations')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['transCount'] ?>"></span>
-                                </a>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($rooms as $index => $room) { ?>
-                            <tr class="active" data-lnk="<?= $this->url('admin-rooms', ['action' => 'edit', 'id' => $room->getId()]) ?>" style="cursor:pointer">
-                                <td class="td-checkbox" data-select="true" data-button="#remove-submit">
-                                    <label>
-                                        <input class="icon-checkbox" type="checkbox" name="rooms&#x5B;&#x5D;" value="<?= $index ?>">
-                                    </label>
-                                </td>
-                                <td><?= $this->escapeHtml($room->getId()) ?></td>
-                                <td><?= $this->escapeHtml($room->getSummary()) ?></td>
-                                <td><?= $this->escapeHtml($room->getPrice()) ?></td>
-                                <td>
-                                    <?= $this->escapeHtml($room->getTransCount()) ?>
-                                    <?php
-                                    $translations = $this->translationList[$room->getId()];
-                                    if (strlen($translations)) {
-                                        if (strlen($translations) > 30) {
-                                            $subTranslations = ' (' . substr($translations, 0, 30) . '...)';
-                                        } else {
-                                            $subTranslations = ' (' . substr($translations, 0, 30) . ')';
-                                        }
-                                        echo $this->escapeHtml($subTranslations);
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
-            <?= $this->form()->closeTag() ?>
-        </div>
-        <?= $this->paginationControl($rooms, 'Sliding', 'paginator/paginator', ['route' => 'admin-rooms', 'requiredQuery' => $requiredQuery]) ?>
+                <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </span>
+            <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
+                <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+            </button>
+        </p>
+        <table id="myTable" class="table table-hover nobottom">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
+                            <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'summary', 'order' => $orders['summary']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['summary'] ?>"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'price', 'order' => $orders['price']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['price'] ?>"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'transCount', 'order' => $orders['transCount']]]) ?>">
+                            <?= $this->escapeHtml($this->translate('Translations')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['transCount'] ?>"></span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($rooms as $index => $room) { ?>
+                    <tr class="active" data-lnk="<?= $this->url('administrationRoom', ['action' => 'edit', 'id' => $room->getId()]) ?>" style="cursor:pointer">
+                        <td class="td-checkbox" data-select="true" data-button="#remove-submit">
+                            <label>
+                                <input class="icon-checkbox" type="checkbox" name="rooms&#x5B;&#x5D;" value="<?= $index ?>">
+                            </label>
+                        </td>
+                        <td><?= $this->escapeHtml($room->getId()) ?></td>
+                        <td><?= $this->escapeHtml($room->getSummary()) ?></td>
+                        <td><?= $this->escapeHtml($room->getPrice()) ?></td>
+                        <td>
+                            <?= $this->escapeHtml($room->getTransCount()) ?>
+                            <?php
+                            $translations = $this->translationList[$room->getId()];
+                            if (strlen($translations)) {
+                                if (strlen($translations) > 30) {
+                                    $subTranslations = ' (' . substr($translations, 0, 30) . '...)';
+                                } else {
+                                    $subTranslations = ' (' . substr($translations, 0, 30) . ')';
+                                }
+                                echo $this->escapeHtml($subTranslations);
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     </div>
+    <?= $this->form()->closeTag() ?>
 </div>
 
+<?= $this->paginationControl($rooms, 'Sliding', 'paginator/paginator', ['route' => 'administrationRoom', 'requiredQuery' => $requiredQuery]) ?>

@@ -1,0 +1,57 @@
+<?php $this->headTitle('Default look & feel') ?>
+
+<div class="page-header">
+    <h1 id="dashboard">
+        <span class="glyphicon glyphicon-dashboard"></span> <?= $this->escapeHtml($this->translate('Dashboard')) ?>
+    </h1>
+</div>
+
+<ul class="nav nav-tabs well-tabs">
+    <li role="presentation">
+        <a href="<?= $this->url('administrationDashboard', ['action' => 'company']) ?>"><?= $this->escapeHtml($this->translate('Company')) ?></a>
+    </li>
+    <li role="presentation">
+        <a href="<?= $this->url('administrationDashboard', ['action' => 'google']) ?>"><?= $this->escapeHtml($this->translate('Google')) ?></a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="<?= $this->url('administrationDashboard', ['action' => 'look']) ?>"><?= $this->escapeHtml($this->translate('Look & feel')) ?></a>
+    </li>
+</ul>
+
+<div class="well tabs-well">
+    <?= $this->form()->openTag($form) ?>
+    <fieldset>
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('theme')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('theme')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('theme'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('navBarStyle')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('navBarStyle')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('navBarStyle'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('headerShow')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('headerShow')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('headerShow'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button class="btn btn-primary" type="submit" name="save">
+                <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Update %s', $this->translate('default look & feel')))) ?>
+            </button>
+        </div>
+    </div>
+    <?= $this->form()->closeTag() ?>
+</div>

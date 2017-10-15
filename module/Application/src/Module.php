@@ -8,13 +8,17 @@
 
 namespace Application;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Session\SessionManager;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
-use Administration\Service\OptionManager;
-use Application\Controller\AuthenticationController;
-use Application\Service\AuthenticationManager;
+use Application\Model\HeaderData;
+use Application\Model\NavBarData;
 use Application\Service\Localizator;
+use Application\Service\SiteOptionManager;
+use Application\Service\ThemeSelector;
+use Authentication\Controller\AuthenticationController;
+use Authentication\Service\AuthenticationManager;
 
 class Module {
 
@@ -32,11 +36,17 @@ class Module {
 
         // Localize
         $localizator = $serviceManager->get(Localizator::class);
-        
+
         // Load brandname from database ('FamilyRunHotel' is the default).
         $viewModel = $event->getViewModel();
-        $optionManager = $serviceManager->get(OptionManager::class);
-        $viewModel->brandName = $optionManager->findByName('brandName', 'FamilyRunHotel');
+        $optionManager = $serviceManager->get(SiteOptionManager::class);
+        $viewModel->brandName = $optionManager->findValueByName('brandName');
+        // Select theme
+        $themeSelector = $serviceManager->get(ThemeSelector::class);
+        $viewModel->theme = $themeSelector->getLocalTheme();
+        // Navbar, header
+        $viewModel->headerData = $serviceManager->get(HeaderData::class);
+        $viewModel->navBarData = $serviceManager->get(NavBarData::class);
 
         // Controller setup
         $eventManager = $event->getApplication()->getEventManager();
@@ -51,10 +61,10 @@ class Module {
 
         $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
 
-        $authentiationManager = $event->getApplication()->getServiceManager()->get(AuthenticationManager::class);
+        $authenticationManager = $event->getApplication()->getServiceManager()->get(AuthenticationManager::class);
 
         if ($controllerName != AuthenticationController::class) {
-            $result = $authentiationManager->filterAccess($controllerName, $actionName);
+            $result = $authenticationManager->filterAccess($controllerName, $actionName);
 
             if ($result == AuthenticationManager::AUTHENTICATION_REQUIRED) {
                 $uri = $event->getApplication()->getRequest()->getUri();
@@ -64,7 +74,7 @@ class Module {
                         ->setUserInfo(NULL);
                 $redirectUrl = $uri->toString();
 
-                return $controller->redirect()->toRoute('auth-login', [], ['query' => ['redirectUrl' => $redirectUrl]]);
+                return $controller->redirect()->toRoute('authenticationLogin', [], ['query' => ['redirectUrl' => $redirectUrl]]);
             } else if ($result == AuthenticationManager::ACCESS_DENIED) {
                 return $controller->redirect()->toRoute('auth-not-authorized');
             }

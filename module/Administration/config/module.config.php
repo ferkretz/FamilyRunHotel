@@ -4,22 +4,24 @@ namespace Administration;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
     'router' => [
         'routes' => [
-            'admin-dashboard' => [
-                'type' => Literal::class,
+            'administrationDashboard' => [
+                'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/dashboard',
+                    'route' => '/admin/dashboard/:action',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                    ],
                     'defaults' => [
                         'controller' => Controller\DashboardController::class,
-                        'action' => 'index',
+                        'action' => 'company',
                     ],
                 ],
             ],
-            'admin-pictures' => [
+            'administrationPicture' => [
                 'type' => Segment::class,
                 'options' => [
                     'route' => '/admin/pictures[/:action][/:id][/:translationLocale]',
@@ -34,7 +36,7 @@ return [
                     ],
                 ],
             ],
-            'admin-services' => [
+            'administrationService' => [
                 'type' => Segment::class,
                 'options' => [
                     'route' => '/admin/services[/:action][/:id][/:translationLocale]',
@@ -49,7 +51,7 @@ return [
                     ],
                 ],
             ],
-            'admin-rooms' => [
+            'administrationRoom' => [
                 'type' => Segment::class,
                 'options' => [
                     'route' => '/admin/rooms[/:action][/:id][/:translationLocale]',
@@ -64,7 +66,7 @@ return [
                     ],
                 ],
             ],
-            'admin-users' => [
+            'administrationUser' => [
                 'type' => Segment::class,
                 'options' => [
                     'route' => '/admin/users[/:action][/:id]',
@@ -80,35 +82,6 @@ return [
             ],
         ],
     ],
-    'doctrine' => [
-        'driver' => [
-            __NAMESPACE__ . '_driver' => [
-                'class' => AnnotationDriver::class,
-                'cache' => 'array',
-                'paths' => [__DIR__ . '/../src/Entity']
-            ],
-            'orm_default' => [
-                'drivers' => [
-                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver'
-                ]
-            ]
-        ]
-    ],
-    'service_manager' => [
-        'factories' => [
-            Service\CapabilityManager::class => Service\Factory\CapabilityManagerFactory::class,
-            Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
-            Service\OptionManager::class => Service\Factory\OptionManagerFactory::class,
-            Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
-            Service\PictureQueryManager::class => Service\Factory\PictureQueryManagerFactory::class,
-            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
-            Service\RoomQueryManager::class => Service\Factory\RoomQueryManagerFactory::class,
-            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
-            Service\RoomServiceQueryManager::class => Service\Factory\RoomServiceQueryManagerFactory::class,
-            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
-            Service\UserQueryManager::class => Service\Factory\UserQueryManagerFactory::class,
-        ],
-    ],
     'controllers' => [
         'factories' => [
             Controller\DashboardController::class => Controller\Factory\DashboardControllerFactory::class,
@@ -121,7 +94,7 @@ return [
     'access_filter' => [
         'controllers' => [
             Controller\DashboardController::class => [
-                ['actions' => ['index'], 'allow' => '+admin']
+                ['actions' => ['company', 'google', 'look'], 'allow' => '+admin']
             ],
             Controller\PictureController::class => [
                 ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
@@ -136,6 +109,14 @@ return [
                 ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
             ],
         ]
+    ],
+    'service_manager' => [
+        'factories' => [
+            Service\PictureQueryManager::class => Service\Factory\PictureQueryManagerFactory::class,
+            Service\RoomQueryManager::class => Service\Factory\RoomQueryManagerFactory::class,
+            Service\RoomServiceQueryManager::class => Service\Factory\RoomServiceQueryManagerFactory::class,
+            Service\UserQueryManager::class => Service\Factory\UserQueryManagerFactory::class,
+        ],
     ],
     'view_manager' => [
         'template_path_stack' => [

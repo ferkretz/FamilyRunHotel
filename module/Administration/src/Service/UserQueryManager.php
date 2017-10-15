@@ -3,7 +3,7 @@
 namespace Administration\Service;
 
 use Doctrine\ORM\EntityManager;
-use Administration\Entity\User;
+use Application\Entity\User;
 use Application\Service\AbstractQueryManager;
 
 class UserQueryManager extends AbstractQueryManager {

@@ -7,14 +7,15 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Entity\RoomService;
-use Administration\Entity\RoomServiceTranslation;
 use Administration\Form\RoomServiceAddForm;
 use Administration\Form\RoomServiceEditForm;
 use Administration\Form\RoomServiceIndexForm;
 use Administration\Service\RoomServiceQueryManager;
-use Administration\Service\RoomServiceManager;
+use Application\Entity\RoomService;
+use Application\Entity\RoomServiceTranslation;
 use Application\Service\Localizator;
+use Application\Service\RoomServiceManager;
+use Application\Service\SiteOptionManager;
 
 class RoomServiceController extends AbstractActionController {
 
@@ -31,12 +32,20 @@ class RoomServiceController extends AbstractActionController {
     protected $roomServiceManager;
     protected $localizator;
 
+    /**
+     * Picture manager.
+     * @var OptionManager
+     */
+    protected $optionManager;
+
     public function __construct(RoomServiceQueryManager $roomServiceQueryManager,
                                 RoomServiceManager $roomServiceManager,
-                                Localizator $localizator) {
+                                Localizator $localizator,
+                                SiteOptionManager $optionManager) {
         $this->roomServiceQueryManager = $roomServiceQueryManager;
         $this->roomServiceManager = $roomServiceManager;
         $this->localizator = $localizator;
+        $this->optionManager = $optionManager;
     }
 
     public function indexAction() {
@@ -82,10 +91,15 @@ class RoomServiceController extends AbstractActionController {
                     throw new \Exception('There are no services to delete.');
                 }
 
-                return $this->redirect()->toRoute('admin-services');
+                return $this->redirect()->toRoute('administrationService');
             } else {
                 throw new \Exception(current($form->getMessages()['roomServices'][0]));
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationService');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([
@@ -146,6 +160,11 @@ class RoomServiceController extends AbstractActionController {
             $form->setData($data);
         }
 
+        $this->layout()->navBarData->setActiveItemId('administrationService');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
+        }
+
         return new ViewModel([
             'id' => $id,
             'translationLocale' => $translationLocale,
@@ -170,8 +189,13 @@ class RoomServiceController extends AbstractActionController {
                 $roomService->setDescription($data['description']);
                 $this->roomServiceManager->add($roomService);
 
-                return $this->redirect()->toRoute('admin-services');
+                return $this->redirect()->toRoute('administrationService', ['action' => 'edit', 'id' => $roomService->getId()]);
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationService');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([

@@ -3,7 +3,7 @@
 namespace Administration\Service;
 
 use Doctrine\ORM\EntityManager;
-use Administration\Entity\RoomService;
+use Application\Entity\RoomService;
 use Application\Service\AbstractQueryManager;
 
 class RoomServiceQueryManager extends AbstractQueryManager {

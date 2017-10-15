@@ -3,7 +3,7 @@
 namespace Administration\Service;
 
 use Doctrine\ORM\EntityManager;
-use Administration\Entity\Picture;
+use Application\Entity\Picture;
 use Application\Service\AbstractQueryManager;
 
 class PictureQueryManager extends AbstractQueryManager {

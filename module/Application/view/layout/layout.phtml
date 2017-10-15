@@ -11,8 +11,8 @@
         ?>
         <?=
                 $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
-                ->prependStylesheet($this->basePath('css/style.css'))
-                ->prependStylesheet($this->basePath('css/coffee-theme.min.css'))
+                ->prependStylesheet($this->basePath('themes/' . $theme . '/css/style.css'))
+                ->prependStylesheet($this->basePath('themes/' . $theme . '/css/theme.min.css'))
         ?>
         <?=
                 $this->headScript()
@@ -22,17 +22,15 @@
         ?>
     </head>
     <body>
-        <?php
-        if (isset($activeMenuItemId)) {
-            $this->navMenu()->setActiveItemId($activeMenuItemId);
-        }
-        ?>
-        <?= $this->navBar()->render() ?>
+        <?= $this->navBar($navBarData) ?>
 
         <div class="container">
-            <?= $this->header()->render() ?>
-            <?= $this->content ?>
+            <div class="row">
+                <div class="col-md-10 center-block" style="float:none">
+                    <?= $this->header($headerData) ?>
+                    <?= $this->content ?>
+                </div>
+            </div>
         </div>
-        <script></script>
     </body>
 </html>

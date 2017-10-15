@@ -7,14 +7,15 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Entity\Room;
-use Administration\Entity\RoomTranslation;
 use Administration\Form\RoomAddForm;
 use Administration\Form\RoomEditForm;
 use Administration\Form\RoomIndexForm;
 use Administration\Service\RoomQueryManager;
-use Administration\Service\RoomManager;
+use Application\Entity\Room;
+use Application\Entity\RoomTranslation;
 use Application\Service\Localizator;
+use Application\Service\RoomManager;
+use Application\Service\SiteOptionManager;
 
 class RoomController extends AbstractActionController {
 
@@ -31,12 +32,20 @@ class RoomController extends AbstractActionController {
     protected $roomManager;
     protected $localizator;
 
+    /**
+     * Picture manager.
+     * @var OptionManager
+     */
+    protected $optionManager;
+
     public function __construct(RoomQueryManager $roomQueryManager,
                                 RoomManager $roomManager,
-                                Localizator $localizator) {
+                                Localizator $localizator,
+                                SiteOptionManager $optionManager) {
         $this->roomQueryManager = $roomQueryManager;
         $this->roomManager = $roomManager;
         $this->localizator = $localizator;
+        $this->optionManager = $optionManager;
     }
 
     public function indexAction() {
@@ -82,10 +91,15 @@ class RoomController extends AbstractActionController {
                     throw new \Exception('There are no rooms to delete.');
                 }
 
-                return $this->redirect()->toRoute('admin-rooms');
+                return $this->redirect()->toRoute('administrationRoom');
             } else {
                 throw new \Exception(current($form->getMessages()['rooms'][0]));
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationRoom');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([
@@ -146,6 +160,11 @@ class RoomController extends AbstractActionController {
             $form->setData($data);
         }
 
+        $this->layout()->navBarData->setActiveItemId('administrationRoom');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
+        }
+
         return new ViewModel([
             'id' => $id,
             'translationLocale' => $translationLocale,
@@ -170,8 +189,13 @@ class RoomController extends AbstractActionController {
                 $room->setDescription($data['description']);
                 $this->roomManager->add($room);
 
-                return $this->redirect()->toRoute('admin-rooms');
+                return $this->redirect()->toRoute('administrationRoom', ['action' => 'edit', 'id' => $room->getId()]);
             }
+        }
+
+        $this->layout()->navBarData->setActiveItemId('administrationRoom');
+        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
+            $this->layout()->headerData->setVisible(TRUE);
         }
 
         return new ViewModel([

@@ -29,8 +29,11 @@
     },
     "autoload": {
         "psr-4": {
+            "Administration\\": "module/Administration/src/",
             "Application\\": "module/Application/src/",
-            "Administration\\": "module/Administration/src/"
+            "Authentication\\": "module/Authentication/src/",
+            "Home\\": "module/Home/src/",
+            "Profile\\": "module/Profile/src/"
         }
     },
     "autoload-dev": {

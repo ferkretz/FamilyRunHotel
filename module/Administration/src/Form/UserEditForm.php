@@ -19,7 +19,7 @@ class UserEditForm extends Form {
         ]);
 
         $this->addElements($roles);
-        $this->addInputFilter($roles);
+        $this->addInputFilter();
     }
 
     protected function addElements($roles) {
@@ -78,7 +78,6 @@ class UserEditForm extends Form {
                 'class' => 'form-control',
             ],
         ]);
-
         $this->add([
             'type' => Element\Select::class,
             'name' => 'role',
@@ -112,7 +111,7 @@ class UserEditForm extends Form {
         ]);
     }
 
-    private function addInputFilter($roles) {
+    private function addInputFilter() {
         $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
 

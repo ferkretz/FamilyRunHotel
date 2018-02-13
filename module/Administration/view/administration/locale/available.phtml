@@ -1,0 +1,108 @@
+<?php
+
+use Application\Service\Locale\LocaleQueryManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Available locales')));
+?>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class = "glyphicon glyphicon-globe"></span> <?= $this->escapeHtml($this->translate('Locales')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of available locales')) ?></li>
+    </ol>
+</nav>
+
+<div class="well tabs-well">
+    <?= $this->form()->openTag($form) ?>
+
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of available locales')) ?></legend>
+
+        <div style="overflow: auto visible">
+            <a class="btn btn-default btn-sm" href="<?= $this->url(NULL, ['action' => 'preferred']) ?>" style="white-space: nowrap">
+                <span class="glyphicon glyphicon-filter"></span> <?= $this->escapeHtml($this->translate('Show preferred locales')) ?>
+            </a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-tag"></span> ABC - <?= strtoupper($abc[$locales->getCurrentPageNumber()] ?? $locales->getItem(0)['name'][0]) ?> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" style="max-height: 10em; overflow: auto">
+                    <?php
+                    foreach ($abc as $pageNumber => $letter) {
+                        if ($pageNumber != $locales->getCurrentPageNumber()) {
+                            $queryParams = $this->localeQueryManager->getParams();
+                            $queryParams['page'] = $pageNumber;
+                            ?><li><a href="<?= $this->url(NULL, ['action' => 'available'], ['query' => $queryParams]) ?>"><?= strtoupper($letter) ?></a></li><?php
+                        }
+                    }
+                    ?>
+                </ul>
+            </div>
+            <span class="btn btn-default btn-sm" onclick="(function () {
+                        $('input[name=\'locales&#x5B;&#x5D;\']').click();
+                    })()">
+                <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </span>
+            <?= $this->formButton()->openTag($form->get('add')) ?>
+            <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add selected')) ?>
+            <?= $this->formButton()->closeTag() ?>
+
+            <table id="locale-table" class="table table-hover button-th nobottom">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->localeQueryManager->getParams();
+                            if ($queryParams['orderBy'] == LocaleQueryManager::ORDER_BY_ID) {
+                                $icon = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? LocaleQueryManager::ORDER_DESC : LocaleQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = LocaleQueryManager::ORDER_BY_ID;
+                                $queryParams['order'] = LocaleQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, ['action' => 'available'], ['query' => $queryParams], TRUE) ?>">
+                                <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->localeQueryManager->getParams();
+                            if ($queryParams['orderBy'] == LocaleQueryManager::ORDER_BY_NAME) {
+                                $icon = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? LocaleQueryManager::ORDER_DESC : LocaleQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = LocaleQueryManager::ORDER_BY_NAME;
+                                $queryParams['order'] = LocaleQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, ['action' => 'available'], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Name')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($locales as $locale) { ?>
+                        <tr class="active">
+                            <td class="td-checkbox" data-select="true" data-button="#add">
+                                <label>
+                                    <input class="icon-checkbox" type="checkbox" name="locales&#x5B;&#x5D;" value="<?= $locale['id'] ?>">
+                                </label>
+                            </td>
+                            <td><?= $locale['id'] ?></td>
+                            <td><?= $this->escapeHtml($locale['name'] . ' - ' . \Locale::getDisplayName($locale['name'])) ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+
+    <?= $this->form()->closeTag() ?>
+</div>
+
+<?= $this->paginationControl($locales, 'Sliding', 'paginator/paginator', ['route' => NULL, 'params' => ['action' => 'available'], 'queryParams' => $this->localeQueryManager->getParams()]) ?>

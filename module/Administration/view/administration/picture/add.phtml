@@ -1,42 +1,35 @@
-<?php $this->headTitle(sprintf('Add new %s', $this->translate('picture'))) ?>
+<?php $this->headTitle($this->escapeHtml($this->translate('Add pictures'))) ?>
 
-<div class="page-header">
-    <h1 id="pictures">
-        <span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>
-    </h1>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>:</strong>
+        <li class="breadcrumb-item"><a href="<?= $this->url('administrationPicture') ?>"><?= $this->escapeHtml($this->translate('List of pictures')) ?></a></li>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Add new picture')) ?></li>
+    </ol>
+</nav>
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>
+
     <fieldset>
-        <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('summary')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('summary')) ?></div>
-            <div class="col-sm-offset-3 col-sm-9">
-                <div class="help-block nobottom">
-                    <?= $this->escapeHtml($this->translate(sprintf('Original "%s" summary.', $fallbackLocaleName))) ?>
-                </div>
-            </div>
-            <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('summary'), ['class' => 'help-block']) ?>
-            </div>
-        </div>
+        <legend><?= $this->escapeHtml($this->translate('List of pictures')) ?></legend>
 
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('license')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('license')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('file')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('file')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('license'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('file'), ['class' => 'help-block']) ?>
             </div>
         </div>
     </fieldset>
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button class="btn btn-primary" type="submit" name="add">
-                <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Add new %s', $this->translate('picture')))) ?>
-            </button>
+            <?= $this->formButton()->openTag($form->get('upload')) ?>
+            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate('Upload pictures')) ?>
+            <?= $this->formButton()->closeTag() ?>
         </div>
     </div>
+
     <?= $this->form()->closeTag() ?>
 </div>

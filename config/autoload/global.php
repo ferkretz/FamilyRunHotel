@@ -16,11 +16,6 @@ use Zend\Session\Validator\HttpUserAgent;
 use Zend\Session\Validator\RemoteAddr;
 
 return [
-    // Language config.
-    'language_config' => [
-        // recommend not to change, if you want multilingual page because of original english messages
-        'fallback_locale' => 'en_US', 
-    ],
     // Session configuration.
     'session_config' => [
         // one hour coockie time
@@ -38,29 +33,6 @@ return [
     // Session storage configuration.
     'session_storage' => [
         'type' => SessionArrayStorage::class
-    ],
-    // Capability configuration.
-    'role_config' => [
-        'admin' => [
-            'summary' => 'Administrator',
-            'capabilities' => ['admin'],
-        ],
-        'user' => [
-            'summary' => 'General user',
-            'capabilities' => [],
-        ],
-    ],
-    // File upload configuration.
-    'upload_config' => [
-        'image' => [
-            'maximum_size' => '1048576',
-            'supported_types' => [
-                IMAGETYPE_GIF => 'gif',
-                IMAGETYPE_JPEG => 'jpeg',
-                IMAGETYPE_PNG => 'png',
-                IMAGETYPE_BMP => 'bmp'
-            ],
-        ],
     ],
     // Database configuration.
     'doctrine' => [

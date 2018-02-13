@@ -63,6 +63,8 @@ abstract class AbstractQueryManager {
         return $this->maxResults;
     }
 
+    abstract public function getParams();
+
     public function setOrderBy($orderBy) {
         $this->orderBy = $orderBy;
     }

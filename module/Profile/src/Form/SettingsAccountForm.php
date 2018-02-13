@@ -22,7 +22,7 @@ class SettingsAccountForm extends Form {
         $this->addInputFilter();
     }
 
-    protected function addElements() {
+    private function addElements() {
         $this->add([
             'type' => Element\Email::class,
             'name' => 'email',
@@ -91,10 +91,11 @@ class SettingsAccountForm extends Form {
         ]);
         $this->add([
             'type' => Element\Submit::class,
-            'name' => 'submit',
+            'name' => 'edit',
             'attributes' => [
                 'value' => 'Edit',
-                'id' => 'submit',
+                'id' => 'edit',
+                'class' => 'btn btn-primary',
             ],
         ]);
     }
@@ -107,27 +108,37 @@ class SettingsAccountForm extends Form {
             'name' => 'email',
             'required' => TRUE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
                         'max' => 160,
                     ],
                 ],
-                ['name' => Validator\EmailAddress::class],
+                [
+                    'name' => Validator\EmailAddress::class
+                ],
             ],
         ]);
         $inputFilter->add([
             'name' => 'realName',
             'required' => TRUE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
@@ -140,7 +151,9 @@ class SettingsAccountForm extends Form {
             'name' => 'displayName',
             'required' => FALSE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
                 [
@@ -155,10 +168,14 @@ class SettingsAccountForm extends Form {
             'name' => 'address',
             'required' => TRUE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
@@ -171,10 +188,14 @@ class SettingsAccountForm extends Form {
             'name' => 'phone',
             'required' => TRUE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
@@ -187,7 +208,9 @@ class SettingsAccountForm extends Form {
             'name' => 'password',
             'required' => FALSE,
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [

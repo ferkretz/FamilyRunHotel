@@ -8,76 +8,40 @@
 
 namespace Application;
 
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 return [
-    'site_options' => [
-        'brandname' => 'Family-run Hotel',
-        'navBarStyle' => 'default',
-        'headerShow' => 'home',
-        'theme' => 'coffee',
-    ],
-    'doctrine' => [
-        'driver' => [
-            __NAMESPACE__ . '_driver' => [
-                'class' => AnnotationDriver::class,
-                'cache' => 'array',
-                'paths' => [__DIR__ . '/../src/Entity']
-            ],
-            'orm_default' => [
-                'drivers' => [
-                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver'
-                ]
-            ]
-        ]
-    ],
-    'language_config' => [
-        'languages_dir' => __DIR__ . '/../language/',
-    ],
     'service_manager' => [
         'factories' => [
-            Model\HeaderData::class => Service\Factory\HeaderDataFactory::class,
-            Model\NavBarData::class => Service\Factory\NavBarDataFactory::class,
-            Service\CapabilityManager::class => Service\Factory\CapabilityManagerFactory::class,
-            Service\DashboardManager::class => Service\Factory\DashboardManagerFactory::class,
-            Service\Localizator::class => Service\Factory\LocalizatorFactory::class,
-            Service\PictureManager::class => Service\Factory\PictureManagerFactory::class,
-            Service\RoomManager::class => Service\Factory\RoomManagerFactory::class,
-            Service\RoomServiceManager::class => Service\Factory\RoomServiceManagerFactory::class,
-            Service\SiteOptionManager::class => Service\Factory\SiteOptionManagerFactory::class,
-            Service\ThemeSelector::class => Service\Factory\ThemeSelectorFactory::class,
-            Service\UserManager::class => Service\Factory\UserManagerFactory::class,
+            Service\Locale\LocaleEntityManager::class => Service\Locale\Factory\LocaleEntityManagerFactory::class,
+            Service\Picture\PictureEntityManager::class => Service\Picture\Factory\PictureEntityManagerFactory::class,
+            Service\Room\RoomEntityManager::class => Service\Room\Factory\RoomEntityManagerFactory::class,
+            Service\Service\ServiceEntityManager::class => Service\Service\Factory\ServiceEntityManagerFactory::class,
+            Service\Site\CurrentOptionValueManager::class => Service\Site\Factory\CurrentOptionValueManagerFactory::class,
+            Service\Site\SiteOptionEntityManager::class => Service\Site\Factory\SiteOptionEntityManagerFactory::class,
+            Service\Site\SiteOptionValueManager::class => Service\Site\Factory\SiteOptionValueManagerFactory::class,
+            \Zend\Authentication\AuthenticationService::class => Service\User\Factory\AuthenticationServiceFactory::class,
+            Service\User\AuthenticationAdapter::class => Service\User\Factory\AuthenticationAdapterFactory::class,
+            Service\User\AuthenticationManager::class => Service\User\Factory\AuthenticationManagerFactory::class,
+            Service\User\CurrentUserEntityManager::class => Service\User\Factory\CurrentUserEntityManagerFactory::class,
+            Service\User\UserEntityManager::class => Service\User\Factory\UserEntityManagerFactory::class,
+            Service\User\UserOptionEntityManager::class => Service\User\Factory\UserOptionEntityManagerFactory::class,
         ],
     ],
     'controller_plugins' => [
         'factories' => [
-            Controller\Plugin\TranslatorPlugin::class => Controller\Plugin\Factory\TranslatorPluginFactory::class,
+            Controller\Plugin\QueryManagerPlugin::class => Controller\Plugin\Factory\QueryManagerPluginFactory::class,
         ],
         'aliases' => [
-            'translator' => Controller\Plugin\TranslatorPlugin::class,
+            'queryManager' => Controller\Plugin\QueryManagerPlugin::class,
         ],
-    ],
-    'access_filter' => [
-        'controllers' => [
-            Controller\IndexController::class => [
-                ['actions' => ['index', 'rooms', 'visitorsBook'], 'allow' => '*']
-            ],
-        ]
     ],
     'view_helpers' => [
         'factories' => [
-        //View\Helper\NavBar2::class => View\Helper\Factory\NavBarFactory::class,
-        //View\Helper\Header::class => View\Helper\Factory\HeaderFactory::class,
+            View\Helper\Site\HeaderHelper::class => View\Helper\Site\Factory\HeaderHelperFactory::class,
+            View\Helper\Site\NavigationBarHelper::class => View\Helper\Site\Factory\NavigationBarHelperFactory::class,
         ],
         'aliases' => [
-        //'header' => View\Helper\Header::class,
-        //'navBar' => View\Helper\NavBar::class,
-        ],
-        'invokables' => [
-            'header' => View\Helper\Header::class,
-            'navBar' => View\Helper\NavBar::class,
-            'languages' => \Zend\Http\Request::class,
-            'translate' => \Zend\I18n\View\Helper\Translate::class
+            'header' => View\Helper\Site\HeaderHelper::class,
+            'navigationBar' => View\Helper\Site\NavigationBarHelper::class,
         ]
     ],
     'view_manager' => [

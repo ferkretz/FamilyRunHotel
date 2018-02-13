@@ -4,77 +4,62 @@ namespace Profile\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Application\Entity\SiteOption;
-use Application\Service\SiteOptionManager;
-use Application\Service\ThemeSelector;
-use Authentication\Service\CurrentUserManager;
+use Application\Service\Site\CurrentOptionValueManager;
+use Application\Service\User\CurrentUserEntityManager;
 use Profile\Form\SettingsAccountForm;
 use Profile\Form\SettingsLookForm;
 
 class SettingsController extends AbstractActionController {
 
     /**
-     * Current User manager.
+     * Current user manager.
      * @var CurrentUserManager
      */
-    protected $currentUserManager;
+    protected $currentUserEntityManager;
 
     /**
-     * Picture manager.
-     * @var OptionManager
+     * Current option value manager.
+     * @var CurrentOptionValueManager
      */
-    protected $optionManager;
+    protected $currentOptionValueManager;
 
-    /**
-     * Theme selector
-     * @var ThemeSelector
-     */
-    protected $themeSelector;
-
-    public function __construct(CurrentUserManager $currentUserManager,
-                                SiteOptionManager $optionManager,
-                                ThemeSelector $themeSelector) {
-        $this->currentUserManager = $currentUserManager;
-        $this->optionManager = $optionManager;
-        $this->themeSelector = $themeSelector;
+    public function __construct(CurrentUserEntityManager $currentUserEntityManager,
+                                CurrentOptionValueManager $currentOptionValueManager) {
+        $this->currentUserEntityManager = $currentUserEntityManager;
+        $this->currentOptionValueManager = $currentOptionValueManager;
     }
 
     public function accountAction() {
         $form = new SettingsAccountForm();
 
-        $currentUser = $this->currentUserManager->get();
+        $currentUserEntity = $this->currentUserEntityManager->get();
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                $currentUser->setEmail($data['email']);
-                $currentUser->setRealName($data['realName']);
-                if (!empty($data['displayName'])) {
-                    $currentUser->setDisplayName($data['displayName']);
-                }
-                $currentUser->setAddress($data['address']);
-                $currentUser->setPhone($data['phone']);
+                $currentUserEntity->setEmail($data['email']);
+                $currentUserEntity->setRealName($data['realName']);
+                $currentUserEntity->setDisplayName(empty($data['displayName']) ? NULL : $data['displayName']);
+                $currentUserEntity->setAddress($data['address']);
+                $currentUserEntity->setPhone($data['phone']);
                 if (!empty($data['password'])) {
                     $bcrypt = new Bcrypt();
-                    $currentUser->setPassword($bcrypt->create($data['password']));
+                    $currentUserEntity->setPassword($bcrypt->create($data['password']));
                 }
-                $this->currentUserManager->update();
+                $this->currentUserEntityManager->update();
             }
         } else {
-            $data['email'] = $currentUser->getEmail();
-            $data['realName'] = $currentUser->getRealName();
-            $data['diaplayName'] = $currentUser->getDisplayName();
-            $data['address'] = $currentUser->getAddress();
-            $data['phone'] = $currentUser->getPhone();
+            $data['email'] = $currentUserEntity->getEmail();
+            $data['realName'] = $currentUserEntity->getRealName();
+            $data['displayName'] = $currentUserEntity->getDisplayName();
+            $data['address'] = $currentUserEntity->getAddress();
+            $data['phone'] = $currentUserEntity->getPhone();
             $form->setData($data);
         }
 
-        $this->layout()->navBarData->setActiveItemId('profileSettings');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'profileSettings';
 
         return new ViewModel([
             'form' => $form,
@@ -82,7 +67,7 @@ class SettingsController extends AbstractActionController {
     }
 
     public function lookAction() {
-        $form = new SettingsLookForm($this->themeSelector->getSupportedThemeNames());
+        $form = new SettingsLookForm();
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
@@ -90,47 +75,32 @@ class SettingsController extends AbstractActionController {
             $form->setData($data);
 
             if ($form->isValid()) {
-                $currentUser = $this->currentUserManager->get();
-                $currentUser->setOptionValue('theme', $data['theme']);
-                $currentUser->setOptionValue('navBarStyle', $data['navBarStyle']);
-                $currentUser->setOptionValue('headerShow', $data['headerShow']);
-                $this->currentUserManager->update();
+                $look = [
+                    'theme' => $data['lookTheme'],
+                    'renderHeader' => $data['lookRenderHeader'],
+                    'barStyle' => $data['lookBarStyle'],
+                ];
+                $currentUserEntity = $this->currentUserEntityManager->get();
+                $currentUserEntity->updateOptionValueByName('look', serialize($look));
+                $this->currentUserEntityManager->update();
 
                 return $this->redirect()->toRoute('profileSettings', ['action' => 'look']); // refresh because of theme change
             }
         } else {
-            $data['theme'] = $this->optionManager->findCurrentValueByName('theme');
-            $data['navBarStyle'] = $this->optionManager->findCurrentValueByName('navBarStyle');
-            $data['headerShow'] = $this->optionManager->findCurrentValueByName('headerShow');
+            $look = $this->currentOptionValueManager->findOneByName('look');
+            $data = [
+                'lookTheme' => $look['theme'],
+                'lookRenderHeader' => $look['renderHeader'],
+                'lookBarStyle' => $look['barStyle'],
+            ];
             $form->setData($data);
         }
 
-        $this->layout()->navBarData->setActiveItemId('profileSettings');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'profileSettings';
 
         return new ViewModel([
             'form' => $form,
         ]);
-    }
-
-    protected function saveOption($name,
-                                  $data) {
-        $option = $this->optionManager->findByName($name);
-        if ($option) {
-            $option->setValue($data);
-            $this->optionManager->update();
-        } else {
-            $option = new SiteOption();
-            $option->setName($name);
-            $option->setValue($data);
-            $this->optionManager->add($option);
-        }
-    }
-
-    protected function translate($message) {
-        $this->translator()->translate($message);
     }
 
 }

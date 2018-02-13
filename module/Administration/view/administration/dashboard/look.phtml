@@ -1,57 +1,116 @@
-<?php $this->headTitle('Default look & feel') ?>
+<?php $this->headTitle($this->escapeHtml($this->translate('Look & feel'))) ?>
 
-<div class="page-header">
-    <h1 id="dashboard">
-        <span class="glyphicon glyphicon-dashboard"></span> <?= $this->escapeHtml($this->translate('Dashboard')) ?>
-    </h1>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-dashboard"></span> <?= $this->escapeHtml($this->translate('Dashboard')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Look & feel')) ?></li>
+    </ol>
+</nav>
 
-<ul class="nav nav-tabs well-tabs">
+<ul class="nav nav-tabs">
     <li role="presentation">
-        <a href="<?= $this->url('administrationDashboard', ['action' => 'company']) ?>"><?= $this->escapeHtml($this->translate('Company')) ?></a>
-    </li>
-    <li role="presentation">
-        <a href="<?= $this->url('administrationDashboard', ['action' => 'google']) ?>"><?= $this->escapeHtml($this->translate('Google')) ?></a>
+        <a href="<?= $this->url(NULL, ['action' => 'features']) ?>"><?= $this->escapeHtml($this->translate('Features')) ?></a>
     </li>
     <li role="presentation" class="active">
-        <a href="<?= $this->url('administrationDashboard', ['action' => 'look']) ?>"><?= $this->escapeHtml($this->translate('Look & feel')) ?></a>
-    </li>
+        <a href="<?= $this->url(NULL, ['action' => 'look']) ?>"><?= $this->escapeHtml($this->translate('Look & feel')) ?></a>
 </ul>
 
-<div class="well tabs-well">
+<div class="well">
     <?= $this->form()->openTag($form) ?>
+
     <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('Default look')) ?></legend>
+
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('theme')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('theme')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookTheme')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookTheme')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('theme'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookTheme'), ['class' => 'help-block']) ?>
             </div>
         </div>
 
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('navBarStyle')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('navBarStyle')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookBarStyle')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookBarStyle')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('navBarStyle'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookBarStyle'), ['class' => 'help-block']) ?>
             </div>
         </div>
 
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('headerShow')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('headerShow')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookRenderHeader')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookRenderHeader')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('headerShow'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookRenderHeader'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('Google maps')) ?></legend>
+
+        <div class="form-group right">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('googleEnable')) ?></div>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        <?= $this->formElement($form->get('googleEnable')); ?>
+                        <?= $this->escapeHtml($this->translate('Enabling Google maps')) ?>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('googleEnable'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('googleLatitude')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('googleLatitude')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <div class="help-block nobottom">
+                    <?= $this->escapeHtml($this->translate('The latitude GPS coordinate is between -90 and 90.')) ?>
+                </div>
+            </div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('googleLatitude'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('googleLongitude')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('googleLongitude')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <div class="help-block nobottom">
+                    <?= $this->escapeHtml($this->translate('The longitude GPS coordinate is between -180 and 180.')) ?>
+                </div>
+            </div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('googleLongitude'), ['class' => 'help-block']) ?>
+            </div>
+        </div>
+
+        <div class="form-group right required">
+            <div class="col-sm-3"><?= $this->formLabel($form->get('googleZoom')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('googleZoom')) ?></div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <div class="help-block nobottom">
+                    <?= $this->escapeHtml($this->translate('15 is generally good zoom value.')) ?>
+                </div>
+            </div>
+            <div class="col-sm-offset-3 col-sm-9">
+                <?= $this->formElementErrors($form->get('googleZoom'), ['class' => 'help-block']) ?>
             </div>
         </div>
     </fieldset>
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button class="btn btn-primary" type="submit" name="save">
-                <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Update %s', $this->translate('default look & feel')))) ?>
-            </button>
+            <?= $this->formButton()->openTag($form->get('save')) ?>
+            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate('Update look & feel')) ?>
+            <?= $this->formButton()->closeTag() ?>
         </div>
     </div>
+
     <?= $this->form()->closeTag() ?>
 </div>

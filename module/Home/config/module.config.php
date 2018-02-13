@@ -12,6 +12,24 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
 return [
+    'site' => [
+        'accessFilters' => [
+            'controllers' => [
+                Controller\IndexController::class => [
+                    [
+                        'actions' => ['index'],
+                        'allow' => ['*'],
+                    ],
+                ],
+                Controller\RoomController::class => [
+                    [
+                        'actions' => ['index', 'view', 'getPicture'],
+                        'allow' => ['*'],
+                    ],
+                ],
+            ],
+        ],
+    ],
     'router' => [
         'routes' => [
             'homeIndex' => [
@@ -25,12 +43,17 @@ return [
                 ],
             ],
             'homeRoom' => [
-                'type' => Literal::class,
+                'type' => Segment::class,
                 'options' => [
-                    'route' => '/rooms',
+                    'route' => '/rooms[/:action][/:id]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                        'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
+                    ],
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'rooms',
+                        'controller' => Controller\RoomController::class,
+                        'action' => 'index',
                     ],
                 ],
             ],
@@ -49,14 +72,8 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
+            Controller\RoomController::class => Controller\Factory\RoomControllerFactory::class,
         ],
-    ],
-    'access_filter' => [
-        'controllers' => [
-            Controller\IndexController::class => [
-                ['actions' => ['index', 'rooms', 'visitorsBook'], 'allow' => '*']
-            ],
-        ]
     ],
     'view_manager' => [
         'template_path_stack' => [

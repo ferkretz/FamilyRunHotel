@@ -16,6 +16,10 @@ $(function () {
                 td.parent().addClass('warning');
             }
         }
+
+        if ($(this).is(':disabled')) {
+            $(this).parent().addClass('disabled');
+        }
     });
 
     chks.change(function () {
@@ -71,6 +75,7 @@ $(function () {
         });
     });
 });
+
 
 /**
  * Clock

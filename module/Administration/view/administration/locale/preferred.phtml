@@ -1,0 +1,97 @@
+<?php
+
+use Application\Service\Locale\LocaleQueryManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Preferred locales')));
+
+$form->setAttributes([
+    'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete locale(s)?')) . ')'
+]);
+?>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class = "glyphicon glyphicon-globe"></span> <?= $this->escapeHtml($this->translate('Locales')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of preferred locales')) ?></li>
+    </ol>
+</nav>
+
+
+<div class="well nobottom">
+    <?= $this->form()->openTag($form) ?>
+
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of preferred locales')) ?></legend>
+
+        <div style="overflow: auto visible">
+            <a class="btn btn-default btn-sm" href="<?= $this->url(NULL, ['action' => 'available']) ?>" style="white-space: nowrap">
+                <span class="glyphicon glyphicon-filter"></span> <?= $this->escapeHtml($this->translate('Show available locales')) ?>
+            </a>
+            <span class="btn btn-default btn-sm" onclick="(function () {
+                        $('input[name=\'locales&#x5B;&#x5D;\']').click();
+                    })()">
+                <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </span>
+            <?= $this->formButton()->openTag($form->get('remove')) ?>
+            <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+            <?= $this->formButton()->closeTag() ?>
+
+            <table id="locale-table" class="table table-hover button-th nobottom">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->localeQueryManager->getParams();
+                            if ($queryParams['orderBy'] == LocaleQueryManager::ORDER_BY_ID) {
+                                $icon = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? LocaleQueryManager::ORDER_DESC : LocaleQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = LocaleQueryManager::ORDER_BY_ID;
+                                $queryParams['order'] = LocaleQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->localeQueryManager->getParams();
+                            if ($queryParams['orderBy'] == LocaleQueryManager::ORDER_BY_NAME) {
+                                $icon = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == LocaleQueryManager::ORDER_ASC ? LocaleQueryManager::ORDER_DESC : LocaleQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = LocaleQueryManager::ORDER_BY_NAME;
+                                $queryParams['order'] = LocaleQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Name')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($locales as $locale) { ?>
+                        <tr class="active">
+                            <td class="td-checkbox" data-select="true" data-button="#remove">
+                                <label>
+                                    <input class="icon-checkbox" type="checkbox" name="locales&#x5B;&#x5D;" value="<?= $locale->getId() ?>" <?= $locale->getId() == 1 ? 'disabled="true"' : '' ?>>
+                                </label>
+                            </td>
+                            <td><?= $this->escapeHtml($locale->getId()) ?></td>
+                            <td><?= $this->escapeHtml($locale->getName() . ' - ' . \Locale::getDisplayName($locale->getName())) ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+
+    <?= $this->form()->closeTag() ?>
+</div>
+
+<?= $this->paginationControl($locales, 'Sliding', 'paginator/paginator', ['route' => NULL, 'queryParams' => $this->localeQueryManager->getParams()]) ?>

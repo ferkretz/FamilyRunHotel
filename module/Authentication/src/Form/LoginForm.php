@@ -22,7 +22,7 @@ class LoginForm extends Form {
         $this->addInputFilter();
     }
 
-    protected function addElements() {
+    private function addElements() {
         $this->add([
             'type' => Element\Email::class,
             'name' => 'email',
@@ -77,10 +77,11 @@ class LoginForm extends Form {
 
         $this->add([
             'type' => Element\Submit::class,
-            'name' => 'submit',
+            'name' => 'login',
             'attributes' => [
                 'value' => 'Sign in',
-                'id' => 'submit',
+                'id' => 'login',
+                'class' => 'btn btn-primary',
             ],
         ]);
     }
@@ -93,17 +94,23 @@ class LoginForm extends Form {
             'name' => 'email',
             'required' => TRUE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
                         'max' => 160,
                     ],
                 ],
-                ['name' => Validator\EmailAddress::class],
+                [
+                    'name' => Validator\EmailAddress::class
+                ],
             ],
         ]);
 
@@ -111,7 +118,9 @@ class LoginForm extends Form {
             'name' => 'password',
             'required' => TRUE,
             'validators' => [
-                ['name' => Validator\NotEmpty::class],
+                [
+                    'name' => Validator\NotEmpty::class
+                ],
                 [
                     'name' => Validator\StringLength::class,
                     'options' => [
@@ -139,7 +148,9 @@ class LoginForm extends Form {
             'name' => 'redirect_url',
             'required' => FALSE,
             'filters' => [
-                ['name' => Filter\StringTrim::class],
+                [
+                    'name' => Filter\StringTrim::class
+                ],
             ],
             'validators' => [
                 [

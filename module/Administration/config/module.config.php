@@ -2,33 +2,73 @@
 
 namespace Administration;
 
-use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
 return [
+    'site' => [
+        'accessFilters' => [
+            'controllers' => [
+                Controller\DashboardController::class => [
+                    [
+                        'actions' => ['features', 'look'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+                Controller\PictureController::class => [
+                    [
+                        'actions' => ['index', 'add', 'thumbnail'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+                Controller\RoomController::class => [
+                    [
+                        'actions' => ['index', 'add', 'edit', 'availableServices', 'selectedServices', 'availablePictures', 'selectedPictures'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+                Controller\ServiceController::class => [
+                    [
+                        'actions' => ['index', 'add', 'edit'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+                Controller\LocaleController::class => [
+                    [
+                        'actions' => ['preferred', 'available'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+                Controller\UserController::class => [
+                    [
+                        'actions' => ['index', 'add', 'edit'],
+                        'allow' => ['+admin'],
+                    ],
+                ],
+            ],
+        ],
+    ],
     'router' => [
         'routes' => [
             'administrationDashboard' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/dashboard/:action',
+                    'route' => '/admin/dashboard[/:action]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\DashboardController::class,
-                        'action' => 'company',
+                        'action' => 'features',
                     ],
                 ],
             ],
             'administrationPicture' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/pictures[/:action][/:id][/:translationLocale]',
+                    'route' => '/admin/pictures[/:action][/:id]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                        'id' => '[0-9]+',
-                        'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
+                        'id' => '[0-9_]*',
                     ],
                     'defaults' => [
                         'controller' => Controller\PictureController::class,
@@ -39,14 +79,14 @@ return [
             'administrationService' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/services[/:action][/:id][/:translationLocale]',
+                    'route' => '/admin/services[/:action][/:id]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
                         'translationLocale' => '[a-zA-Z][a-zA-Z_-]*',
                     ],
                     'defaults' => [
-                        'controller' => Controller\RoomServiceController::class,
+                        'controller' => Controller\ServiceController::class,
                         'action' => 'index',
                     ],
                 ],
@@ -54,7 +94,7 @@ return [
             'administrationRoom' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/admin/rooms[/:action][/:id][/:translationLocale]',
+                    'route' => '/admin/rooms[/:action][/:id]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+',
@@ -63,6 +103,20 @@ return [
                     'defaults' => [
                         'controller' => Controller\RoomController::class,
                         'action' => 'index',
+                    ],
+                ],
+            ],
+            'administrationLocale' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/admin/locales[/:action]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\LocaleController::class,
+                        'action' => 'preferred',
                     ],
                 ],
             ],
@@ -85,37 +139,11 @@ return [
     'controllers' => [
         'factories' => [
             Controller\DashboardController::class => Controller\Factory\DashboardControllerFactory::class,
+            Controller\LocaleController::class => Controller\Factory\LocaleControllerFactory::class,
             Controller\PictureController::class => Controller\Factory\PictureControllerFactory::class,
             Controller\RoomController::class => Controller\Factory\RoomControllerFactory::class,
-            Controller\RoomServiceController::class => Controller\Factory\RoomServiceControllerFactory::class,
+            Controller\ServiceController::class => Controller\Factory\ServiceControllerFactory::class,
             Controller\UserController::class => Controller\Factory\UserControllerFactory::class,
-        ],
-    ],
-    'access_filter' => [
-        'controllers' => [
-            Controller\DashboardController::class => [
-                ['actions' => ['company', 'google', 'look'], 'allow' => '+admin']
-            ],
-            Controller\PictureController::class => [
-                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
-            ],
-            Controller\RoomController::class => [
-                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
-            ],
-            Controller\RoomServiceController::class => [
-                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
-            ],
-            Controller\UserController::class => [
-                ['actions' => ['index', 'add', 'edit'], 'allow' => '+admin']
-            ],
-        ]
-    ],
-    'service_manager' => [
-        'factories' => [
-            Service\PictureQueryManager::class => Service\Factory\PictureQueryManagerFactory::class,
-            Service\RoomQueryManager::class => Service\Factory\RoomQueryManagerFactory::class,
-            Service\RoomServiceQueryManager::class => Service\Factory\RoomServiceQueryManagerFactory::class,
-            Service\UserQueryManager::class => Service\Factory\UserQueryManagerFactory::class,
         ],
     ],
     'view_manager' => [

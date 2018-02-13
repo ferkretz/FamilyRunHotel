@@ -4,152 +4,131 @@ namespace Administration\Controller;
 
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use Zend\Crypt\Password\Bcrypt;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Form\UserAddForm;
-use Administration\Form\UserEditForm;
-use Administration\Form\UserIndexForm;
-use Administration\Service\UserQueryManager;
-use Application\Entity\User;
-use Application\Service\UserManager;
-use Application\Service\SiteOptionManager;
+use Administration\Form\User\AddForm;
+use Administration\Form\User\EditForm;
+use Administration\Form\User\IndexForm;
+use Application\Entity\User\UserEntity;
+use Application\Service\User\UserEntityManager;
+use Application\Service\User\UserQueryManager;
 
 class UserController extends AbstractActionController {
 
     /**
-     * UserQuery manager.
-     * @var UserQueryManager
+     * User entity manager.
+     * @var UserEntityManager
      */
-    protected $userQueryManager;
+    protected $userEntityManager;
 
     /**
-     * User manager.
-     * @var UserManager
-     */
-    protected $userManager;
-
-    /**
-     * Picture manager.
-     * @var OptionManager
-     */
-    protected $optionManager;
-
-    /**
-     * Roles from the 'capability_config' config key.
+     * Roles from the 'roles' config key.
      * @var array
      */
     protected $roles;
 
-    public function __construct(UserQueryManager $userQueryManager,
-                                UserManager $userManager,
-                                SiteOptionManager $optionManager,
-                                $roles) {
-        $this->userQueryManager = $userQueryManager;
-        $this->userManager = $userManager;
-        $this->optionManager = $optionManager;
+    public function __construct(UserEntityManager $userEntityManager,
+                                array $roles) {
+        $this->userEntityManager = $userEntityManager;
         $this->roles = $roles;
     }
 
     public function indexAction() {
-        $page = $this->params()->fromQuery('page', 1);
-        $orderBy = $this->params()->fromQuery('orderBy', UserQueryManager::ORDER_BY_ID);
-        $order = $this->params()->fromQuery('order', UserQueryManager::ORDER_ASC);
+        $userQueryManager = $this->queryManager(UserQueryManager::class);
 
-        $this->userQueryManager->setOrder($order);
-        $this->userQueryManager->setOrderBy($orderBy);
-        $userQuery = $this->userQueryManager->getQuery();
+        $page = $this->params()->fromQuery('page', 1);
+
+        $userQueryManager->setOrder($this->params()->fromQuery('order'));
+        $userQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $userQuery = $userQueryManager->getQuery();
 
         $adapter = new DoctrineAdapter(new ORMPaginator($userQuery, FALSE));
         $paginator = new Paginator($adapter);
-        $paginator->setDefaultItemCountPerPage(5);
+        $paginator->setDefaultItemCountPerPage(10);
         $paginator->setCurrentPageNumber($page);
 
         $userIds = [];
-        foreach ($paginator as $user) {
-            $userIds[] = $user->getId();
+        foreach ($paginator as $userEntity) {
+            $userIds[$userEntity->getId()] = $userEntity->getId();
         }
-        $form = new UserIndexForm($userIds);
+        $form = new IndexForm($userIds);
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                if (count($data)) {
-                    foreach ($data['users'] as $index) {
-                        $users[] = $paginator->getItem($index + 1);
+                if (!empty($data)) {
+                    $protectException = FALSE;
+
+                    foreach ($data['users'] as $userId) {
+                        if ($userId == 1) {
+                            $protectException = TRUE;
+                        } else {
+                            $this->userEntityManager->removeById($userId);
+                        }
                     }
-                    foreach ($users as $user) {
-                        $this->userManager->remove($user);
+
+                    if ($protectException) {
+                        throw new \Exception('Default user can not be deleted.');
                     }
                 } else {
                     throw new \Exception('There are no users to delete.');
                 }
 
-                return $this->redirect()->toRoute('administrationUser');
-            } else {
-                throw new \Exception(current($form->getMessages()['users'][0]));
+                return $this->redirect()->toRoute(NULL);
             }
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationUser');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationUser';
 
         return new ViewModel([
             'form' => $form,
             'users' => $paginator,
-            'orderBy' => $this->userQueryManager->getOrderBy(),
-            'order' => $this->userQueryManager->getOrder(),
-            'requiredQuery' => ['orderBy' => $this->userQueryManager->getOrderBy(), 'order' => $this->userQueryManager->getOrder()],
+            'userQueryManager' => $userQueryManager,
         ]);
     }
 
     public function editAction() {
-        $form = new UserEditForm($this->roles);
-
         $id = $this->params()->fromRoute('id', -1);
-        $user = $this->userManager->findById($id);
-        if ($user == NULL) {
-            $this->getResponse()->setStatusCode(404);
-            return;
+        $userEntity = $this->userEntityManager->findOneById($id);
+
+        if ($userEntity == NULL) {
+            return $this->notFoundAction();
         }
+
+        $form = new EditForm($this->roles);
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                $user->setEmail($data['email']);
-                $user->setRealName($data['realName']);
-                if (!empty($data['displayName'])) {
-                    $user->setDisplayName($data['displayName']);
-                }
-                $user->setAddress($data['address']);
-                $user->setPhone($data['phone']);
-                $user->setRole($data['role']);
+                $userEntity->setEmail($data['email']);
+                $userEntity->setRealName($data['realName']);
+                $userEntity->setDisplayName(empty($data['displayName']) ? NULL : $data['displayName']);
+                $userEntity->setAddress($data['address']);
+                $userEntity->setPhone($data['phone']);
+                $userEntity->setRole($data['role']);
                 if (!empty($data['password'])) {
                     $bcrypt = new Bcrypt();
-                    $user->setPassword($bcrypt->create($data['password']));
+                    $userEntity->setPassword($bcrypt->create($data['password']));
                 }
-                $this->userManager->update();
+                $this->userEntityManager->update();
             }
         } else {
-            $data['email'] = $user->getEmail();
-            $data['realName'] = $user->getRealName();
-            $data['diaplayName'] = $user->getDisplayName();
-            $data['address'] = $user->getAddress();
-            $data['phone'] = $user->getPhone();
-            $data['role'] = $user->getRole();
+            $data['email'] = $userEntity->getEmail();
+            $data['realName'] = $userEntity->getRealName();
+            $data['diaplayName'] = $userEntity->getDisplayName();
+            $data['address'] = $userEntity->getAddress();
+            $data['phone'] = $userEntity->getPhone();
+            $data['role'] = $userEntity->getRole();
             $form->setData($data);
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationUser');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationUser';
 
         return new ViewModel([
             'form' => $form,
@@ -157,44 +136,37 @@ class UserController extends AbstractActionController {
     }
 
     public function addAction() {
-        $form = new UserAddForm($this->roles);
+        $form = new AddForm($this->roles);
 
-        $user = new User();
+        $userEntity = new UserEntity();
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                $user->setEmail($data['email']);
-                $user->setRealName($data['realName']);
-                $user->setDisplayName($data['displayName']);
-                $user->setAddress($data['address']);
-                $user->setPhone($data['phone']);
-                $user->setRole($data['role']);
+                $userEntity->setEmail($data['email']);
+                $userEntity->setRealName($data['realName']);
+                $userEntity->setDisplayName(empty($data['displayName']) ? NULL : $data['displayName']);
+                $userEntity->setAddress($data['address']);
+                $userEntity->setPhone($data['phone']);
+                $userEntity->setRole($data['role']);
                 if (!empty($data['password'])) {
                     $bcrypt = new Bcrypt();
-                    $user->setPassword($bcrypt->create($data['password']));
+                    $userEntity->setPassword($bcrypt->create($data['password']));
                 }
-                $user->setRegistered(new \DateTime(NULL, new \DateTimeZone("UTC")));
-                $this->userManager->add($user);
+                $userEntity->setRegistered(new \DateTime(NULL, new \DateTimeZone("UTC")));
+                $this->userEntityManager->insert($userEntity);
 
-                return $this->redirect()->toRoute('administrationUser', ['action' => 'edit', 'id' => $user->getId()]);
+                return $this->redirect()->toRoute(NULL, ['action' => 'edit', 'id' => $userEntity->getId()]);
             }
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationUser');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationUser';
 
         return new ViewModel([
             'form' => $form,
         ]);
-    }
-
-    protected function translate($message) {
-        $this->translator()->translate($message);
     }
 
 }

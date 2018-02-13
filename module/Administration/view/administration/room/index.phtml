@@ -1,104 +1,140 @@
 <?php
-$this->headTitle('Rooms');
+
+use Application\Service\Room\RoomQueryManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Rooms')));
 
 $form->setAttributes([
-    "onsubmit" => "return confirm($this->escapeHtml($this->translate('Do you really want to delete these rooms?')))",
+    'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete room(s)?')) . ')'
 ]);
-$orders = [
-    'id' => 'ASC',
-    'price' => 'ASC',
-    'summary' => 'ASC',
-    'transCount' => 'ASC',
-];
-$orders[$orderBy] = $order == 'ASC' ? 'DESC' : 'ASC';
-$sortIcons = [
-    'id' => '',
-    'price' => '',
-    'summary' => '',
-    'transCount' => '',
-];
-$sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
 
-<div class="page-header">
-    <h1 id="rooms">
-        <span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>
-    </h1>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of rooms')) ?></li>
+    </ol>
+</nav>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>
-    <div class="overflow-auto">
-        <p>
-            <a class="btn btn-default btn-sm" href="<?= $this->url('administrationRoom', ['action' => 'add']) ?>" style="white-space: nowrap">
-                <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new rooms')) ?>
+
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of rooms')) ?></legend>
+
+        <div style="overflow: auto visible">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-globe"></span> <?= $locales[$this->roomQueryManager->getLocaleId()] ?> <span class="caret"></span>
+                </button>
+
+                <ul class="dropdown-menu" style="max-height: 10em; overflow: auto">
+                    <?php
+                    foreach ($locales as $id => $name) {
+                        if ($id != $this->roomQueryManager->getLocaleId()) {
+                            $queryParams = $this->roomQueryManager->getParams();
+                            $queryParams['localeId'] = $id;
+                            ?><li><a href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>"><?= $name ?></a></li><?php
+                        }
+                    }
+                    ?>
+                </ul>
+            </div>
+            <a class="btn btn-default btn-sm" href="<?= $this->url(NULL, ['action' => 'add']) ?>" style="white-space: nowrap">
+                <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new room')) ?>
             </a>
             <span class="btn btn-default btn-sm" onclick="(function () {
-                                $('input[name=\'rooms&#x5B;&#x5D;\']').click();
-                            })()">
+                        $('input[name=\'rooms&#x5B;&#x5D;\']').click();
+                    })()">
                 <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
             </span>
-            <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
-                <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
-            </button>
-        </p>
-        <table id="myTable" class="table table-hover nobottom">
-            <thead>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
-                            <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'summary', 'order' => $orders['summary']]]) ?>">
-                            <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['summary'] ?>"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'price', 'order' => $orders['price']]]) ?>">
-                            <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['price'] ?>"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationRoom', [], ['query' => ['orderBy' => 'transCount', 'order' => $orders['transCount']]]) ?>">
-                            <?= $this->escapeHtml($this->translate('Translations')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['transCount'] ?>"></span>
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($rooms as $index => $room) { ?>
-                    <tr class="active" data-lnk="<?= $this->url('administrationRoom', ['action' => 'edit', 'id' => $room->getId()]) ?>" style="cursor:pointer">
-                        <td class="td-checkbox" data-select="true" data-button="#remove-submit">
-                            <label>
-                                <input class="icon-checkbox" type="checkbox" name="rooms&#x5B;&#x5D;" value="<?= $index ?>">
-                            </label>
-                        </td>
-                        <td><?= $this->escapeHtml($room->getId()) ?></td>
-                        <td><?= $this->escapeHtml($room->getSummary()) ?></td>
-                        <td><?= $this->escapeHtml($room->getPrice()) ?></td>
-                        <td>
-                            <?= $this->escapeHtml($room->getTransCount()) ?>
+            <?= $this->formButton()->openTag($form->get('remove')) ?>
+            <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+            <?= $this->formButton()->closeTag() ?>
+
+            <table id="room-table" class="table table-hover button-th nobottom">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>
                             <?php
-                            $translations = $this->translationList[$room->getId()];
-                            if (strlen($translations)) {
-                                if (strlen($translations) > 30) {
-                                    $subTranslations = ' (' . substr($translations, 0, 30) . '...)';
-                                } else {
-                                    $subTranslations = ' (' . substr($translations, 0, 30) . ')';
-                                }
-                                echo $this->escapeHtml($subTranslations);
+                            $icon = '';
+                            $queryParams = $this->roomQueryManager->getParams();
+                            if ($queryParams['orderBy'] == RoomQueryManager::ORDER_BY_ID) {
+                                $icon = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? RoomQueryManager::ORDER_DESC : RoomQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = RoomQueryManager::ORDER_BY_ID;
+                                $queryParams['order'] = RoomQueryManager::ORDER_ASC;
                             }
                             ?>
-                        </td>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->roomQueryManager->getParams();
+                            if ($queryParams['orderBy'] == RoomQueryManager::ORDER_BY_SUMMARY) {
+                                $icon = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? RoomQueryManager::ORDER_DESC : RoomQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = RoomQueryManager::ORDER_BY_SUMMARY;
+                                $queryParams['order'] = RoomQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->roomQueryManager->getParams();
+                            if ($queryParams['orderBy'] == RoomQueryManager::ORDER_BY_PRICE) {
+                                $icon = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? RoomQueryManager::ORDER_DESC : RoomQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = RoomQueryManager::ORDER_BY_PRICE;
+                                $queryParams['order'] = RoomQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
                     </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    <?php
+                    $decimalFormatter = new \NumberFormatter(NULL, \NumberFormatter::CURRENCY);
+                    $decimalFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
+                    foreach ($rooms as $room) {
+                        ?>
+                        <tr class="active" data-lnk="<?= $this->url(NULL, ['action' => 'edit', 'id' => $room->getId()], $this->roomQueryManager->getLocaleId() == 1 ? [] : ['query' => ['localeId' => $this->roomQueryManager->getLocaleId()]]) ?>" style="cursor:pointer">
+                            <td class="td-checkbox" data-select="true" data-button="#remove">
+                                <label>
+                                    <input class="icon-checkbox" type="checkbox" name="rooms&#x5B;&#x5D;" value="<?= $room->getId() ?>">
+                                </label>
+                            </td>
+                            <td><?= $this->escapeHtml($room->getId()) ?></td>
+                            <td>
+                                <?php
+                                $localeId = $this->roomQueryManager->getLocaleId();
+                                $summary = $room->getTranslations()->containsKey($localeId) ? $room->getTranslations()->get($localeId)->getSummary() : $this->translate('*** undefined ***');
+                                echo $this->escapeHtml($summary);
+                                ?>
+                            </td>
+                            <td><?= $this->escapeHtml($decimalFormatter->formatCurrency($room->getPrice(), $currency)) ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+
     <?= $this->form()->closeTag() ?>
 </div>
 
-<?= $this->paginationControl($rooms, 'Sliding', 'paginator/paginator', ['route' => 'administrationRoom', 'requiredQuery' => $requiredQuery]) ?>
+<?= $this->paginationControl($rooms, 'Sliding', 'paginator/paginator', ['route' => NULL, 'queryParams' => $this->roomQueryManager->getParams()]) ?>

@@ -1,4 +1,4 @@
-<?php $this->headTitle('Sign in') ?>
+<?php $this->headTitle($this->escapeHtml($this->translate('Sign in'))) ?>
 
 <div class="page-header">
     <h1 id="login">
@@ -8,11 +8,14 @@
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>
+
     <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('Please, sign in!')) ?></legend>
+
         <?php if ($isLoginError) { ?>
             <div class="alert alert-warning" role="alert">
                 <?= $this->translate('Incorrect email and/or password.') ?>
-                <a href="<?= $this->url('authenticationResetPassword') ?>"><?= $this->translate('Forgot password?') ?></a>
+                <a href="<?= $this->url('authenticationResetPassword') ?>"><?= $this->escapeHtml($this->translate('Forgot password?')) ?></a>
             </div>
         <?php } ?>
 
@@ -21,7 +24,7 @@
             <div class="col-sm-9"><?= $this->formElement($form->get('email')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="help-block nobottom">
-                    <?= $this->escapeHtml($this->translate('Email address. This is your login either.')) ?>
+                    <?= $this->escapeHtml($this->escapeHtml($this->translate('Email address. This is your login either.'))) ?>
                 </div>
             </div>
             <div class="col-sm-offset-3 col-sm-9">
@@ -52,12 +55,13 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button class="btn btn-primary" type="submit">
-                    <span class="glyphicon glyphicon-log-in"></span> <?= $this->escapeHtml($this->translate('Sign in')) ?>
-                </button>
+                <?= $this->formButton()->openTag($form->get('login')) ?>
+                <span class="glyphicon glyphicon-log-in"></span> <?= $this->escapeHtml($this->translate('Sign in')) ?>
+                <?= $this->formButton()->closeTag() ?>
             </div>
         </div>
 
     </fieldset>
+
     <?= $this->form()->closeTag() ?>
 </div>

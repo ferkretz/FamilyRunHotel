@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <?= $this->headTitle($this->brandName)->setSeparator(' - ')->setAutoEscape(FALSE) ?>
+        <?= $this->headTitle($this->titleString)->setSeparator(' - ')->setAutoEscape(FALSE) ?>
         <?=
                 $this->headMeta()
                 ->appendName('viewport', 'width=device-width, initial-scale=1.0')
@@ -11,8 +11,8 @@
         ?>
         <?=
                 $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
-                ->prependStylesheet($this->basePath('themes/' . $theme . '/css/style.css'))
-                ->prependStylesheet($this->basePath('themes/' . $theme . '/css/theme.min.css'))
+                ->prependStylesheet($this->basePath('themes/' . $this->themeString . '/css/style.css'))
+                ->prependStylesheet($this->basePath('themes/' . $this->themeString . '/css/theme.css'))
         ?>
         <?=
                 $this->headScript()
@@ -22,12 +22,11 @@
         ?>
     </head>
     <body>
-        <?= $this->navBar($navBarData) ?>
-
+        <?= $this->navigationBar($this->activeMenuItemId) ?>
         <div class="container">
             <div class="row">
                 <div class="col-md-10 center-block" style="float:none">
-                    <?= $this->header($headerData) ?>
+                    <?= $this->header() ?>
                     <?= $this->content ?>
                 </div>
             </div>

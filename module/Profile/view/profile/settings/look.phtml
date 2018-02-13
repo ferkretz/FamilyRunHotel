@@ -1,12 +1,13 @@
-<?php $this->headTitle('Your look & feel') ?>
+<?php $this->headTitle($this->escapeHtml($this->translate('Look & feel'))) ?>
 
-<div class="page-header">
-    <h1 id="settings">
-        <span class="glyphicon glyphicon-wrench"></span> <?= $this->escapeHtml($this->translate('Settings')) ?>
-    </h1>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-wrench"></span> <?= $this->escapeHtml($this->translate('Profile')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Look & feel')) ?></li>
+    </ol>
+</nav>
 
-<ul class="nav nav-tabs well-tabs">
+<ul class="nav nav-tabs">
     <li role="presentation">
         <a href="<?= $this->url('profileSettings', ['action' => 'account']) ?>"><?= $this->escapeHtml($this->translate('Account')) ?></a>
     </li>
@@ -15,40 +16,44 @@
     </li>
 </ul>
 
-<div class="well tabs-well">
+<div class="well">
     <?= $this->form()->openTag($form) ?>
+
     <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('Look & feel')) ?></legend>
+
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('theme')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('theme')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookTheme')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookTheme')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('theme'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookTheme'), ['class' => 'help-block']) ?>
             </div>
         </div>
 
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('navBarStyle')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('navBarStyle')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookBarStyle')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookBarStyle')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('navBarStyle'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookBarStyle'), ['class' => 'help-block']) ?>
             </div>
         </div>
 
         <div class="form-group right required">
-            <div class="col-sm-3"><?= $this->formLabel($form->get('headerShow')) ?></div>
-            <div class="col-sm-9"><?= $this->formElement($form->get('headerShow')) ?></div>
+            <div class="col-sm-3"><?= $this->formLabel($form->get('lookRenderHeader')) ?></div>
+            <div class="col-sm-9"><?= $this->formElement($form->get('lookRenderHeader')) ?></div>
             <div class="col-sm-offset-3 col-sm-9">
-                <?= $this->formElementErrors($form->get('headerShow'), ['class' => 'help-block']) ?>
+                <?= $this->formElementErrors($form->get('lookRenderHeader'), ['class' => 'help-block']) ?>
             </div>
         </div>
     </fieldset>
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button class="btn btn-primary" type="submit" name="save">
-                <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate(sprintf('Update %s', $this->translate('your look & feel')))) ?>
-            </button>
+            <?= $this->formButton()->openTag($form->get('save')) ?>
+            <span class="glyphicon glyphicon-edit"></span> <?= $this->escapeHtml($this->translate('Update look & feel')) ?>
+            <?= $this->formButton()->closeTag() ?>
         </div>
     </div>
+
     <?= $this->form()->closeTag() ?>
 </div>

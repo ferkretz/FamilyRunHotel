@@ -2,10 +2,21 @@
 
 namespace Profile;
 
-use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
 return [
+    'site' => [
+        'accessFilters' => [
+            'controllers' => [
+                Controller\SettingsController::class => [
+                    [
+                        'actions' => ['account', 'look'],
+                        'allow' => ['!users'],
+                    ],
+                ],
+            ],
+        ],
+    ],
     'router' => [
         'routes' => [
             'profileSettings' => [
@@ -26,18 +37,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\SettingsController::class => Controller\Factory\SettingsControllerFactory::class,
-        ],
-    ],
-    'access_filter' => [
-        'controllers' => [
-            Controller\SettingsController::class => [
-                ['actions' => ['account', 'look'], 'allow' => '@']
-            ],
-        ]
-    ],
-    'service_manager' => [
-        'factories' => [
-            //Service\PictureQueryManager::class => Service\Factory\PictureQueryManagerFactory::class,
         ],
     ],
     'view_manager' => [

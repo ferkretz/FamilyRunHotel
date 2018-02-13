@@ -43,16 +43,6 @@ return [
                     ],
                 ],
             ],
-            'authenticationNotAuthorized' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/not-authorized',
-                    'defaults' => [
-                        'controller' => Controller\AuthenticationController::class,
-                        'action' => 'notAuthorized',
-                    ],
-                ],
-            ],
             'authenticationResetPassword' => [
                 'type' => Literal::class,
                 'options' => [
@@ -68,14 +58,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\AuthenticationController::class => Controller\Factory\AuthenticationControllerFactory::class,
-        ],
-    ],
-    'service_manager' => [
-        'factories' => [
-            \Zend\Authentication\AuthenticationService::class => Service\Factory\AuthenticationServiceFactory::class,
-            Service\AuthenticationAdapter::class => Service\Factory\AuthenticationAdapterFactory::class,
-            Service\AuthenticationManager::class => Service\Factory\AuthenticationManagerFactory::class,
-            Service\CurrentUserManager::class => Service\Factory\CurrentUserManagerFactory::class,
         ],
     ],
     'view_manager' => [

@@ -1,0 +1,82 @@
+<?php
+
+use Application\Service\Room\RoomQueryManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Rooms')));
+?>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of rooms')) ?></li>
+    </ol>
+</nav>
+
+<div class="well nobottom">
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of rooms')) ?></legend>
+
+        <div style="overflow: auto visible">
+
+            <table id="room-table" class="table table-hover button-th nobottom">
+                <thead>
+                    <tr>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->roomQueryManager->getParams();
+                            unset($queryParams['localeId']);
+                            if ($queryParams['orderBy'] == RoomQueryManager::ORDER_BY_SUMMARY) {
+                                $icon = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? RoomQueryManager::ORDER_DESC : RoomQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = RoomQueryManager::ORDER_BY_SUMMARY;
+                                $queryParams['order'] = RoomQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->roomQueryManager->getParams();
+                            unset($queryParams['localeId']);
+                            if ($queryParams['orderBy'] == RoomQueryManager::ORDER_BY_PRICE) {
+                                $icon = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == RoomQueryManager::ORDER_ASC ? RoomQueryManager::ORDER_DESC : RoomQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = RoomQueryManager::ORDER_BY_PRICE;
+                                $queryParams['order'] = RoomQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Price')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $decimalFormatter = new \NumberFormatter(NULL, \NumberFormatter::CURRENCY);
+                    $decimalFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
+                    foreach ($rooms as $room) {
+                        $localeId = $this->roomQueryManager->getLocaleId();
+                        if ($room->getTranslations()->containsKey($localeId)) {
+                            ?>
+                            <tr class="active" data-lnk="<?= $this->url(NULL, ['action' => 'view', 'id' => $room->getId()]) ?>" style="cursor:pointer">
+                                <td><?= $this->escapeHtml($room->getTranslations()->get($localeId)->getSummary()) ?></td>
+                                <td><?= $this->escapeHtml($decimalFormatter->formatCurrency($room->getPrice(), $currency)) ?></td>
+                            </tr>
+                            <?php
+                        }
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<?= $this->paginationControl($rooms, 'Sliding', 'paginator/paginator', ['route' => NULL, 'queryParams' => $this->roomQueryManager->getParams()]) ?>

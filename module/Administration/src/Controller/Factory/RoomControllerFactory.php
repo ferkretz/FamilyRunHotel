@@ -5,22 +5,31 @@ namespace Administration\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Administration\Controller\RoomController;
-use Administration\Service\RoomQueryManager;
-use Application\Service\Localizator;
-use Application\Service\RoomManager;
-use Application\Service\SiteOptionManager;
+use Application\Service\Locale\LocaleEntityManager;
+use Application\Service\Room\RoomEntityManager;
+use Application\Service\Picture\PictureEntityManager;
+use Application\Service\Service\ServiceEntityManager;
+use Application\Service\Site\SiteOptionValueManager;
 
 class RoomControllerFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = NULL) {
-        $roomQueryManager = $container->get(RoomQueryManager::class);
-        $roomManager = $container->get(RoomManager::class);
-        $localizator = $container->get(Localizator::class);
-        $optionManager = $container->get(SiteOptionManager::class);
+        $roomEntityManager = $container->get(RoomEntityManager::class);
+        $localeEntityManager = $container->get(LocaleEntityManager::class);
+        $siteOptionValueManager = $container->get(SiteOptionValueManager::class);
+        $serviceEntityManager = $container->get(ServiceEntityManager::class);
+        $pictureEntityManager = $container->get(PictureEntityManager::class);
+        $defaultUpload = [
+            'jpegQuality' => 75,
+            'minImageSize' => 256,
+            'maxImageSize' => 7680,
+            'thumbnailWidth' => 196,
+        ];
+        $uploadOptions = $siteOptionValueManager->findOneByName('upload', $defaultUpload);
 
-        return new RoomController($roomQueryManager, $roomManager, $localizator, $optionManager);
+        return new RoomController($roomEntityManager, $localeEntityManager, $siteOptionValueManager, $serviceEntityManager, $pictureEntityManager, $uploadOptions);
     }
 
 }

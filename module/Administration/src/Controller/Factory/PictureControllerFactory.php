@@ -5,22 +5,25 @@ namespace Administration\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Administration\Controller\PictureController;
-use Administration\Service\PictureQueryManager;
-use Application\Service\Localizator;
-use Application\Service\PictureManager;
-use Application\Service\SiteOptionManager;
+use Application\Service\Picture\PictureEntityManager;
+use Application\Service\Site\SiteOptionValueManager;
 
 class PictureControllerFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = NULL) {
-        $pictureQueryManager = $container->get(PictureQueryManager::class);
-        $pictureManager = $container->get(PictureManager::class);
-        $localizator = $container->get(Localizator::class);
-        $optionManager = $container->get(SiteOptionManager::class);
+        $siteOptionValueManager = $container->get(SiteOptionValueManager::class);
+        $pictureEntityManager = $container->get(PictureEntityManager::class);
+        $defaultUpload = [
+            'jpegQuality' => 75,
+            'minImageSize' => 256,
+            'maxImageSize' => 7680,
+            'thumbnailWidth' => 196,
+        ];
+        $uploadOptions = $siteOptionValueManager->findOneByName('upload', $defaultUpload);
 
-        return new PictureController($pictureQueryManager, $pictureManager, $localizator, $optionManager);
+        return new PictureController($pictureEntityManager, $uploadOptions);
     }
 
 }

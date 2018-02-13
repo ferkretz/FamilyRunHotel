@@ -1,6 +1,7 @@
 <?php
 
 return [
+    "Add new %s" => "Új %s hozzáadása",
     "Administration" => "Adminisztráció",
     "Contact information:" => "Elérhetőségek:",
     "Dashboard" => "Vezérlőpult",
@@ -18,6 +19,7 @@ return [
     "Pictures" => "Képek",
     "Please sign in" => "Kérlek, jelentkezz be",
     "Previous" => "Előző",
+    'Price (%s)' => 'Ár (%s)',
     "Remember me" => "Emlékezz rám",
     "Remove" => "Törlés",
     "Role" => "Szerepkör",

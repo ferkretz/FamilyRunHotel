@@ -8,45 +8,49 @@
 
 namespace Application;
 
-use Zend\Authentication\AuthenticationService;
 use Zend\Session\SessionManager;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
-use Application\Model\HeaderData;
-use Application\Model\NavBarData;
-use Application\Service\Localizator;
-use Application\Service\SiteOptionManager;
-use Application\Service\ThemeSelector;
+use Zend\Mvc\I18n\Translator;
+use Zend\Validator\AbstractValidator;
+use Application\Service\Locale\LocaleEntityManager;
+use Application\Service\Site\CurrentOptionValueManager;
+use Application\Service\Site\SiteOptionValueManager;
+use Application\Service\User\AuthenticationManager;
 use Authentication\Controller\AuthenticationController;
-use Authentication\Service\AuthenticationManager;
 
 class Module {
 
-    const VERSION = '3.0.3-dev';
+    const VERSION = '3.1.0';
 
     public function getConfig() {
-        return include __DIR__ . '/../config/module.config.php';
+        $config = include __DIR__ . '/../config/module.config.php';
+
+        $handle = opendir(__DIR__ . '/../config');
+        if ($handle) {
+            while (($entry = readdir($handle)) !== FALSE) {
+                if ($entry != '.' && $entry != '..' && $entry != 'module.config.php') {
+                    $config = array_merge($config, include __DIR__ . '/../config/' . $entry);
+                }
+            }
+            closedir($handle);
+        }
+
+        return $config;
     }
 
     public function onBootstrap(MvcEvent $event) {
         $application = $event->getApplication();
-
         $serviceManager = $application->getServiceManager();
         $sessionManager = $serviceManager->get(SessionManager::class);
-
-        // Localize
-        $localizator = $serviceManager->get(Localizator::class);
-
-        // Load brandname from database ('FamilyRunHotel' is the default).
         $viewModel = $event->getViewModel();
-        $optionManager = $serviceManager->get(SiteOptionManager::class);
-        $viewModel->brandName = $optionManager->findValueByName('brandName');
-        // Select theme
-        $themeSelector = $serviceManager->get(ThemeSelector::class);
-        $viewModel->theme = $themeSelector->getLocalTheme();
-        // Navbar, header
-        $viewModel->headerData = $serviceManager->get(HeaderData::class);
-        $viewModel->navBarData = $serviceManager->get(NavBarData::class);
+
+        // Locale
+        $this->setLocale($serviceManager);
+
+        // Some variable
+        $viewModel->titleString = $this->getTitleString($serviceManager);
+        $viewModel->themeString = $this->getThemeString($serviceManager);
 
         // Controller setup
         $eventManager = $event->getApplication()->getEventManager();
@@ -76,9 +80,102 @@ class Module {
 
                 return $controller->redirect()->toRoute('authenticationLogin', [], ['query' => ['redirectUrl' => $redirectUrl]]);
             } else if ($result == AuthenticationManager::ACCESS_DENIED) {
-                return $controller->redirect()->toRoute('auth-not-authorized');
+                return $controller->notFoundAction();
             }
         }
+    }
+
+    private function getTitleString($serviceManager) {
+        $translator = $serviceManager->get(Translator::class);
+        $siteOptionValueManager = $serviceManager->get(SiteOptionValueManager::class);
+
+        $defaultCompanyData = [
+            'name' => 'Family-run Hotel',
+            'i18n' => FALSE,
+        ];
+        $companyData = $siteOptionValueManager->findOneByName('company', $defaultCompanyData);
+
+        if ($companyData['i18n']) {
+            return $translator->translate($companyData['name']);
+        }
+
+        return $companyData['name'];
+    }
+
+    private function getThemeString($serviceManager) {
+        $currentOptionValueManager = $serviceManager->get(CurrentOptionValueManager::class);
+
+        $defaultLookData = [
+            'theme' => 'cofee',
+        ];
+        $lookData = $currentOptionValueManager->findOneByName('look', $defaultLookData);
+        $currentThemeName = $lookData['theme'];
+
+        $themesDir = __DIR__ . '/../../../public/themes';
+        $supportedThemeNames = [];
+
+        if (is_dir($themesDir)) {
+            $handle = opendir($themesDir);
+            if ($handle) {
+                while (($entry = readdir($handle)) !== FALSE) {
+                    if ($entry != '.' && $entry != '..') {
+                        $supportedThemeNames[] = $entry;
+                    }
+                }
+                closedir($handle);
+            }
+        }
+
+        if (in_array($currentThemeName, $supportedThemeNames)) {
+            return $currentThemeName;
+        }
+
+        return $supportedThemeNames[0];
+    }
+
+    private function setLocale($serviceManager) {
+        $translator = $serviceManager->get(Translator::class);
+        $currentLocale = $this->findCurrentLocale($serviceManager);
+        $languageDir = __DIR__ . '/../language/' . $currentLocale;
+
+        if (is_dir($languageDir)) {
+            $handle = opendir($languageDir);
+            if ($handle) {
+                while (($entry = readdir($handle)) !== FALSE) {
+                    if ($entry != '.' && $entry != '..') {
+                        if (strrpos($entry, '.php') === (strlen($entry) - 4)) {
+                            $translator->addTranslationFile('phpArray', $languageDir . '/' . $entry, 'default', $currentLocale);
+                        }
+                    }
+                }
+                closedir($handle);
+            }
+        }
+
+        AbstractValidator::setDefaultTranslator($translator);
+        \Locale::setDefault($currentLocale);
+    }
+
+    private function findCurrentLocale($serviceManager) {
+        $localeEntityManager = $serviceManager->get(LocaleEntityManager::class);
+        $supportedLocales = $localeEntityManager->findAllName();
+
+        $headers = $serviceManager->get('Request')->getHeaders();
+        if ($headers->has('Accept-Language')) {
+            $requestedLocales = $headers->get('Accept-Language')->getPrioritized();
+        }
+
+        foreach ($requestedLocales as $requestedLocale) {
+            $currentLocale = \Locale::lookup($supportedLocales, $requestedLocale->typeString, TRUE, '.');
+            if ($currentLocale != '.') {
+                $localeEntityManager->setCurrentByName($currentLocale);
+                return $currentLocale;
+            }
+        }
+
+        $currentLocaleEntity = $localeEntityManager->findOneById(1);
+        $localeEntityManager->setCurrent($currentLocaleEntity);
+        return $currentLocaleEntity->getName();
     }
 
 }

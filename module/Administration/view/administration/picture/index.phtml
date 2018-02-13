@@ -1,98 +1,53 @@
 <?php
-$this->headTitle('Pictures');
+$this->headTitle($this->escapeHtml($this->translate('Pictures')));
 
 $form->setAttributes([
-    "onsubmit" => "return confirm($this->escapeHtml($this->translate('Do you really want to delete these pictures?')))",
+    'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete picture(s)?')) . ')'
 ]);
-$orders = [
-    'id' => 'ASC',
-    'price' => 'ASC',
-    'summary' => 'ASC',
-    'transCount' => 'ASC',
-];
-$orders[$orderBy] = $order == 'ASC' ? 'DESC' : 'ASC';
-$sortIcons = [
-    'id' => '',
-    'price' => '',
-    'summary' => '',
-    'transCount' => '',
-];
-$sortIcons[$orderBy] = $order == 'ASC' ? '-by-attributes' : '-by-attributes-alt'
 ?>
 
-<div class="page-header">
-    <h1 id="pictures">
-        <span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>
-    </h1>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <strong><span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>:</strong>
+        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of pictures')) ?></li>
+    </ol>
+</nav>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>
-    <div class="overflow-auto">
-        <p>
-            <a class="btn btn-default btn-sm" href="<?= $this->url('administrationPicture', ['action' => 'add']) ?>" style="white-space: nowrap">
+
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of pictures')) ?></legend>
+
+        <div style="overflow: auto">
+            <a class="btn btn-default btn-sm" href="<?= $this->url(NULL, ['action' => 'add']) ?>" style="white-space: nowrap">
                 <span class="glyphicon glyphicon-plus"></span> <?= $this->escapeHtml($this->translate('Add new pictures')) ?>
             </a>
             <span class="btn btn-default btn-sm" onclick="(function () {
-                                $('input[name=\'pictures&#x5B;&#x5D;\']').click();
-                            })()">
+                        $('input[name=\'pictures&#x5B;&#x5D;\']').click();
+                    })()">
                 <span class="glyphicon glyphicon-random"></span> <?= $this->escapeHtml($this->translate('Inverse select')) ?>
             </span>
-            <button class="btn btn-default btn-sm" type="submit" id='remove-submit' style="display:none">
-                <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
-            </button>
-        </p>
-        <table id="myTable" class="table table-hover nobottom">
-            <thead>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationPicture', [], ['query' => ['orderBy' => 'id', 'order' => $orders['id']]]) ?>">
-                            <span class="glyphicon glyphicon-sort<?= $sortIcons['id'] ?>"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationPicture', [], ['query' => ['orderBy' => 'summary', 'order' => $orders['summary']]]) ?>">
-                            <?= $this->escapeHtml($this->translate('Summary')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['summary'] ?>"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="btn btn-default btn-sm btn-block" href="<?= $this->url('administrationPicture', [], ['query' => ['orderBy' => 'transCount', 'order' => $orders['transCount']]]) ?>">
-                            <?= $this->escapeHtml($this->translate('Translations')) ?> <span class="glyphicon glyphicon-sort<?= $sortIcons['transCount'] ?>"></span>
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($pictures as $index => $picture) { ?>
-                    <tr class="active" data-lnk="<?= $this->url('administrationPicture', ['action' => 'edit', 'id' => $picture->getId()]) ?>" style="cursor:pointer">
-                        <td class="td-checkbox" data-select="true" data-button="#remove-submit">
-                            <label>
-                                <input class="icon-checkbox" type="checkbox" name="pictures&#x5B;&#x5D;" value="<?= $index ?>">
-                            </label>
-                        </td>
-                        <td><?= $this->escapeHtml($picture->getId()) ?></td>
-                        <td><?= $this->escapeHtml($picture->getSummary()) ?></td>
-                        <td>
-                            <?= $this->escapeHtml($picture->getTransCount()) ?>
-                            <?php
-                            $translations = $this->translationList[$picture->getId()];
-                            if (strlen($translations)) {
-                                if (strlen($translations) > 30) {
-                                    $subTranslations = ' (' . substr($translations, 0, 30) . '...)';
-                                } else {
-                                    $subTranslations = ' (' . substr($translations, 0, 30) . ')';
-                                }
-                                echo $this->escapeHtml($subTranslations);
-                            }
-                            ?>
-                        </td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </div>
+            <?= $this->formButton()->openTag($form->get('remove')) ?>
+            <span class="glyphicon glyphicon-trash"></span> <?= $this->escapeHtml($this->translate('Remove selected')) ?>
+            <?= $this->formButton()->closeTag() ?>
+
+            <p>
+                <?php foreach ($pictures as $picture) { ?>
+                <div class="img-thumbnail">
+                    <img src="<?= $this->url(NULL, ['action' => 'thumbnail', 'id' => $picture->getId()]) ?>" width="<?= $this->thumbnailWidth ?>">
+                    <div class="caption caption-checkbox" data-button="#remove">
+                        <label>
+                            <input class="icon-checkbox" type="checkbox" name="pictures&#x5B;&#x5D;" value="<?= $picture->getId() ?>"><?= $picture->getId() ?>
+                        </label>
+                    </div>
+                </div>
+            <?php } ?>
+            </p>
+        </div>
+    </fieldset>
+
     <?= $this->form()->closeTag() ?>
 </div>
 
-<?= $this->paginationControl($pictures, 'Sliding', 'paginator/paginator', ['route' => 'administrationPicture', 'requiredQuery' => $requiredQuery]) ?>
+<?= $this->paginationControl($pictures, 'Sliding', 'paginator/paginator', ['route' => NULL, 'queryParams' => $this->pictureQueryManager->getParams()]) ?>

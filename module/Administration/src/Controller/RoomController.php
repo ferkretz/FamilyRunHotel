@@ -7,205 +7,478 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Administration\Form\RoomAddForm;
-use Administration\Form\RoomEditForm;
-use Administration\Form\RoomIndexForm;
-use Administration\Service\RoomQueryManager;
-use Application\Entity\Room;
-use Application\Entity\RoomTranslation;
-use Application\Service\Localizator;
-use Application\Service\RoomManager;
-use Application\Service\SiteOptionManager;
+use Administration\Form\Room\AddForm;
+use Administration\Form\Room\AvailablePicturesForm;
+use Administration\Form\Room\AvailableServicesForm;
+use Administration\Form\Room\EditForm;
+use Administration\Form\Room\IndexForm;
+use Administration\Form\Room\SelectedPicturesForm;
+use Administration\Form\Room\SelectedServicesForm;
+use Application\Entity\Room\RoomEntity;
+use Application\Entity\Room\RoomTranslationEntity;
+use Application\Service\Locale\LocaleEntityManager;
+use Application\Service\Picture\PictureEntityManager;
+use Application\Service\Picture\PictureQueryManager;
+use Application\Service\Service\ServiceEntityManager;
+use Application\Service\Service\ServiceQueryManager;
+use Application\Service\Site\SiteOptionValueManager;
+use Application\Service\Room\RoomEntityManager;
+use Application\Service\Room\RoomQueryManager;
 
 class RoomController extends AbstractActionController {
 
     /**
-     * RoomQuery manager.
-     * @var RoomQueryManager
+     * Room entity manager.
+     * @var RoomEntityManager
      */
-    protected $roomQueryManager;
+    protected $roomEntityManager;
 
     /**
-     * Room manager.
-     * @var RoomManager
+     * Locale entity manager.
+     * @var LocaleEntityManager
      */
-    protected $roomManager;
-    protected $localizator;
+    protected $localeEntityManager;
 
     /**
-     * Picture manager.
-     * @var OptionManager
+     * Site option value manager
+     * @var SiteOptionValueManager
      */
-    protected $optionManager;
+    protected $siteOptionValueManager;
 
-    public function __construct(RoomQueryManager $roomQueryManager,
-                                RoomManager $roomManager,
-                                Localizator $localizator,
-                                SiteOptionManager $optionManager) {
-        $this->roomQueryManager = $roomQueryManager;
-        $this->roomManager = $roomManager;
-        $this->localizator = $localizator;
-        $this->optionManager = $optionManager;
+    /**
+     * Service entity manager.
+     * @var ServiceEntityManager
+     */
+    protected $serviceEntityManager;
+
+    /**
+     * Picture entity manager.
+     * @var PictureEntityManager
+     */
+    protected $pictureEntityManager;
+
+    /**
+     * Upload options
+     * @var array
+     */
+    protected $uploadOptions;
+
+    public function __construct(RoomEntityManager $roomEntityManager,
+                                LocaleEntityManager $localeEntityManager,
+                                SiteOptionValueManager $siteOptionValueManager,
+                                ServiceEntityManager $serviceEntityManager,
+                                PictureEntityManager $pictureEntityManager,
+                                $uploadOptions) {
+        $this->roomEntityManager = $roomEntityManager;
+        $this->localeEntityManager = $localeEntityManager;
+        $this->siteOptionValueManager = $siteOptionValueManager;
+        $this->serviceEntityManager = $serviceEntityManager;
+        $this->pictureEntityManager = $pictureEntityManager;
+        $this->uploadOptions = $uploadOptions;
+        $this->uploadOptions['pictureEntityManager'] = $pictureEntityManager;
     }
 
     public function indexAction() {
-        $page = $this->params()->fromQuery('page', 1);
-        $orderBy = $this->params()->fromQuery('orderBy', RoomQueryManager::ORDER_BY_ID);
-        $order = $this->params()->fromQuery('order', RoomQueryManager::ORDER_ASC);
+        $roomQueryManager = $this->queryManager(RoomQueryManager::class);
 
-        $this->roomQueryManager->setOrder($order);
-        $this->roomQueryManager->setOrderBy($orderBy);
-        $roomQuery = $this->roomQueryManager->getQuery();
+        $page = $this->params()->fromQuery('page', 1);
+
+        $roomQueryManager->setOrder($this->params()->fromQuery('order'));
+        $roomQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $roomQueryManager->setLocaleId($this->params()->fromQuery('localeId'), $this->localeEntityManager->findAllId());
+        $roomQuery = $roomQueryManager->getQuery();
 
         $adapter = new DoctrineAdapter(new ORMPaginator($roomQuery, FALSE));
         $paginator = new Paginator($adapter);
-        $paginator->setDefaultItemCountPerPage(5);
+        $paginator->setDefaultItemCountPerPage(10);
         $paginator->setCurrentPageNumber($page);
 
         $roomIds = [];
-        $translationList = [];
-        foreach ($paginator as $room) {
-            $roomIds[] = $room->getId();
-
-            $translationArr = [];
-            foreach ($room->getTranslations() as $translation) {
-                $translationArr[] = \Locale::getDisplayName($translation->getLocale());
-            }
-            $translationList[$room->getId()] = implode(', ', $translationArr);
+        foreach ($paginator as $roomEntity) {
+            $roomIds[$roomEntity->getId()] = $roomEntity->getId();
         }
-        $form = new RoomIndexForm($roomIds);
+        $form = new IndexForm($roomIds);
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                if (count($data)) {
-                    foreach ($data['rooms'] as $index) {
-                        $rooms[] = $paginator->getItem($index + 1);
-                    }
-                    foreach ($rooms as $room) {
-                        $this->roomManager->remove($room);
+                if (!empty($data)) {
+                    foreach ($data['rooms'] as $roomId) {
+                        $this->roomEntityManager->removeById($roomId);
                     }
                 } else {
                     throw new \Exception('There are no rooms to delete.');
                 }
 
-                return $this->redirect()->toRoute('administrationRoom');
-            } else {
-                throw new \Exception(current($form->getMessages()['rooms'][0]));
+                return $this->redirect()->toRoute(NULL);
             }
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationRoom');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        $defaultCompany = [
+            'currency' => 'USD',
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
 
         return new ViewModel([
             'form' => $form,
             'rooms' => $paginator,
-            'translationList' => $translationList,
-            'orderBy' => $this->roomQueryManager->getOrderBy(),
-            'order' => $this->roomQueryManager->getOrder(),
-            'requiredQuery' => ['orderBy' => $this->roomQueryManager->getOrderBy(), 'order' => $this->roomQueryManager->getOrder()],
+            'locales' => $this->localeEntityManager->findAllDisplayName(),
+            'roomQueryManager' => $roomQueryManager,
+            'currency' => $company['currency'],
         ]);
     }
 
     public function editAction() {
-        $form = new RoomEditForm($this->localizator->getSupportedLocaleNames());
-
         $id = $this->params()->fromRoute('id', -1);
-        $translationLocale = $this->params()->fromRoute('translationLocale', 'none');
-        $supportedLocales = array_merge(['none'], $this->localizator->getSupportedLocales());
-        $room = $this->roomManager->findById($id);
-        if ($room == NULL || !in_array($translationLocale, $supportedLocales)) {
-            $this->getResponse()->setStatusCode(404);
-            return;
+        $roomEntity = $this->roomEntityManager->findOneById($id);
+        if ($roomEntity == NULL) {
+            return $this->notFoundAction();
         }
+        $locales = $this->localeEntityManager->findAllDisplayName();
+        $localeId = $this->params()->fromQuery('localeId');
+        if (!array_key_exists($localeId, $locales)) {
+            $localeId = 1;
+        }
+
+        $form = new EditForm();
+
+        $decimalFormatter = new \NumberFormatter(NULL, \NumberFormatter::DECIMAL);
+        $decimalFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
 
             $form->setData($data);
-            if ($translationLocale != 'none') {
-                $form->getInputFilter()->get('translationSummary')->setRequired(TRUE);
-            }
-
             if ($form->isValid()) {
-                $room->setSummary($data['summary']);
-                $room->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
-                $room->setCurrency($data['currency']);
-                $room->setDescription($data['description']);
-                if ($translationLocale != 'none') {
-                    $translation = new RoomTranslation();
-                    $translation->setSummary($data['translationSummary']);
-                    $translation->setDescription($data['translationDescription']);
-                    $room->setTranslation($translationLocale, $translation);
+                $roomEntity->setPrice($decimalFormatter->parse($data['price']));
+                if ($roomEntity->getTranslations()->containsKey($localeId)) {
+                    $translationEntity = $roomEntity->getTranslations()->get($localeId);
+                    $translationEntity->setSummary($data['summary']);
+                    $translationEntity->setDescription($data['description']);
+                    $this->roomEntityManager->update();
+                } else {
+                    $translationEntity = new RoomTranslationEntity();
+                    $translationEntity->setRoom($roomEntity);
+                    $translationEntity->setLocale($this->localeEntityManager->findOneById($localeId));
+                    $translationEntity->setSummary($data['summary']);
+                    $translationEntity->setDescription($data['description']);
+                    $roomEntity->getTranslations()->add($translationEntity);
+                    $this->roomEntityManager->insert($roomEntity);
                 }
-                $this->roomManager->update();
             }
         } else {
-            $data['summary'] = $room->getSummary();
-            $data['price'] = number_format($room->getPrice(), 2, localeconv()['decimal_point'], '');
-            $data['currency'] = $room->getCurrency();
-            $data['description'] = $room->getDescription();
-            if ($translationLocale != 'none') {
-                $translation = $room->getTranslation($translationLocale);
-                if ($translation) {
-                    $data['translationSummary'] = $translation->getSummary();
-                    $data['translationDescription'] = $translation->getDescription();
-                }
+            $data['price'] = $decimalFormatter->format($roomEntity->getPrice());
+            if ($roomEntity->getTranslations()->containsKey($localeId)) {
+                $translationEntity = $roomEntity->getTranslations()->get($localeId);
+                $data['summary'] = $translationEntity->getSummary();
+                $data['description'] = $translationEntity->getDescription();
             }
             $form->setData($data);
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationRoom');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        $defaultCompany = [
+            'currency' => 'USD',
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
 
         return new ViewModel([
             'id' => $id,
-            'translationLocale' => $translationLocale,
-            'translationName' => \Locale::getDisplayName($translationLocale),
-            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
+            'localeId' => $localeId,
+            'locales' => $locales,
             'form' => $form,
+            'currency' => $company['currency'],
         ]);
     }
 
     public function addAction() {
-        $form = new RoomAddForm();
-        $room = new Room();
+        $form = new AddForm();
+
+        $decimalFormatter = new \NumberFormatter(NULL, \NumberFormatter::DECIMAL);
+        $decimalFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
 
         if ($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()) {
-                $room->setSummary($data['summary']);
-                $room->setPrice(str_replace(localeconv()['decimal_point'], '.', $data['price']));
-                $room->setCurrency($data['currency']);
-                $room->setDescription($data['description']);
-                $this->roomManager->add($room);
+                $roomEntity = new RoomEntity();
+                $roomEntity->setPrice($decimalFormatter->parse($data['price']));
+                $translationEntity = new RoomTranslationEntity();
+                $translationEntity->setRoom($roomEntity);
+                $translationEntity->setLocale($this->localeEntityManager->findOneById(1));
+                $translationEntity->setSummary($data['summary']);
+                $translationEntity->setDescription($data['description']);
+                $roomEntity->getTranslations()->add($translationEntity);
+                $this->roomEntityManager->insert($roomEntity);
 
-                return $this->redirect()->toRoute('administrationRoom', ['action' => 'edit', 'id' => $room->getId()]);
+                return $this->redirect()->toRoute(NULL, ['action' => 'edit', 'id' => $roomEntity->getId()], ['query' => ['localeId' => 1]]);
             }
         }
 
-        $this->layout()->navBarData->setActiveItemId('administrationRoom');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        $defaultCompany = [
+            'currency' => 'USD',
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
 
         return new ViewModel([
-            'fallbackLocaleName' => \Locale::getDisplayName($this->localizator->getFallbackLocale()),
+            'defaultLocaleDisplayName' => \Locale::getDisplayName($this->localeEntityManager->findOneById(1)->getName()),
             'form' => $form,
+            'currency' => $company['currency'],
         ]);
     }
 
-    protected function translate($message) {
-        $this->translator()->translate($message);
+    public function availableServicesAction() {
+        $id = $this->params()->fromRoute('id', -1);
+        $roomEntity = $this->roomEntityManager->findOneById($id);
+        if ($roomEntity == NULL) {
+            return $this->notFoundAction();
+        }
+        $serviceQueryManager = $this->queryManager(ServiceQueryManager::class);
+
+        $page = $this->params()->fromQuery('page', 1);
+
+        $serviceQueryManager->setOrder($this->params()->fromQuery('order'));
+        $serviceQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $serviceQueryManager->setLocaleId($this->params()->fromQuery('localeId'), $this->localeEntityManager->findAllId());
+        $serviceQueryManager->setRoomId($id, TRUE);
+        $serviceQuery = $serviceQueryManager->getQuery();
+
+        $adapter = new DoctrineAdapter(new ORMPaginator($serviceQuery, FALSE));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage(10);
+        $paginator->setCurrentPageNumber($page);
+
+        $serviceIds = [];
+        foreach ($paginator as $serviceEntity) {
+            $serviceIds[$serviceEntity->getId()] = $serviceEntity->getId();
+        }
+        $form = new AvailableServicesForm($serviceIds);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+                if (!empty($data)) {
+                    $serviceCollection = $roomEntity->getServices();
+                    foreach ($data['services'] as $serviceId) {
+                        if (!$serviceCollection->containsKey($serviceId)) {
+                            $serviceCollection->add($this->serviceEntityManager->findOneById($serviceId));
+                        }
+                    }
+                    $this->roomEntityManager->update();
+                } else {
+                    throw new \Exception('There are no services to add.');
+                }
+
+                return $this->redirect()->toRoute(NULL, ['action' => 'availableServices', 'id' => $id]);
+            }
+        }
+
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        $defaultCompany = [
+            'currency' => 'USD',
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
+
+        return new ViewModel([
+            'id' => $id,
+            'form' => $form,
+            'services' => $paginator,
+            'locales' => $this->localeEntityManager->findAllDisplayName(),
+            'serviceQueryManager' => $serviceQueryManager,
+            'currency' => $company['currency'],
+        ]);
+    }
+
+    public function selectedServicesAction() {
+        $id = $this->params()->fromRoute('id', -1);
+        $roomEntity = $this->roomEntityManager->findOneById($id);
+        if ($roomEntity == NULL) {
+            return $this->notFoundAction();
+        }
+        $serviceQueryManager = $this->queryManager(ServiceQueryManager::class);
+
+        $page = $this->params()->fromQuery('page', 1);
+
+        $serviceQueryManager->setOrder($this->params()->fromQuery('order'));
+        $serviceQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $serviceQueryManager->setLocaleId($this->params()->fromQuery('localeId'), $this->localeEntityManager->findAllId());
+        $serviceQueryManager->setRoomId($id);
+        $serviceQuery = $serviceQueryManager->getQuery();
+
+        $adapter = new DoctrineAdapter(new ORMPaginator($serviceQuery, FALSE));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage(10);
+        $paginator->setCurrentPageNumber($page);
+
+        $serviceIds = [];
+        foreach ($paginator as $serviceEntity) {
+            $serviceIds[$serviceEntity->getId()] = $serviceEntity->getId();
+        }
+        $form = new SelectedServicesForm($serviceIds);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+                if (!empty($data)) {
+                    $serviceCollection = $roomEntity->getServices();
+                    foreach ($data['services'] as $serviceId) {
+                        if ($serviceCollection->containsKey($serviceId)) {
+                            $serviceCollection->remove($serviceId);
+                        }
+                    }
+                    $this->roomEntityManager->update();
+                } else {
+                    throw new \Exception('There are no services to delete.');
+                }
+
+                return $this->redirect()->toRoute(NULL, ['action' => 'selectedServices', 'id' => $id]);
+            }
+        }
+
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        $defaultCompany = [
+            'currency' => 'USD',
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
+
+        return new ViewModel([
+            'id' => $id,
+            'form' => $form,
+            'services' => $paginator,
+            'locales' => $this->localeEntityManager->findAllDisplayName(),
+            'serviceQueryManager' => $serviceQueryManager,
+            'currency' => $company['currency'],
+        ]);
+    }
+
+    public function availablePicturesAction() {
+        $id = $this->params()->fromRoute('id', -1);
+        $roomEntity = $this->roomEntityManager->findOneById($id);
+        if ($roomEntity == NULL) {
+            return $this->notFoundAction();
+        }
+        $pictureQueryManager = $this->queryManager(PictureQueryManager::class);
+
+        $page = $this->params()->fromQuery('page', 1);
+
+        $pictureQueryManager->setOrder($this->params()->fromQuery('order'));
+        $pictureQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $pictureQueryManager->setRoomId($id, TRUE);
+        $pictureQuery = $pictureQueryManager->getQuery();
+
+        $adapter = new DoctrineAdapter(new ORMPaginator($pictureQuery, FALSE));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage(20);
+        $paginator->setCurrentPageNumber($page);
+
+        $pictureIds = [];
+        foreach ($paginator as $pictureEntity) {
+            $pictureIds[$pictureEntity->getId()] = $pictureEntity->getId();
+        }
+        $form = new AvailablePicturesForm($pictureIds);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+                if (!empty($data)) {
+                    $pictureCollection = $roomEntity->getPictures();
+                    foreach ($data['pictures'] as $pictureId) {
+                        if (!$pictureCollection->containsKey($pictureId)) {
+                            $pictureCollection->add($this->pictureEntityManager->findOneById($pictureId));
+                        }
+                    }
+                    $this->roomEntityManager->update();
+                } else {
+                    throw new \Exception('There are no pictures to add.');
+                }
+
+                return $this->redirect()->toRoute(NULL, ['action' => 'availablePictures', 'id' => $id]);
+            }
+        }
+
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        return new ViewModel([
+            'id' => $id,
+            'form' => $form,
+            'thumbnailWidth' => $this->uploadOptions['thumbnailWidth'],
+            'pictures' => $paginator,
+            'pictureQueryManager' => $pictureQueryManager,
+        ]);
+    }
+
+    public function selectedPicturesAction() {
+        $id = $this->params()->fromRoute('id', -1);
+        $roomEntity = $this->roomEntityManager->findOneById($id);
+        if ($roomEntity == NULL) {
+            return $this->notFoundAction();
+        }
+        $pictureQueryManager = $this->queryManager(PictureQueryManager::class);
+
+        $page = $this->params()->fromQuery('page', 1);
+
+        $pictureQueryManager->setOrder($this->params()->fromQuery('order'));
+        $pictureQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
+        $pictureQueryManager->setRoomId($id);
+        $pictureQuery = $pictureQueryManager->getQuery();
+
+        $adapter = new DoctrineAdapter(new ORMPaginator($pictureQuery, FALSE));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage(20);
+        $paginator->setCurrentPageNumber($page);
+
+        $pictureIds = [];
+        foreach ($paginator as $pictureEntity) {
+            $pictureIds[$pictureEntity->getId()] = $pictureEntity->getId();
+        }
+        $form = new SelectedPicturesForm($pictureIds);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+                if (!empty($data)) {
+                    $pictureCollection = $roomEntity->getPictures();
+                    foreach ($data['pictures'] as $pictureId) {
+                        if ($pictureCollection->containsKey($pictureId)) {
+                            $pictureCollection->remove($pictureId);
+                        }
+                    }
+                    $this->roomEntityManager->update();
+                } else {
+                    throw new \Exception('There are no pictures to delete.');
+                }
+
+                return $this->redirect()->toRoute(NULL, ['action' => 'selectedPictures', 'id' => $id]);
+            }
+        }
+
+        $this->layout()->activeMenuItemId = 'administrationRoom';
+
+        return new ViewModel([
+            'id' => $id,
+            'form' => $form,
+            'thumbnailWidth' => $this->uploadOptions['thumbnailWidth'],
+            'pictures' => $paginator,
+            'pictureQueryManager' => $pictureQueryManager,
+        ]);
     }
 
 }

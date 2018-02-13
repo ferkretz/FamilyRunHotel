@@ -1,40 +1,40 @@
 <?php
-$this->headTitle('Home');
+$this->headTitle($this->escapeHtml($this->translate('Home')));
 ?>
 
-<div class="panel panel-default">
-    <div class="panel-heading"><?= $this->escapeHtml($this->translate('Contact information:')) ?></div>
-    <div class="panel-body">
-        <?php if ($address || $email || $phone) { ?>
-            <ul style="list-style-type: none;padding: 0">
-                <?php if ($address) { ?>
-                    <li>
-                        <span class="glyphicon glyphicon-home"></span> <?= $this->escapeHtml($address) ?>
-                    </li>
-                <?php } ?>
-                <?php if ($email) { ?>
-                    <li>
-                        <span class="glyphicon glyphicon-envelope"></span> <?= $this->escapeHtml($email) ?>
-                    </li>
-                <?php } ?>
-                <?php if ($phone) { ?>
-                    <li>
-                        <span class="glyphicon glyphicon-phone-alt"></span> <?= $this->escapeHtml($phone) ?>
-                    </li>
-                <?php } ?>
-            </ul>
+<div class="well nobottom">
+    <ul style="list-style-type: none;padding: 0">
+        <?php if ($company['fullName']) { ?>
+            <li style="padding-bottom: 5px">
+                <strong><?= $this->escapeHtml($company['fullName']) ?></strong>
+            </li>
         <?php } ?>
-        <?php if ($latitude && $longitude && $zoom) { ?>
-            <div id="map" class="google-map"></div>
+        <?php if ($company['address']) { ?>
+            <li>
+                <span class="glyphicon glyphicon-home"></span> <?= $this->escapeHtml($company['address']) ?>
+            </li>
         <?php } ?>
-    </div>
+        <?php if ($company['email']) { ?>
+            <li>
+                <span class="glyphicon glyphicon-envelope"></span> <?= $this->escapeHtml($company['email']) ?>
+            </li>
+        <?php } ?>
+        <?php if ($company['phone']) { ?>
+            <li>
+                <span class="glyphicon glyphicon-phone-alt"></span> <?= $this->escapeHtml($company['phone']) ?>
+            </li>
+        <?php } ?>
+    </ul>
+    <?php if ($google['enable']) { ?>
+        <div id="map" class="google-map"></div>
+    <?php } ?>
 </div>
-<?php if ($latitude && $longitude && $zoom) { ?>
+<?php if ($google['enable']) { ?>
     <script>
         function initMap() {
-            var uluru = {lat: <?= $this->escapeHtml($latitude) ?>, lng: <?= $this->escapeHtml($longitude) ?>};
+            var uluru = {lat: <?= $this->escapeHtml($google['latitude']) ?>, lng: <?= $this->escapeHtml($google['longitude']) ?>};
             var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: <?= $this->escapeHtml($zoom) ?>,
+                zoom: <?= $this->escapeHtml($google['zoom']) ?>,
                 center: uluru
             });
             var marker = new google.maps.Marker({

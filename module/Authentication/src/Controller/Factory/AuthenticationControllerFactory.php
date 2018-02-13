@@ -5,9 +5,9 @@ namespace Authentication\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Application\Service\User\AuthenticationManager;
+use Application\Service\User\UserEntityManager;
 use Authentication\Controller\AuthenticationController;
-use Authentication\Service\AuthenticationManager;
-use Application\Service\UserManager;
 
 class AuthenticationControllerFactory implements FactoryInterface {
 
@@ -16,10 +16,9 @@ class AuthenticationControllerFactory implements FactoryInterface {
                              array $options = NULL) {
         $authenticationManager = $container->get(AuthenticationManager::class);
         $authenticationService = $container->get(AuthenticationService::class);
-        $entityManager = $container->get('doctrine.entitymanager.orm_default');
-        $userManager = $container->get(UserManager::class);
+        $userEntityManager = $container->get(UserEntityManager::class);
 
-        return new AuthenticationController($authenticationManager, $authenticationService, $entityManager, $userManager);
+        return new AuthenticationController($authenticationManager, $authenticationService, $userEntityManager);
     }
 
 }

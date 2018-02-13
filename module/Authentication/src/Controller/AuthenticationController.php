@@ -2,15 +2,14 @@
 
 namespace Authentication\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Uri;
 use Zend\View\Model\ViewModel;
+use Application\Service\User\AuthenticationManager;
+use Application\Service\User\UserEntityManager;
 use Authentication\Form\LoginForm;
-use Authentication\Service\AuthenticationManager;
-use Application\Service\UserManager;
 
 class AuthenticationController extends AbstractActionController {
 
@@ -27,25 +26,17 @@ class AuthenticationController extends AbstractActionController {
     protected $authenticationService;
 
     /**
-     * Entity manager.
-     * @var EntityManager
+     * User entity manager.
+     * @var UserEntityManager
      */
-    protected $entityManager;
-
-    /**
-     * User manager.
-     * @var UserManager
-     */
-    protected $userManager;
+    protected $userEntityManager;
 
     public function __construct(AuthenticationManager $authenticationManager,
                                 AuthenticationService $authenticationService,
-                                EntityManager $entityManager,
-                                UserManager $userManager) {
+                                UserEntityManager $userEntityManager) {
         $this->authenticationManager = $authenticationManager;
         $this->authenticationService = $authenticationService;
-        $this->entityManager = $entityManager;
-        $this->userManager = $userManager;
+        $this->userEntityManager = $userEntityManager;
     }
 
     public function registerAction() {
@@ -108,12 +99,6 @@ class AuthenticationController extends AbstractActionController {
         $this->authenticationManager->logout();
 
         return $this->redirect()->toRoute('homeIndex');
-    }
-
-    public function notAuthorizedAction() {
-        $this->getResponse()->setStatusCode(403);
-
-        return new ViewModel();
     }
 
     public function resetPasswordAction() {

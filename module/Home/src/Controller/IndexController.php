@@ -4,60 +4,46 @@ namespace Home\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Application\Service\SiteOptionManager;
-use Application\Model\NavBarData;
+use Application\Service\Site\SiteOptionValueManager;
 
 class IndexController extends AbstractActionController {
 
-    protected $optionManager;
-    protected $navBarData;
+    /**
+     * Site option value manager.
+     * @var SiteOptionValueManager
+     */
+    protected $siteOptionValueManager;
 
-    public function __construct(SiteOptionManager $optionManager,
-                                NavBarData $navBarData) {
-        $this->optionManager = $optionManager;
-        $this->navBar = $navBarData;
+    public function __construct(SiteOptionValueManager $siteOptionValueManager) {
+        $this->siteOptionValueManager = $siteOptionValueManager;
     }
 
     public function indexAction() {
-        $address = $this->optionManager->findValueByName('address');
-        $email = $this->optionManager->findValueByName('email');
-        $phone = $this->optionManager->findValueByName('phone');
+        // google
+        $defaultGoogle = [
+            'enable' => FALSE,
+            'latitude' => 0,
+            'longitude' => 0,
+            'zoom' => 15,
+        ];
+        $google = $this->siteOptionValueManager->findOneByName('google', $defaultGoogle);
+        // company
+        $defaultCompany = [
+            'name' => 'Family-run Hotel',
+            'i18n' => FALSE,
+            'fullName' => 'Family-run Hotel Inc.',
+            'email' => NULL,
+            'address' => NULL,
+            'phone' => NULL,
+        ];
+        $company = $this->siteOptionValueManager->findOneByName('company', $defaultCompany);
 
-        $latitude = $this->optionManager->findValueByName('latitude');
-        $longitude = $this->optionManager->findValueByName('longitude');
-        $zoom = $this->optionManager->findValueByName('zoom');
-
-        $this->layout()->navBarData->setActiveItemId('homeIndex');
-        if ($this->optionManager->findCurrentValueByName('headerShow') != 'nowhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
+        $this->layout()->activeMenuItemId = 'homeIndex';
 
         return new ViewModel([
-            'address' => $address,
-            'email' => $email,
-            'phone' => $phone,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'zoom' => $zoom,
+            'google' => $google,
+            'company' => $company,
         ]);
-    }
-
-    public function roomsAction() {
-        $this->layout()->navBarData->setActiveItemId('homeRoom');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
-    }
-
-    public function visitorsBookAction() {
-        $this->layout()->navBarData->setActiveItemId('homeVisitorsBook');
-        if ($this->optionManager->findCurrentValueByName('headerShow') == 'everywhere') {
-            $this->layout()->headerData->setVisible(TRUE);
-        }
-    }
-
-    protected function translate($message) {
-        $this->translator()->translate($message);
     }
 
 }

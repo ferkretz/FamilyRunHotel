@@ -5,28 +5,24 @@ namespace Administration\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Administration\Controller\UserController;
-use Administration\Service\UserQueryManager;
-use Application\Service\SiteOptionManager;
-use Application\Service\UserManager;
+use Application\Service\User\UserEntityManager;
 
 class UserControllerFactory implements FactoryInterface {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = NULL) {
-        $userQueryManager = $container->get(UserQueryManager::class);
-        $userManager = $container->get(UserManager::class);
-        $optionManager = $container->get(SiteOptionManager::class);
+        $userEntityManager = $container->get(UserEntityManager::class);
         $config = $container->get('Config');
-        if (isset($config['role_config'])) {
-            foreach ($config['role_config'] as $key => $value) {
+        if (isset($config['site']['roles'])) {
+            foreach ($config['site']['roles'] as $key => $value) {
                 $roles[$key] = $value['summary'];
             }
         } else {
             $roles = [];
         }
 
-        return new UserController($userQueryManager, $userManager, $optionManager, $roles);
+        return new UserController($userEntityManager, $roles);
     }
 
 }

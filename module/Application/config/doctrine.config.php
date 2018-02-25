@@ -13,6 +13,7 @@ return [
                 'paths' => [
                     __DIR__ . '/../src/Entity\Locale',
                     __DIR__ . '/../src/Entity\Picture',
+                    __DIR__ . '/../src/Entity\Reservation',
                     __DIR__ . '/../src/Entity\Room',
                     __DIR__ . '/../src/Entity\Service',
                     __DIR__ . '/../src/Entity\Site',
@@ -23,6 +24,7 @@ return [
                 'drivers' => [
                     __NAMESPACE__ . '\Entity\Locale' => __NAMESPACE__ . '_driver',
                     __NAMESPACE__ . '\Entity\Picture' => __NAMESPACE__ . '_driver',
+                    __NAMESPACE__ . '\Entity\Reservation' => __NAMESPACE__ . '_driver',
                     __NAMESPACE__ . '\Entity\Room' => __NAMESPACE__ . '_driver',
                     __NAMESPACE__ . '\Entity\Service' => __NAMESPACE__ . '_driver',
                     __NAMESPACE__ . '\Entity\Site' => __NAMESPACE__ . '_driver',

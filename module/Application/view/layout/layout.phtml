@@ -22,11 +22,12 @@
         ?>
     </head>
     <body>
-        <?= $this->navigationBar($this->activeMenuItemId) ?>
+        <?php $this->navigationBar()->setActiveMenuItemId($this->activeMenuItemId) ?>
+        <?= $this->navigationBar()->render() ?>
         <div class="container">
             <div class="row">
                 <div class="col-md-10 center-block" style="float:none">
-                    <?= $this->header() ?>
+                    <?= $this->header()->render() ?>
                     <?= $this->content ?>
                 </div>
             </div>

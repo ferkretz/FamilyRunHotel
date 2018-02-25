@@ -3,18 +3,17 @@
 use Application\Service\User\UserQueryManager;
 
 $this->headTitle($this->escapeHtml($this->translate('Users')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Users', 'icon' => 'user'],
+    ['label' => 'List of users', 'active' => TRUE],
+]);
 
 $form->setAttributes([
     'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete user(s)?')) . ')',
 ]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-user"></span> <?= $this->escapeHtml($this->translate('Users')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of users')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>

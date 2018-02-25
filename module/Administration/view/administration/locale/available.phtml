@@ -3,14 +3,13 @@
 use Application\Service\Locale\LocaleQueryManager;
 
 $this->headTitle($this->escapeHtml($this->translate('Available locales')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Locales', 'icon' => 'globe'],
+    ['label' => 'List of available locales', 'active' => TRUE],
+]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class = "glyphicon glyphicon-globe"></span> <?= $this->escapeHtml($this->translate('Locales')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of available locales')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well tabs-well">
     <?= $this->form()->openTag($form) ?>

@@ -91,10 +91,24 @@ class RoomEntity {
      */
     protected $services;
 
+    /**
+     * @ORM\OneToMany(
+     *      targetEntity="Application\Entity\Reservation\ReservationEntity",
+     *      mappedBy="reservation",
+     *      indexBy="id",
+     *      fetch="EXTRA_LAZY",
+     *      orphanRemoval=true,
+     *      cascade={"all","merge","persist","refresh","remove"}
+     * )
+     * @ORM\OrderBy({"id"="ASC"})
+     */
+    protected $reservations;
+
     public function __construct() {
         $this->translations = new ArrayCollection();
         $this->pictures = new ArrayCollection();
         $this->services = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     public function getId() {
@@ -117,6 +131,10 @@ class RoomEntity {
         return $this->services;
     }
 
+    public function getReservations() {
+        return $this->reservations;
+    }
+
     public function setId($id) {
         $this->id = $id;
     }
@@ -135,6 +153,10 @@ class RoomEntity {
 
     public function setServices($services) {
         $this->services = $services;
+    }
+
+    public function setReservations($reservations) {
+        $this->reservations = $reservations;
     }
 
 }

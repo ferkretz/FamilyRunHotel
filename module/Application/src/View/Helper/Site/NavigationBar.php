@@ -2,45 +2,51 @@
 
 namespace Application\View\Helper\Site;
 
-use Zend\Mvc\I18n\Translator;
 use Zend\View\Helper\AbstractHelper;
 use Application\Model\Site\MenuModel;
 use Application\Model\Site\MenuItemModel;
 use Application\Service\User\AuthenticationManager;
 use Application\Service\User\CurrentUserEntityManager;
 
-class NavigationBarHelper extends AbstractHelper {
+class NavigationBar extends AbstractHelper {
 
-    protected $lookBarStyle;
-    protected $companyName;
     protected $menuModel;
-    protected $translator;
     protected $authenticationManager;
     protected $currentUserEntityManager;
+    protected $lookConfig;
+    protected $companyConfig;
+    protected $activeMenuItemId;
 
-    public function __construct(string $lookBarStyle,
-                                string $companyName,
-                                MenuModel $menuModel,
-                                Translator $translator,
+    public function __construct(MenuModel $menuModel,
                                 AuthenticationManager $authenticationManager,
-                                CurrentUserEntityManager $currentUserEntityManager) {
-        $this->lookBarStyle = $lookBarStyle;
-        $this->companyName = $companyName;
+                                CurrentUserEntityManager $currentUserEntityManager,
+                                $lookConfig,
+                                $companyConfig) {
         $this->menuModel = $menuModel;
-        $this->translator = $translator;
         $this->authenticationManager = $authenticationManager;
         $this->currentUserEntityManager = $currentUserEntityManager;
+        $this->lookConfig = $lookConfig;
+        $this->companyConfig = $companyConfig;
+        $this->activeMenuItemId = NULL;
     }
 
-    public function __invoke($activeMenuItemId = NULL) {
+    public function setActiveMenuItemId($activeMenuItemId = NULL) {
         if ($activeMenuItemId) {
-            $this->menuModel->activateChild($activeMenuItemId);
+            $this->activeMenuItemId = $activeMenuItemId;
+        }
+    }
+
+    public function render() {
+        if ($this->activeMenuItemId) {
+            $this->menuModel->activateChild($this->activeMenuItemId);
         }
 
         $escapeHtml = $this->getView()->plugin('escapeHtml');
         $url = $this->getView()->plugin('url');
+        $translate = $this->getView()->plugin('translate');
+        $label = $this->companyConfig['i18n'] ? $translate($this->companyConfig['name']) : $this->companyConfig['name'];
 
-        $html = '<nav class="navbar navbar-' . $escapeHtml($this->lookBarStyle) . ' navbar-fixed-top" role="navigation">'
+        $html = '<nav class="navbar navbar-' . $escapeHtml($this->lookConfig['barStyle']) . ' navbar-fixed-top" role="navigation">'
                 . '<div class="container" >'
                 . '<div class="navbar-header">'
                 . '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">'
@@ -49,7 +55,7 @@ class NavigationBarHelper extends AbstractHelper {
                 . '<span class="icon-bar"></span>'
                 . '<span class="icon-bar"></span>'
                 . '</button>'
-                . '<a class="navbar-brand" href="' . $url('homeIndex') . '">' . $escapeHtml($this->companyName) . '</a>'
+                . '<a class="navbar-brand" href="' . $url('homeIndex') . '">' . $escapeHtml($label) . '</a>'
                 . '</div>'
                 . '<div id="navbar" class="collapse navbar-collapse">'
                 . '<ul class="nav navbar-nav">';
@@ -81,12 +87,13 @@ class NavigationBarHelper extends AbstractHelper {
     protected function renderItem(MenuItemModel $item) {
         $escapeHtml = $this->getView()->plugin('escapeHtml');
         $url = $this->getView()->plugin('url');
+        $translate = $this->getView()->plugin('translate');
 
         if ($item->getLabel() == '%username%') {
             $currentUserEntity = $this->currentUserEntityManager->get();
             $label = $escapeHtml($currentUserEntity->getDisplayName() ?? $currentUserEntity->getRealName());
         } else {
-            $label = $item->getLabel() ? $escapeHtml($item->isI18n() ? $this->translator->translate($item->getLabel()) : $item->getLabel()) : '';
+            $label = $item->getLabel() ? $escapeHtml($item->isI18n() ? $translate($item->getLabel()) : $item->getLabel()) : '';
         }
         $icon = $item->getIcon() ? '<span class="glyphicon glyphicon-' . $escapeHtml($item->getIcon()) . '"></span> ' : '';
         $link = $url($item->getRoute(), is_array($item->getAction()) ? $item->getAction() : []);
@@ -103,7 +110,7 @@ class NavigationBarHelper extends AbstractHelper {
                 if ($child->isSeparator()) {
                     $html .= '<li role="separator" class="divider"></li>';
                 } else {
-                    $label = $child->getLabel() ? $escapeHtml($child->isI18n() ? $this->translator->translate($child->getLabel()) : $child->getLabel()) : '';
+                    $label = $child->getLabel() ? $escapeHtml($child->isI18n() ? $translate($child->getLabel()) : $child->getLabel()) : '';
                     $icon = $child->getIcon() ? '<span class="glyphicon glyphicon-' . $escapeHtml($child->getIcon()) . '"></span> ' : '';
                     $link = $url($child->getRoute(), is_array($child->getAction()) ? $child->getAction() : []);
 

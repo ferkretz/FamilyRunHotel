@@ -3,18 +3,17 @@
 use Application\Service\Room\RoomQueryManager;
 
 $this->headTitle($this->escapeHtml($this->translate('Rooms')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Rooms', 'icon' => 'bed'],
+    ['label' => 'List of rooms', 'active' => TRUE],
+]);
 
 $form->setAttributes([
     'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete room(s)?')) . ')'
 ]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of rooms')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>

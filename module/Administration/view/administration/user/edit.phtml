@@ -1,12 +1,13 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Edit user'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Edit user')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Users', 'icon' => 'user'],
+    ['label' => 'List of users', 'url' => ['administrationUser', []]],
+    ['label' => 'Edit user', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-user"></span> <?= $this->escapeHtml($this->translate('Users')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationUser') ?>"><?= $this->escapeHtml($this->translate('List of users')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Edit user')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>

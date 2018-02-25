@@ -3,18 +3,17 @@
 use Application\Service\Service\ServiceQueryManager;
 
 $this->headTitle($this->escapeHtml($this->translate('Services')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Services', 'icon' => 'cutlery'],
+    ['label' => 'List of services', 'active' => TRUE],
+]);
 
 $form->setAttributes([
     'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete service(s)?')) . ')'
 ]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-cutlery"></span> <?= $this->escapeHtml($this->translate('Services')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of services')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>

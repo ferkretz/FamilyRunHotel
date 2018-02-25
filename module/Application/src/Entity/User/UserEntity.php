@@ -129,8 +129,22 @@ class UserEntity {
      */
     protected $options;
 
+    /**
+     * @ORM\OneToMany(
+     *      targetEntity="Application\Entity\Reservation\ReservationEntity",
+     *      mappedBy="reservation",
+     *      indexBy="id",
+     *      fetch="EXTRA_LAZY",
+     *      orphanRemoval=true,
+     *      cascade={"all","merge","persist","refresh","remove"}
+     * )
+     * @ORM\OrderBy({"id"="ASC"})
+     */
+    protected $reservations;
+
     public function __construct() {
         $this->options = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     public function getId() {
@@ -175,6 +189,10 @@ class UserEntity {
 
     public function getOptions() {
         return $this->options;
+    }
+
+    public function getReservations() {
+        return $this->reservations;
     }
 
     public function setId($id) {
@@ -234,6 +252,10 @@ class UserEntity {
         }
 
         $optionEntity->setValue($value);
+    }
+
+    public function setReservations($reservations) {
+        $this->reservations = $reservations;
     }
 
 }

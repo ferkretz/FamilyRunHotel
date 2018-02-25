@@ -8,22 +8,8 @@ use Application\Service\AbstractEntityManager;
 
 class LocaleEntityManager extends AbstractEntityManager {
 
-    private $current;
-
     public function __construct(EntityManager $entityManager) {
         parent::__construct($entityManager, LocaleEntity::class);
-    }
-
-    public function getCurrent() {
-        return $this->current;
-    }
-
-    public function setCurrent($localeEntity) {
-        $this->current = $localeEntity;
-    }
-
-    public function setCurrentByName($name) {
-        $this->current = $this->findOneByName($name);
     }
 
     public function findOneByName(string $name) {

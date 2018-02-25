@@ -13,7 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\I18n\Translator;
 use Zend\Validator\AbstractValidator;
-use Application\Service\Locale\LocaleEntityManager;
+use Application\Service\Locale\CurrentLocaleEntityManager;
 use Application\Service\Site\CurrentOptionValueManager;
 use Application\Service\Site\SiteOptionValueManager;
 use Application\Service\User\AuthenticationManager;
@@ -135,8 +135,10 @@ class Module {
 
     private function setLocale($serviceManager) {
         $translator = $serviceManager->get(Translator::class);
-        $currentLocale = $this->findCurrentLocale($serviceManager);
-        $languageDir = __DIR__ . '/../language/' . $currentLocale;
+        $currentLocaleEntityManager = $serviceManager->get(CurrentLocaleEntityManager::class);
+        $currentLocaleName = $currentLocaleEntityManager->get()->getName();
+
+        $languageDir = __DIR__ . '/../language/' . $currentLocaleName;
 
         if (is_dir($languageDir)) {
             $handle = opendir($languageDir);
@@ -144,7 +146,7 @@ class Module {
                 while (($entry = readdir($handle)) !== FALSE) {
                     if ($entry != '.' && $entry != '..') {
                         if (strrpos($entry, '.php') === (strlen($entry) - 4)) {
-                            $translator->addTranslationFile('phpArray', $languageDir . '/' . $entry, 'default', $currentLocale);
+                            $translator->addTranslationFile('phpArray', $languageDir . '/' . $entry, 'default', $currentLocaleName);
                         }
                     }
                 }
@@ -153,29 +155,7 @@ class Module {
         }
 
         AbstractValidator::setDefaultTranslator($translator);
-        \Locale::setDefault($currentLocale);
-    }
-
-    private function findCurrentLocale($serviceManager) {
-        $localeEntityManager = $serviceManager->get(LocaleEntityManager::class);
-        $supportedLocales = $localeEntityManager->findAllName();
-
-        $headers = $serviceManager->get('Request')->getHeaders();
-        if ($headers->has('Accept-Language')) {
-            $requestedLocales = $headers->get('Accept-Language')->getPrioritized();
-        }
-
-        foreach ($requestedLocales as $requestedLocale) {
-            $currentLocale = \Locale::lookup($supportedLocales, $requestedLocale->typeString, TRUE, '.');
-            if ($currentLocale != '.') {
-                $localeEntityManager->setCurrentByName($currentLocale);
-                return $currentLocale;
-            }
-        }
-
-        $currentLocaleEntity = $localeEntityManager->findOneById(1);
-        $localeEntityManager->setCurrent($currentLocaleEntity);
-        return $currentLocaleEntity->getName();
+        \Locale::setDefault($currentLocaleName);
     }
 
 }

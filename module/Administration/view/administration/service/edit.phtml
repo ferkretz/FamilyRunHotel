@@ -1,12 +1,13 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Edit service'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Edit service')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Services', 'icon' => 'cutlery'],
+    ['label' => 'List of services', 'url' => ['administrationService', []]],
+    ['label' => 'Edit service', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-cutlery"></span> <?= $this->escapeHtml($this->translate('Services')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationService') ?>"><?= $this->escapeHtml($this->translate('List of services')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Edit service')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>

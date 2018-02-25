@@ -1,12 +1,13 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Rooms'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Rooms')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Rooms', 'icon' => 'bed'],
+    ['label' => 'List of rooms', 'url' => ['homeRoom', []]],
+    ['label' => 'View room', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('homeRoom') ?>"><?= $this->escapeHtml($this->translate('List of rooms')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('View room')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well">
     <fieldset>

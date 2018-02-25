@@ -11,8 +11,10 @@ namespace Application;
 return [
     'service_manager' => [
         'factories' => [
+            Service\Locale\CurrentLocaleEntityManager::class => Service\Locale\Factory\CurrentLocaleEntityManagerFactory::class,
             Service\Locale\LocaleEntityManager::class => Service\Locale\Factory\LocaleEntityManagerFactory::class,
             Service\Picture\PictureEntityManager::class => Service\Picture\Factory\PictureEntityManagerFactory::class,
+            Service\Reservation\ReservationEntityManager::class => Service\Reservation\Factory\ReservationEntityManagerFactory::class,
             Service\Room\RoomEntityManager::class => Service\Room\Factory\RoomEntityManagerFactory::class,
             Service\Service\ServiceEntityManager::class => Service\Service\Factory\ServiceEntityManagerFactory::class,
             Service\Site\CurrentOptionValueManager::class => Service\Site\Factory\CurrentOptionValueManagerFactory::class,
@@ -36,12 +38,16 @@ return [
     ],
     'view_helpers' => [
         'factories' => [
-            View\Helper\Site\HeaderHelper::class => View\Helper\Site\Factory\HeaderHelperFactory::class,
-            View\Helper\Site\NavigationBarHelper::class => View\Helper\Site\Factory\NavigationBarHelperFactory::class,
+            View\Helper\Reservation\ReservationCalendar::class => \Zend\ServiceManager\Factory\InvokableFactory::class,
+            View\Helper\Site\Breadcrumbs::class => \Zend\ServiceManager\Factory\InvokableFactory::class,
+            View\Helper\Site\Header::class => View\Helper\Site\Factory\HeaderFactory::class,
+            View\Helper\Site\NavigationBar::class => View\Helper\Site\Factory\NavigationBarFactory::class,
         ],
         'aliases' => [
-            'header' => View\Helper\Site\HeaderHelper::class,
-            'navigationBar' => View\Helper\Site\NavigationBarHelper::class,
+            'reservationCalendar' => View\Helper\Reservation\ReservationCalendar::class,
+            'breadcrumbs' => View\Helper\Site\Breadcrumbs::class,
+            'header' => View\Helper\Site\Header::class,
+            'navigationBar' => View\Helper\Site\NavigationBar::class,
         ]
     ],
     'view_manager' => [

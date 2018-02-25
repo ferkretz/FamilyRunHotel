@@ -1,0 +1,79 @@
+<?php
+
+use Application\Service\Reservation\ReservationQueryManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Reservations')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Reservations', 'icon' => 'pushpin'],
+    ['label' => 'List of Reservations', 'active' => TRUE],
+]);
+?>
+
+<?= $this->breadcrumbs()->render() ?>
+
+<div class="well nobottom">
+    <fieldset>
+        <legend><?= $this->escapeHtml($this->translate('List of reservations')) ?></legend>
+
+        <div style="overflow: auto visible">
+
+            <table id="room-table" class="table table-hover button-th nobottom">
+                <thead>
+                    <tr>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->reservationQueryManager->getParams();
+                            unset($queryParams['userId']);
+                            if ($queryParams['orderBy'] == ReservationQueryManager::ORDER_BY_ROOM) {
+                                $icon = $queryParams['order'] == ReservationQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == ReservationQueryManager::ORDER_ASC ? ReservationQueryManager::ORDER_DESC : ReservationQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = ReservationQueryManager::ORDER_BY_ROOM;
+                                $queryParams['order'] = ReservationQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Room')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <?php
+                            $icon = '';
+                            $queryParams = $this->reservationQueryManager->getParams();
+                            unset($queryParams['userId']);
+                            if ($queryParams['orderBy'] == ReservationQueryManager::ORDER_BY_MONTH) {
+                                $icon = $queryParams['order'] == ReservationQueryManager::ORDER_ASC ? '-by-attributes' : '-by-attributes-alt';
+                                $queryParams['order'] = $queryParams['order'] == ReservationQueryManager::ORDER_ASC ? ReservationQueryManager::ORDER_DESC : ReservationQueryManager::ORDER_ASC;
+                            } else {
+                                $queryParams['orderBy'] = ReservationQueryManager::ORDER_BY_MONTH;
+                                $queryParams['order'] = ReservationQueryManager::ORDER_ASC;
+                            }
+                            ?>
+                            <a class="btn btn-default btn-sm btn-block" href="<?= $this->url(NULL, [], ['query' => $queryParams]) ?>">
+                                <?= $this->escapeHtml($this->translate('Month')) ?> <span class="glyphicon glyphicon-sort<?= $icon ?>"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $dateFormatter = \IntlDateFormatter::create(\Locale::getDefault(), \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
+                    foreach ($reservations as $reservation) {
+                        if ($reservation->getRoom()->getTranslations()->containsKey($this->reservationQueryManager->getLocaleId())) {
+                            ?>
+                            <tr class="active" data-lnk="<?= $this->url(NULL, ['action' => 'edit', 'id' => $room->getId()]) ?>" style="cursor:pointer">
+                                <td><?= $this->escapeHtml($reservation->getRoom()->getTranslations()->get($this->reservationQueryManager->getLocaleId())->getSummary()) ?></td>
+                                <td><?= $this->escapeHtml($dateFormatter->format($reservation->getMonth())) ?></td>
+                            </tr>
+                            <?php
+                        }
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<?= $this->paginationControl($reservations, 'Sliding', 'paginator/paginator', ['route' => NULL, 'queryParams' => $this->reservationQueryManager->getParams()]) ?>

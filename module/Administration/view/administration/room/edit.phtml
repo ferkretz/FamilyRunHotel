@@ -1,12 +1,13 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Edit room'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Edit room')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Rooms', 'icon' => 'bed'],
+    ['label' => 'List of rooms', 'url' => ['administrationRoom', []]],
+    ['label' => 'Edit room', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationRoom') ?>"><?= $this->escapeHtml($this->translate('List of rooms')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Edit room')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>

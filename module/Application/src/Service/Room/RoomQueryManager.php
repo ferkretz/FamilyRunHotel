@@ -2,6 +2,7 @@
 
 namespace Application\Service\Room;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
 use Application\Entity\Room\RoomEntity;

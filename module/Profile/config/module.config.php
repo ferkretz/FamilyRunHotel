@@ -14,6 +14,12 @@ return [
                         'allow' => ['!users'],
                     ],
                 ],
+                Controller\ReservationController::class => [
+                    [
+                        'actions' => ['index', 'edit'],
+                        'allow' => ['!users'],
+                    ],
+                ],
             ],
         ],
     ],
@@ -22,7 +28,7 @@ return [
             'profileSettings' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/profile/settings/:action',
+                    'route' => '/profile/settings[/:action]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                     ],
@@ -32,11 +38,28 @@ return [
                     ],
                 ],
             ],
+            'profileReservation' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/profile/reservations[/:action][/:id][/:year][/:month]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9_]*',
+                        'year' => '[0-9_]*',
+                        'month' => '[0-9_]*',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\ReservationController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\SettingsController::class => Controller\Factory\SettingsControllerFactory::class,
+            Controller\ReservationController::class => Controller\Factory\ReservationControllerFactory::class,
         ],
     ],
     'view_manager' => [

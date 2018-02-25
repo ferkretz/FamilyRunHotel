@@ -1,17 +1,16 @@
 <?php
 $this->headTitle($this->escapeHtml($this->translate('Pictures')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Pictures', 'icon' => 'picture'],
+    ['label' => 'List of pictures', 'active' => TRUE],
+]);
 
 $form->setAttributes([
     'onsubmit' => 'return confirm(' . $this->escapeHtml($this->translate('Do you really want to delete picture(s)?')) . ')'
 ]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of pictures')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>

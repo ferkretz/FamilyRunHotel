@@ -23,7 +23,7 @@ class LocaleController extends AbstractActionController {
     protected $localeEntityManager;
 
     public function __construct(LocaleEntityManager $localeEntityManager) {
-        $this->localeContainer = $localeContainer;
+        $this->localeEntityManager = $localeEntityManager;
     }
 
     public function preferredAction() {

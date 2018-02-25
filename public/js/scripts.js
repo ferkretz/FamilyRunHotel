@@ -57,6 +57,71 @@ $(function () {
 });
 
 /**
+ * Calendar table
+ */
+$(function () {
+    var cths = $('.table-calendar th.clickable-column');
+    var tds = $('.table-calendar td');
+
+    cths.each(function () {
+        $(this).click(function () {
+            cth = $(this);
+            tds.each(function () {
+                if ($(this).index() === cth.index()) {
+                    $(this).find('input').click();
+                }
+            });
+        });
+    });
+
+    var rths = $('.table-calendar th.clickable-row');
+    rths.each(function () {
+        $(this).click(function () {
+            $(this).parent().find('input').each(function () {
+                $(this).click();
+            });
+        });
+    });
+
+    $('.table-calendar th.clickable-table').click(function () {
+        tds.each(function () {
+            $(this).find('input').click();
+        });
+    });
+
+    var chks = $('input[type=checkbox].date-checkbox');
+
+    chks.each(function () {
+        $(this).wrap('<div class="date-checkbox">' + $(this).val() + '</div>');
+
+        if ($(this).is(':checked')) {
+            $(this).parent().addClass('checked');
+        }
+
+        if ($(this).is(':disabled')) {
+            $(this).parent().addClass('disabled');
+        }
+    });
+
+    chks.change(function () {
+        sel = false;
+
+        if ($(this).is(':checked')) {
+            $(this).parent().addClass('checked');
+        } else {
+            $(this).parent().removeClass('checked');
+        }
+
+        chks.each(function () {
+            if ($(this).is(':checked')) {
+                sel = true;
+            }
+        });
+
+    });
+});
+
+/**
  * Add link for table row
  */
 $(function () {

@@ -3,39 +3,31 @@
 namespace Application\View\Helper\Site\Factory;
 
 use Interop\Container\ContainerInterface;
-use Zend\Mvc\I18n\Translator;
 use Application\Service\Site\CurrentOptionValueManager;
 use Application\Service\Site\SiteOptionValueManager;
-use Application\View\Helper\Site\HeaderHelper;
+use Application\View\Helper\Site\Header;
 
-class HeaderHelperFactory {
+class HeaderFactory {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = NULL) {
-        $translator = $container->get(Translator::class);
         $routeMatch = $container->get('Application')->getMvcEvent()->getRouteMatch();
         $currentOptionValueManager = $container->get(CurrentOptionValueManager::class);
         $siteOptionValueManager = $container->get(SiteOptionValueManager::class);
 
-        $defaultLookData = [
+        $defaultLookConfig = [
             'renderHeader' => 'home',
         ];
-        $lookData = $currentOptionValueManager->findOneByName('look', $defaultLookData);
-        $lookRenderHeader = $lookData['renderHeader'];
+        $lookConfig = $currentOptionValueManager->findOneByName('look', $defaultLookConfig);
 
-        $defaultCompanyData = [
+        $defaultCompanyConfig = [
             'name' => 'Family-run Hotel',
             'i18n' => FALSE,
         ];
-        $companyData = $siteOptionValueManager->findOneByName('company', $defaultCompanyData);
-        if ($companyData['i18n']) {
-            $companyName = $translator->translate($companyData['name']);
-        } else {
-            $companyName = $companyData['name'];
-        }
+        $companyConfig = $siteOptionValueManager->findOneByName('company', $defaultCompanyConfig);
 
-        return new HeaderHelper($lookRenderHeader, $companyName, $routeMatch);
+        return new Header($routeMatch, $lookConfig, $companyConfig);
     }
 
 }

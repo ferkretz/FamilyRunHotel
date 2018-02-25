@@ -3,49 +3,41 @@
 namespace Application\View\Helper\Site\Factory;
 
 use Interop\Container\ContainerInterface;
-use Zend\Mvc\I18n\Translator;
 use Application\Model\Site\MenuModel;
 use Application\Service\Site\CurrentOptionValueManager;
 use Application\Service\Site\SiteOptionValueManager;
 use Application\Service\User\AuthenticationManager;
 use Application\Service\User\CurrentUserEntityManager;
-use Application\View\Helper\Site\NavigationBarHelper;
+use Application\View\Helper\Site\NavigationBar;
 
-class NavigationBarHelperFactory {
+class NavigationBarFactory {
 
     public function __invoke(ContainerInterface $container,
                              $requestedName,
                              array $options = NULL) {
-        $translator = $container->get(Translator::class);
         $authenticationManager = $container->get(AuthenticationManager::class);
         $currentUserEntityManager = $container->get(CurrentUserEntityManager::class);
         $currentOptionValueManager = $container->get(CurrentOptionValueManager::class);
         $siteOptionValueManager = $container->get(SiteOptionValueManager::class);
         $config = $container->get('Config');
 
-        $defaultLookData = [
+        $defaultLookConfig = [
             'barStyle' => 'default',
         ];
-        $lookData = $currentOptionValueManager->findOneByName('look', $defaultLookData);
-        $lookBarStyle = $lookData['barStyle'];
+        $lookConfig = $currentOptionValueManager->findOneByName('look', $defaultLookConfig);
 
-        $defaultCompanyData = [
+        $defaultCompanyConfig = [
             'name' => 'Family-run Hotel',
             'i18n' => FALSE,
         ];
-        $companyData = $siteOptionValueManager->findOneByName('company', $defaultCompanyData);
-        if ($companyData['i18n']) {
-            $companyName = $translator->translate($companyData['name']);
-        } else {
-            $companyName = $companyData['name'];
-        }
+        $companyConfig = $siteOptionValueManager->findOneByName('company', $defaultCompanyConfig);
 
         $menuModel = new MenuModel();
         if (isset($config['site']['navigationMenu'])) {
             $menuModel->parseMenuData($config['site']['navigationMenu']);
         }
 
-        return new NavigationBarHelper($lookBarStyle, $companyName, $menuModel, $translator, $authenticationManager, $currentUserEntityManager);
+        return new NavigationBar($menuModel, $authenticationManager, $currentUserEntityManager, $lookConfig, $companyConfig);
     }
 
 }

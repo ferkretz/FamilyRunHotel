@@ -45,5 +45,9 @@ class IndexController extends AbstractActionController {
             'company' => $company,
         ]);
     }
+    
+    public function test() {
+        
+    }
 
 }

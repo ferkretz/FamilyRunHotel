@@ -1,11 +1,12 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Features and options'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Features and options')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Dashboard', 'icon' => 'dashboard'],
+    ['label' => 'Features', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-dashboard"></span> <?= $this->escapeHtml($this->translate('Dashboard')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Features')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <ul class="nav nav-tabs">
     <li role="presentation" class="active">

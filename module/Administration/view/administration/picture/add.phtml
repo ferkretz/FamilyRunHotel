@@ -1,12 +1,13 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Add pictures'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Add pictures')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Pictures', 'icon' => 'picture'],
+    ['label' => 'List of pictures', 'url' => ['administrationPicture', []]],
+    ['label' => 'Add new picture', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-picture"></span> <?= $this->escapeHtml($this->translate('Pictures')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationPicture') ?>"><?= $this->escapeHtml($this->translate('List of pictures')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Add new picture')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well">
     <?= $this->form()->openTag($form) ?>

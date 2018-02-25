@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Application\Service\Locale\LocaleEntityManager;
+use Application\Service\Locale\CurrentLocaleEntityManager;
 use Application\Service\Picture\PictureEntityManager;
 use Application\Service\Room\RoomEntityManager;
 use Application\Service\Room\RoomQueryManager;
@@ -22,10 +22,10 @@ class RoomController extends AbstractActionController {
     protected $roomEntityManager;
 
     /**
-     * Locale entity manager.
-     * @var LocaleEntityManager
+     * Current locale entity manager.
+     * @var CurrentLocaleEntityManager
      */
-    protected $localeEntityManager;
+    protected $currentLocaleEntityManager;
 
     /**
      * Site option value manager
@@ -40,11 +40,11 @@ class RoomController extends AbstractActionController {
     protected $pictureEntityManager;
 
     public function __construct(RoomEntityManager $roomEntityManager,
-                                LocaleEntityManager $localeEntityManager,
+                                CurrentLocaleEntityManager $currentLocaleEntityManager,
                                 SiteOptionValueManager $siteOptionValueManager,
                                 PictureEntityManager $pictureEntityManager) {
         $this->roomEntityManager = $roomEntityManager;
-        $this->localeEntityManager = $localeEntityManager;
+        $this->currentLocaleEntityManager = $currentLocaleEntityManager;
         $this->siteOptionValueManager = $siteOptionValueManager;
         $this->pictureEntityManager = $pictureEntityManager;
     }
@@ -56,7 +56,7 @@ class RoomController extends AbstractActionController {
 
         $roomQueryManager->setOrder($this->params()->fromQuery('order'));
         $roomQueryManager->setOrderBy($this->params()->fromQuery('orderBy'));
-        $roomQueryManager->setLocaleId($this->localeEntityManager->getCurrent()->getId());
+        $roomQueryManager->setLocaleId($this->currentLocaleEntityManager->get()->getId());
         $roomQuery = $roomQueryManager->getQuery();
 
         $adapter = new DoctrineAdapter(new ORMPaginator($roomQuery, FALSE));
@@ -81,7 +81,7 @@ class RoomController extends AbstractActionController {
     public function viewAction() {
         $id = $this->params()->fromRoute('id', -1);
         $roomEntity = $this->roomEntityManager->findOneById($id);
-        $localeId = $this->localeEntityManager->getCurrent()->getId();
+        $localeId = $this->currentLocaleEntityManager->get()->getId();
         if ($roomEntity == NULL || !$roomEntity->getTranslations()->containsKey($localeId)) {
             return $this->notFoundAction();
         }

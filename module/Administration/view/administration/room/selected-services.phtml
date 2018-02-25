@@ -3,16 +3,15 @@
 use Application\Service\Service\ServiceQueryManager;
 
 $this->headTitle($this->escapeHtml($this->translate('Selected services')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Rooms', 'icon' => 'bed'],
+    ['label' => 'List of rooms', 'url' => ['administrationRoom', []]],
+    ['label' => 'Edit room', 'url' => ['administrationRoom', ['action' => 'edit', 'id' => $id]]],
+    ['label' => 'List of selected services', 'active' => TRUE],
+]);
 ?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-bed"></span> <?= $this->escapeHtml($this->translate('Rooms')) ?>:</strong>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationRoom') ?>"><?= $this->escapeHtml($this->translate('List of rooms')) ?></a></li>
-        <li class="breadcrumb-item"><a href="<?= $this->url('administrationRoom', ['action' => 'edit', 'id' => $id]) ?>"><?= $this->escapeHtml($this->translate('Edit room')) ?></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of selected services')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <div class="well nobottom">
     <?= $this->form()->openTag($form) ?>

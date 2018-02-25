@@ -1,11 +1,12 @@
-<?php $this->headTitle($this->escapeHtml($this->translate('Your account'))) ?>
+<?php
+$this->headTitle($this->escapeHtml($this->translate('Your account')));
+$this->breadcrumbs()->setItems([
+    ['label' => 'Profile', 'icon' => 'wrench'],
+    ['label' => 'Account settings', 'active' => TRUE],
+]);
+?>
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <strong><span class="glyphicon glyphicon-wrench"></span> <?= $this->escapeHtml($this->translate('Profile')) ?>:</strong>
-        <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Account settings')) ?></li>
-    </ol>
-</nav>
+<?= $this->breadcrumbs()->render() ?>
 
 <ul class="nav nav-tabs">
     <li role="presentation" class="active">

@@ -183,11 +183,11 @@ return [
                         'route' => 'profileSettings',
                     ],
                     [
-                        'id' => 'profileReservations',
+                        'id' => 'profileReservation',
                         'icon' => 'pushpin',
                         'label' => 'My reservations',
                         'i18n' => TRUE,
-                    //'route' => 'profileReservations',
+                        'route' => 'profileReservation',
                     ],
                     [
                         'separator' => TRUE,

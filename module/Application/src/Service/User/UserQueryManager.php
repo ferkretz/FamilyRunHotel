@@ -2,6 +2,7 @@
 
 namespace Application\Service\User;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Application\Entity\User\UserEntity;
 use Application\Service\AbstractQueryManager;

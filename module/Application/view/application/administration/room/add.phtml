@@ -1,0 +1,75 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Adding a new room')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-room bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item"><a href="<?= $this->url(null, ['action' => 'list'], ['query' => ['locale' => $this->locale]]) ?>"><?= $this->escapeHtml($this->translate('List of rooms')) ?></a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Adding a new room')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 13rem)">
+
+                <div class="border-bottom pb-1 mb-3">
+                    <?= $this->escapeHtml($this->translate('Translatable properties')) ?>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-12">
+                        <div class="btn-group">
+                            <button typy="button" class="btn btn-sm btn-outline-primary dropdown-toggle disabled" id="localeDropdown" data-toggle="dropdown">
+                                <span class="if if-locale"></span><?= $this->escapeHtml($this->settingsManager->getSetting(SettingsManager::LOCALE_NAMES)[$this->settingsManager->getSetting(SettingsManager::LOCALE, true)]) ?> <span class="caret"></span>
+                            </button>
+                            <div class="pl-1 d-flex align-items-center">
+                                <?= $this->escapeHtml($this->translate('Disabled, because you must select default language at first!')) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('summary')) ?>
+                        <?= $this->formElement($form->get('summary')) ?>
+                        <?= $this->formElementErrors($form->get('summary'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('description')) ?>
+                        <?= $this->formElement($form->get('description')) ?>
+                        <?= $this->formElementErrors($form->get('description'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+                <div class="border-bottom pb-1 mb-3">
+                    <?= $this->escapeHtml($this->translate('Non translatable properties')) ?>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-12">
+                        <?= sprintf($this->formLabel($form->get('price')), $this->settingsManager->getSetting($this->settingsManager::CURRENCY)) ?>
+                        <?= $this->formElement($form->get('price')) ?>
+                        <?= $this->formElementErrors($form->get('price'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" id="add" name="add" class="btn btn-primary">
+            <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Add new room')) ?>
+        </button>
+
+        <?= $this->form()->closeTag() ?>
+
+    </div>
+</div>

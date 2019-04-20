@@ -1,0 +1,85 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate('List of photos')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-photo bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of photos')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="modal fade" id="delection-confirm" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content text-center bg-default">
+                    <div class="modal-header text-center text-white bg-warning">
+                        <h5 class="modal-title w-100 font-weight-bold">
+                            <?= $this->escapeHtml($this->translate('Confirm deletion!')) ?>
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <?= $this->escapeHtml($this->translate('Do you really want to delete photo(s)?')) ?>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" id="remove" name="remove" class="btn btn-primary mr-2">
+                            <span class="if if-yes"></span><?= $this->escapeHtml($this->translate('Yes')) ?>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <span class="if if-no"></span><?= $this->escapeHtml($this->translate('No')) ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group mb-2" role="group">
+            <?php if ($this->accessManager->currentUserCan('add.offers')) { ?>
+                <a role="button" class="btn btn-sm btn-outline-primary" href="<?= $this->url(null, ['action' => 'add']) ?>">
+                    <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Add new photo')) ?>
+                </a>
+            <?php } ?>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="checkbox" data-target="[name='photos[]']">
+                <span class="if if-inverse"></span><?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </button>
+            <?php if ($this->accessManager->currentUserCan('delete.offers')) { ?>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#delection-confirm" data-hide="[name='photos[]']" style="display: none">
+                    <span class="if if-remove"></span><?= $this->escapeHtml($this->translate('Remove selected')) ?>
+                </button>
+            <?php } ?>
+        </div>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 15rem)">
+
+                <div class="d-flex align-content-start flex-wrap m-n1">
+                    <?php foreach ($this->photos as $photo) { ?>
+                        <div>
+                            <div class="card m-1">
+                                <img class="card-img-top px-2 pt-2 btn btn-outline-secondary border-0" src="<?= $this->url('index-photo', ['id' => $photo->getId()], ['query' => ['width' => $this->settingsManager->getSetting(SettingsManager::PHOTO_THUMBNAIL_WIDTH)]]) ?>" data-href="<?= $this->url(null, ['action' => 'view', 'id' => $photo->getId()]) ?>">
+                                <div class="card-body p-2 m-0">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="photo<?= $photo->getId() ?>" name="photos[]" value="<?= $photo->getId() ?>">
+                                        <label class="custom-control-label" for="photo<?= $photo->getId() ?>"><?= $photo->getId() ?></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+
+            </div>
+        </div>
+
+        <?= $this->form()->closeTag() ?>
+
+        <?= $this->paginationControl($this->photos, 'Sliding', 'paginator/paginator', ['urlParams' => [null, [], ['query' => $this->photoQueryManager->getParams()]]]) ?>
+
+    </div>
+</div>

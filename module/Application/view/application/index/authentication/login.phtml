@@ -1,0 +1,65 @@
+<?php $this->headTitle($this->escapeHtml($this->translate('Login'))) ?>
+
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-login bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Please, sign in!')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 13rem)">
+
+                <?php if ($isLoginError) { ?>
+                    <div class="alert alert-warning" role="alert">
+                        <?= $this->translate('Incorrect email and/or password.') ?>
+                        <a href="<?= $this->url(null) ?>"><?= $this->escapeHtml($this->translate('Forgot password?')) ?></a>
+                    </div>
+                <?php } ?>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <?= $this->formLabel($form->get('email')) ?>
+                        <?= $this->formElement($form->get('email')) ?>
+                        <?= $this->formElementErrors($form->get('email'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        <div class="text-muted">
+                            <?= $this->escapeHtml($this->translate('Email address. This is your login either.')) ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <?= $this->formLabel($form->get('password')) ?>
+                        <?= $this->formElement($form->get('password')) ?>
+                        <?= $this->formElementErrors($form->get('password'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <div class="custom-control custom-checkbox">
+                            <?= $this->formElement($form->get('rememberMe')) ?>
+                            <?= $this->formLabel($form->get('rememberMe')) ?>
+                            <?= $this->formElementErrors($form->get('rememberMe'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <?= $this->formElement($form->get('redirectUrl')) ?>
+        <?= $this->formElement($form->get('csrf')) ?>
+
+        <button type="submit" id="login" name="login" class="btn btn-primary">
+            <span class="if if-login"></span><?= $this->escapeHtml($this->translate('Sign in')) ?>
+        </button>
+
+        <?= $this->form()->closeTag() ?>
+    </div>
+</div>

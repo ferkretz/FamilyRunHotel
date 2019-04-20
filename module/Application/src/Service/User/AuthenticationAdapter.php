@@ -5,7 +5,7 @@ namespace Application\Service\User;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
-use Application\Service\User\UserEntityManager;
+use Application\Service\User\UserManager;
 
 class AuthenticationAdapter implements AdapterInterface {
 
@@ -22,38 +22,38 @@ class AuthenticationAdapter implements AdapterInterface {
     protected $password;
 
     /**
-     * Entity manager.
-     * @var UserEntityManager
+     * User entity manager.
+     * @var UserManager
      */
-    protected $userEntityManager;
+    protected $userManager;
 
-    public function __construct(UserEntityManager $userEntityManager) {
-        $this->userEntityManager = $userEntityManager;
+    public function __construct(UserManager $userManager) {
+        $this->userManager = $userManager;
     }
 
-    public function setEmail($email) {
+    public function setEmail(string $email) {
         $this->email = $email;
     }
 
-    public function setPassword($password) {
+    public function setPassword(string $password) {
         $this->password = $password;
     }
 
     public function authenticate() {
-        $user = $this->userEntityManager->findOneByEmail($this->email);
+        $user = $this->userManager->findOneByEmail($this->email);
 
-        if ($user == NULL) {
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, NULL, ['Invalid credentials.']);
+        if ($user == null) {
+            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Invalid credentials.']);
         }
 
         $bcrypt = new Bcrypt();
         $passwordHash = $user->getPassword();
 
         if ($bcrypt->verify($this->password, $passwordHash)) {
-            return new Result(Result::SUCCESS, $this->email, ['Authenticated successfully.']);
+            return new Result(Result::SUCCESS, $user->getId(), ['Authenticated successfully.']);
         }
 
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, NULL, ['Invalid credentials.']);
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Invalid credentials.']);
     }
 
 }

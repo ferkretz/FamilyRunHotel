@@ -1,0 +1,32 @@
+<?php
+
+namespace Application\Form\Administration\Service;
+
+use Zend\Form\Element;
+use Zend\Form\Form;
+
+class ListForm extends Form {
+
+    private $serviceIds;
+
+    public function __construct($serviceIds) {
+        parent::__construct('list-form');
+
+        $this->serviceIds = $serviceIds;
+
+        $this->setAttribute('method', 'post');
+
+        $this->addElements();
+    }
+
+    private function addElements() {
+        $this->add([
+            'type' => Element\MultiCheckbox::class,
+            'name' => 'services',
+            'options' => [
+                'value_options' => $this->serviceIds
+            ]
+        ]);
+    }
+
+}

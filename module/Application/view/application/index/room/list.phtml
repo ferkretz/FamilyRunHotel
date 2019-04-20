@@ -1,0 +1,87 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate('List of available rooms')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-room bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of available rooms')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body p-0" style="overflow: auto; height: calc(100vh - 12.6rem)">
+
+                <?php
+                $locale = $this->settingsManager->getSetting(SettingsManager::LOCALE);
+                $currency = $this->settingsManager->getSetting(SettingsManager::CURRENCY);
+                ?>
+
+                <div class="row mx-1 my-3">
+                    <?php foreach ($this->rooms as $room) { ?>
+                        <?php if ($room->getTranslations()->containsKey($locale)) { ?>
+                            <div class="bg-default col-lg-6 px-3">
+                                <h5 class="border-bottom">
+                                    <?= $this->escapeHtml($room->getTranslations()->get($locale)->getSummary()) ?>
+                                </h5>
+
+                                <div class="row m-0 pb-4">
+                                    <div class="col-sm-6 px-2 pb-2">
+                                        <p>
+                                            <?php if ($room->getTranslations()->get($locale)->getDescription()) { ?>
+                                                <?= $this->escapeHtml($room->getTranslations()->get($locale)->getDescription()) ?>
+                                                <br>
+                                            <?php } ?>
+                                            <b><?= $this->escapeHtml($this->translate('Price: ')) ?></b>
+                                            <?= $this->escapeHtml($room->getPrice()) ?>
+                                            (<?= $currency ?>)
+                                        </p>
+                                        <a href="<?= $this->url(null, ['action' => 'view', 'id' => $room->getId()]) ?>" class="btn-lnk" role="button"><?= $this->escapeHtml($this->translate('Further information')) ?></a>
+                                    </div>
+
+                                    <?php $photoIds = $room->getPhotos()->getKeys() ?>
+                                    <?php if (count($photoIds)) { ?>
+                                        <div class="col-sm-6 px-2">
+                                            <div id="photos" class="carousel slide carousel-fade" data-ride="carousel">
+                                                <ol class="carousel-indicators">
+                                                    <?php foreach ($photoIds as $key => $id) { ?>
+                                                        <li data-target="#photos" data-slide-to="<?= $key ?>" <?= $key == 0 ? 'class="active"' : '' ?>></li>
+                                                    <?php } ?>
+                                                </ol>
+                                                <div class="carousel-inner">
+                                                    <?php foreach ($photoIds as $key => $id) { ?>
+                                                        <div class="carousel-item <?= $key == 0 ? 'active' : '' ?>" data-interval="3000">
+                                                            <img src="<?= $this->url('index-photo', ['action' => 'view', 'id' => $id]) ?>" class="d-block w-100" alt="">
+                                                        </div>
+                                                    <?php } ?>
+                                                </div>
+                                                <a class="carousel-control-prev" href="#photos" role="button" data-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                </a>
+                                                <a class="carousel-control-next" href="#photos" role="button" data-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+
+        <?= $this->form()->closeTag() ?>
+
+        <?= $this->paginationControl($this->rooms, 'Sliding', 'paginator/paginator', ['urlParams' => [null, [], ['query' => $this->roomQueryManager->getParams()]]]) ?>
+
+    </div>
+</div>

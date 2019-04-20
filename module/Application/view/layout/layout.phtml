@@ -1,36 +1,41 @@
-<?= $this->doctype() ?>
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+echo $this->doctype();
+?>
 
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <?= $this->headTitle($this->titleString)->setSeparator(' - ')->setAutoEscape(FALSE) ?>
+        <?= $this->headTitle($this->settingsManager->getSetting(SettingsManager::COMPANY_NAME))->setSeparator(' - ')->setAutoEscape(false) ?>
+
         <?=
                 $this->headMeta()
                 ->appendName('viewport', 'width=device-width, initial-scale=1.0')
                 ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
         ?>
+
         <?=
                 $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
-                ->prependStylesheet($this->basePath('themes/' . $this->themeString . '/css/style.css'))
-                ->prependStylesheet($this->basePath('themes/' . $this->themeString . '/css/theme.css'))
+                ->prependStylesheet($this->basePath('themes/' . $this->settingsManager->getSetting(SettingsManager::THEME) . '/css/bootstrap.min.css'))
+                ->prependStylesheet($this->basePath('/css/iconfont.css'))
         ?>
+
         <?=
                 $this->headScript()
-                ->prependFile($this->basePath('js/scripts.js'))
-                ->prependFile($this->basePath('js/bootstrap.min.js'))
+                ->prependFile($this->basePath('js/family.run.hotel.js'))
+                ->prependFile($this->basePath('js/bootstrap.bundle.min.js'))
                 ->prependFile($this->basePath('js/jquery-3.1.0.min.js'))
         ?>
     </head>
     <body>
-        <?php $this->navigationBar()->setActiveMenuItemId($this->activeMenuItemId) ?>
-        <?= $this->navigationBar()->render() ?>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 center-block" style="float:none">
-                    <?= $this->header()->render() ?>
-                    <?= $this->content ?>
-                </div>
-            </div>
+        <?= $this->navbar()->render() ?>
+
+        <div class="container-fluid px-md-5 text">
+            <?= $this->content ?>
         </div>
+
+        <?= $this->inlineScript() ?>
     </body>
 </html>

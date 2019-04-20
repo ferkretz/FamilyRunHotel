@@ -8,154 +8,29 @@
 
 namespace Application;
 
-use Zend\Session\SessionManager;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
-use Zend\Mvc\I18n\Translator;
-use Zend\Validator\AbstractValidator;
-use Application\Service\Locale\CurrentLocaleEntityManager;
-use Application\Service\Site\CurrentOptionValueManager;
-use Application\Service\Site\SiteOptionValueManager;
-use Application\Service\User\AuthenticationManager;
-use Authentication\Controller\AuthenticationController;
+use Zend\Session\SessionManager;
+use Application\Service\Option\LocalizeManager;
+use Application\Service\Option\SettingsManager;
 
 class Module {
 
-    const VERSION = '3.1.0';
+    const VERSION = '3.0.3-dev';
 
     public function getConfig() {
-        $config = include __DIR__ . '/../config/module.config.php';
-
-        $handle = opendir(__DIR__ . '/../config');
-        if ($handle) {
-            while (($entry = readdir($handle)) !== FALSE) {
-                if ($entry != '.' && $entry != '..' && $entry != 'module.config.php') {
-                    $config = array_merge($config, include __DIR__ . '/../config/' . $entry);
-                }
-            }
-            closedir($handle);
-        }
-
-        return $config;
+        return include __DIR__ . '/../config/module.config.php';
     }
 
     public function onBootstrap(MvcEvent $event) {
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
         $sessionManager = $serviceManager->get(SessionManager::class);
+
         $viewModel = $event->getViewModel();
-
-        // Locale
-        $this->setLocale($serviceManager);
-
-        // Some variable
-        $viewModel->titleString = $this->getTitleString($serviceManager);
-        $viewModel->themeString = $this->getThemeString($serviceManager);
-
-        // Controller setup
-        $eventManager = $event->getApplication()->getEventManager();
-        $sharedEventManager = $eventManager->getSharedManager();
-        $sharedEventManager->attach(AbstractActionController::class, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], 100);
-    }
-
-    public function onDispatch(MvcEvent $event) {
-        $controller = $event->getTarget();
-        $controllerName = $event->getRouteMatch()->getParam('controller', NULL);
-        $actionName = $event->getRouteMatch()->getParam('action', NULL);
-
-        $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
-
-        $authenticationManager = $event->getApplication()->getServiceManager()->get(AuthenticationManager::class);
-
-        if ($controllerName != AuthenticationController::class) {
-            $result = $authenticationManager->filterAccess($controllerName, $actionName);
-
-            if ($result == AuthenticationManager::AUTHENTICATION_REQUIRED) {
-                $uri = $event->getApplication()->getRequest()->getUri();
-                $uri->setScheme(NULL)
-                        ->setHost(NULL)
-                        ->setPort(NULL)
-                        ->setUserInfo(NULL);
-                $redirectUrl = $uri->toString();
-
-                return $controller->redirect()->toRoute('authenticationLogin', [], ['query' => ['redirectUrl' => $redirectUrl]]);
-            } else if ($result == AuthenticationManager::ACCESS_DENIED) {
-                return $controller->notFoundAction();
-            }
-        }
-    }
-
-    private function getTitleString($serviceManager) {
-        $translator = $serviceManager->get(Translator::class);
-        $siteOptionValueManager = $serviceManager->get(SiteOptionValueManager::class);
-
-        $defaultCompanyData = [
-            'name' => 'Family-run Hotel',
-            'i18n' => FALSE,
-        ];
-        $companyData = $siteOptionValueManager->findOneByName('company', $defaultCompanyData);
-
-        if ($companyData['i18n']) {
-            return $translator->translate($companyData['name']);
-        }
-
-        return $companyData['name'];
-    }
-
-    private function getThemeString($serviceManager) {
-        $currentOptionValueManager = $serviceManager->get(CurrentOptionValueManager::class);
-
-        $defaultLookData = [
-            'theme' => 'cofee',
-        ];
-        $lookData = $currentOptionValueManager->findOneByName('look', $defaultLookData);
-        $currentThemeName = $lookData['theme'];
-
-        $themesDir = __DIR__ . '/../../../public/themes';
-        $supportedThemeNames = [];
-
-        if (is_dir($themesDir)) {
-            $handle = opendir($themesDir);
-            if ($handle) {
-                while (($entry = readdir($handle)) !== FALSE) {
-                    if ($entry != '.' && $entry != '..') {
-                        $supportedThemeNames[] = $entry;
-                    }
-                }
-                closedir($handle);
-            }
-        }
-
-        if (in_array($currentThemeName, $supportedThemeNames)) {
-            return $currentThemeName;
-        }
-
-        return $supportedThemeNames[0];
-    }
-
-    private function setLocale($serviceManager) {
-        $translator = $serviceManager->get(Translator::class);
-        $currentLocaleEntityManager = $serviceManager->get(CurrentLocaleEntityManager::class);
-        $currentLocaleName = $currentLocaleEntityManager->get()->getName();
-
-        $languageDir = __DIR__ . '/../language/' . $currentLocaleName;
-
-        if (is_dir($languageDir)) {
-            $handle = opendir($languageDir);
-            if ($handle) {
-                while (($entry = readdir($handle)) !== FALSE) {
-                    if ($entry != '.' && $entry != '..') {
-                        if (strrpos($entry, '.php') === (strlen($entry) - 4)) {
-                            $translator->addTranslationFile('phpArray', $languageDir . '/' . $entry, 'default', $currentLocaleName);
-                        }
-                    }
-                }
-                closedir($handle);
-            }
-        }
-
-        AbstractValidator::setDefaultTranslator($translator);
-        \Locale::setDefault($currentLocaleName);
+        $settingsManager = $serviceManager->get(SettingsManager::class);
+        $localizeManager = $serviceManager->get(LocalizeManager::class);
+        $localeName = $localizeManager();
+        $viewModel->settingsManager = $settingsManager;
     }
 
 }

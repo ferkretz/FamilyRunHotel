@@ -1,0 +1,93 @@
+<?php $this->headTitle($this->escapeHtml($this->translate('Edit user'))) ?>
+
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-user bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item"><a href="<?= $this->url(null, ['action' => 'list'], ['query' => ['locale' => $this->locale]]) ?>"><?= $this->escapeHtml($this->translate('Adding a new user')) ?></a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Edit user')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 13rem)">
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('email')) ?>
+                        <?= $this->formElement($form->get('email')) ?>
+                        <?= $this->formElementErrors($form->get('email'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        <div class="text-muted">
+                            <?= $this->escapeHtml($this->translate('Email address. This is your login either.')) ?>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('role')) ?>
+                        <?= $this->formElement($form->get('role')) ?>
+                        <?= $this->formElementErrors($form->get('role'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        <div class="text-muted">
+                            <?= $this->formElementErrors($form->get('role'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('realName')) ?>
+                        <?= $this->formElement($form->get('realName')) ?>
+                        <?= $this->formElementErrors($form->get('realName'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        <div class="text-muted">
+                            <?= $this->escapeHtml($this->translate('Real name. Other people will not see if display name is defined.')) ?>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('displayName')) ?>
+                        <?= $this->formElement($form->get('displayName')) ?>
+                        <?= $this->formElementErrors($form->get('displayName'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                        <div class="text-muted">
+                            <?= $this->escapeHtml($this->translate('This is the displayed name that other user will see.')) ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('address')) ?>
+                        <?= $this->formElement($form->get('address')) ?>
+                        <?= $this->formElementErrors($form->get('address'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('phone')) ?>
+                        <?= $this->formElement($form->get('phone')) ?>
+                        <?= $this->formElementErrors($form->get('phone'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('password')) ?>
+                        <?= $this->formElement($form->get('password')) ?>
+                        <?= $this->formElementErrors($form->get('password'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('confirmPassword')) ?>
+                        <?= $this->formElement($form->get('confirmPassword')) ?>
+                        <?= $this->formElementErrors($form->get('confirmPassword'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" id="add" name="add" class="btn btn-primary">
+            <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Add new user')) ?>
+        </button>
+
+        <?= $this->form()->closeTag() ?>
+
+    </div>
+</div>

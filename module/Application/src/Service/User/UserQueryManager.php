@@ -4,32 +4,48 @@ namespace Application\Service\User;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
-use Application\Entity\User\UserEntity;
-use Application\Service\AbstractQueryManager;
+use Doctrine\ORM\Query;
+use Application\Entity\User\User;
+use Application\Service\Common\AbstractQueryManager;
 
 class UserQueryManager extends AbstractQueryManager {
 
-    const ORDER_BY_ID = 'id';
-    const ORDER_BY_REAL_NAME = 'realName';
-    const ORDER_BY_EMAIL = 'email';
-    const ORDER_BY_ROLE = 'role';
+    const REAL_NAME = 1;
+    const EMAIL = 2;
+    const ROLE = 3;
 
     protected $role;
 
     public function __construct(EntityManager $entityManager) {
-        parent::__construct($entityManager);
-        $this->role = NULL;
+        parent::__construct(
+                $entityManager,
+                ['realName', 'email', 'role'],
+                ['Name', 'Email', 'Role']
+        );
+        $this->role = null;
     }
 
-    public function getQuery() {
-        $queryBuilder = $this->entityManager->getRepository(UserEntity::class)->createQueryBuilder('user');
-        $queryBuilder->addCriteria($this->getCriteria());
-
-        return $queryBuilder->getQuery();
+    public function setRole(?string $role) {
+        $this->role = $role;
     }
 
-    public function getCriteria() {
-        $criteria = parent::getCriteria();
+    public function getRole(): ?string {
+        return $this->role;
+    }
+
+    public function getCriteria(): Criteria {
+        $criteria = new Criteria();
+
+        if ($this->orderBy) {
+            $criteria->orderBy([$this->orderBy => $this->order]);
+        }
+
+        if ($this->firstResult) {
+            $criteria->setFirstResult($this->firstResult);
+        }
+        if ($this->maxResults) {
+            $criteria->setMaxResults($this->maxResults);
+        }
 
         if ($this->role) {
             $criteria->andWhere(Criteria::expr()->eq('role', $this->role));
@@ -38,20 +54,40 @@ class UserQueryManager extends AbstractQueryManager {
         return $criteria;
     }
 
-    public function getRole() {
-        return $this->role;
+    public function getQuery(): Query {
+        $queryBuilder = $this->entityManager->getRepository(User::class)->createQueryBuilder('user');
+        $queryBuilder->addCriteria($this->getCriteria());
+
+        return $queryBuilder->getQuery();
     }
 
-    public function getParams() {
-        return ['orderBy' => $this->getOrderBy(), 'order' => $this->getOrder()];
-    }
+    public function getParams(?array $overrides = NULL): array {
+        if ($overrides) {
+            $params = $this->getParams();
 
-    public function setRole($role) {
-        $this->role = $role;
-    }
+            switch ($overrides['orderBy']) {
+                case '%DEFAULT%':
+                    $params['orderBy'] = $this->orderByList[self::ID];
+                    break;
+                default:
+                    $params['orderBy'] = in_array($overrides['orderBy'], $this->orderByList) ? $overrides['orderBy'] : $this->orderByList[self::ID];
+            }
 
-    public function setOrderBy($orderBy) {
-        $this->orderBy = in_array($orderBy, [self::ORDER_BY_ID, self::ORDER_BY_REAL_NAME, self::ORDER_BY_EMAIL, self::ORDER_BY_ROLE]) ? $orderBy : self::ORDER_BY_ID;
+            switch ($overrides['order']) {
+                case '%DEFAULT%':
+                    $params['order'] = $this->orderList[self::ASC];
+                    break;
+                case '%INVERSE%':
+                    $params['order'] = $this->order == $this->orderList[self::ASC] ? $this->orderList[self::DESC] : $this->orderList[self::ASC];
+                    break;
+                default:
+                    $params['order'] = in_array($overrides['order'], $this->orderList) ? $overrides['order'] : $this->orderList[self::ASC];
+            }
+
+            return $params;
+        } else {
+            return ['orderBy' => $this->orderBy, 'order' => $this->order];
+        }
     }
 
 }

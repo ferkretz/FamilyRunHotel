@@ -1,0 +1,116 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate('List of rooms')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-room bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of rooms')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="modal fade" id="delection-confirm" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content text-center bg-default">
+                    <div class="modal-header text-center text-white bg-warning">
+                        <h5 class="modal-title w-100 font-weight-bold">
+                            <?= $this->escapeHtml($this->translate('Confirm deletion!')) ?>
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <?= $this->escapeHtml($this->translate('Do you really want to delete room(s)?')) ?>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" id="remove" name="remove" class="btn btn-primary mr-2">
+                            <span class="if if-yes"></span><?= $this->escapeHtml($this->translate('Yes')) ?>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <span class="if if-no"></span><?= $this->escapeHtml($this->translate('No')) ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group mb-2 bg-default" role="group">
+            <div class="btn-group">
+                <button typy="button" class="btn btn-sm btn-outline-primary dropdown-toggle" id="localeDropdown" data-toggle="dropdown">
+                    <span class="if if-locale"></span><?= $this->escapeHtml($this->settingsManager->getSetting(SettingsManager::LOCALE_NAMES)[$this->roomQueryManager->getLocale()]) ?> <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="localeDropdown" style="max-height: 10em; overflow: auto">
+                    <?php foreach ($this->settingsManager->getSetting(SettingsManager::LOCALE_NAMES) as $locale => $localeName) { ?>
+                        <?php if ($locale != $this->roomQueryManager->getLocale()) { ?>
+                            <a class="dropdown-item" href="<?= $this->url(null, ['action' => 'list'], ['query' => $this->roomQueryManager->getParams(['locale' => $locale])]) ?>"><?= $this->escapeHtml($localeName) ?></a>
+                        <?php } ?>
+                    <?php } ?>
+                </div>
+            </div>
+            <?php if ($this->accessManager->currentUserCan('add.offers')) { ?>
+                <a role="button" class="btn btn-sm btn-outline-primary" href="<?= $this->url(null, ['action' => 'add']) ?>">
+                    <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Add new room')) ?>
+                </a>
+            <?php } ?>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="checkbox" data-target="[name='rooms[]']">
+                <span class="if if-inverse"></span><?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </button>
+            <?php if ($this->accessManager->currentUserCan('delete.offers')) { ?>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#delection-confirm" data-hide="[name='rooms[]']" style="display: none">
+                    <span class="if if-remove"></span><?= $this->escapeHtml($this->translate('Remove selected')) ?>
+                </button>
+            <?php } ?>
+        </div>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 15rem)">
+
+                <table id="room-table" class="table table-hover table-sm" style="min-width: 30rem">
+                    <thead>
+                        <tr>
+                            <th scope="col">&nbsp</th>
+                            <?php foreach ($this->roomQueryManager->getColumnNameList() as $idx => $columnName) { ?>
+                                <?php
+                                $orderBy = $this->roomQueryManager->getOrderByList()[$idx];
+                                $order = $this->roomQueryManager->getOrderBy() == $orderBy ? '%INVERSE%' : '%DEFAULT%';
+                                $icon = $this->roomQueryManager->getOrderBy() == $orderBy ? strtolower($this->roomQueryManager->getOrder()) : 'blank';
+                                ?>
+                                <th scope="col" data-href="<?= $this->url(null, ['action' => 'list'], ['query' => $this->roomQueryManager->getParams(['orderBy' => $orderBy, 'order' => $order])]) ?>">
+                                    <?= $this->escapeHtml($this->translate($columnName)) ?><span class="if if-<?= $icon ?> ml-1"></span>
+                                </th>
+                            <?php } ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->rooms as $room) { ?>
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="room<?= $room->getId() ?>" name="rooms[]" value="<?= $room->getId() ?>">
+                                        <label class="custom-control-label" for="room<?= $room->getId() ?>"></label>
+                                    </div>
+                                </td>
+                                <?php foreach ($this->roomQueryManager->getColumnIdList() as $columnId) { ?>
+                                    <td data-href="<?= $this->url(null, ['action' => 'edit', 'id' => $room->getId()], ['query' => ['locale' => $this->roomQueryManager->getLocale()]]) ?>">
+                                        <?= $this->escapeHtml($room->get(str_replace('translation', 'translation.' . $this->roomQueryManager->getLocale(), $columnId))) ?>
+                                    </td>
+                                <?php } ?>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <?= $this->form()->closeTag() ?>
+
+        <?= $this->paginationControl($this->rooms, 'Sliding', 'paginator/paginator', ['urlParams' => [null, [], ['query' => $this->roomQueryManager->getParams()]]]) ?>
+
+    </div>
+</div>

@@ -1,0 +1,152 @@
+@font-face {
+    font-family: 'IconFont';
+    font-style: normal;
+    src: url("../fonts/IconFont.ttf") format("truetype");
+}
+.if {
+    font-family: 'IconFont';
+}
+.if {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+}
+.if.if-blank:before {
+    content: "\e000";
+}
+.if.if-ok:before {
+    content: "\e001";
+}
+.if.if-yes:before {
+    content: "\e001";
+}
+.if.if-cancel:before {
+    content: "\e002";
+}
+.if.if-no:before {
+    content: "\e002";
+}
+.if.if-add:before {
+    content: "\e003";
+}
+.if.if-plus:before {
+    content: "\e003";
+}
+.if.if-remove:before {
+    content: "\e004";
+}
+.if.if-minus:before {
+    content: "\e004";
+}
+.if.if-reload:before {
+    content: "\e005";
+}
+.if.if-update:before {
+    content: "\e005";
+}
+.if.if-edit:before {
+    content: "\e005";
+}
+.if.if-inverse:before {
+    content: "\e006";
+}
+.if.if-replace:before {
+    content: "\e006";
+}
+.if.if-sort-asc:before {
+    content: "\e007";
+}
+.if.if-asc:before {
+    content: "\e007";
+}
+.if.if-sort-desc:before {
+    content: "\e008";
+}
+.if.if-desc:before {
+    content: "\e008";
+}
+.if.if-info:before {
+    content: "\e009";
+}
+.if.if-warning:before {
+    content: "\e00a";
+}
+.if.if-question:before {
+    content: "\e00b";
+}
+.if.if-touch:before {
+    content: "\e00c";
+}
+.if.if-start:before {
+    content: "\e00c";
+}
+.if.if-home:before {
+    content: "\e00d";
+}
+.if.if-index:before {
+    content: "\e00d";
+}
+.if.if-register:before {
+    content: "\e00e";
+}
+.if.if-sign-up:before {
+    content: "\e00e";
+}
+.if.if-login:before {
+    content: "\e00f";
+}
+.if.if-sign-in:before {
+    content: "\e00f";
+}
+.if.if-logout:before {
+    content: "\e010";
+}
+.if.if-book:before {
+    content: "\e011";
+}
+.if.if-room:before {
+    content: "\e012";
+}
+.if.if-service:before {
+    content: "\e013";
+}
+.if.if-photo:before {
+    content: "\e014";
+}
+.if.if-reservation:before {
+    content: "\e015";
+}
+.if.if-admin:before {
+    content: "\e016";
+}
+.if.if-settings:before {
+    content: "\e017";
+}
+.if.if-look:before {
+    content: "\e018";
+}
+.if.if-poi:before {
+    content: "\e019";
+}
+.if.if-user:before {
+    content: "\e01a";
+}
+.if.if-locale:before {
+    content: "\e01b";
+}
+.if.if-list:before {
+    content: "\e01d";
+}
+.if.if-password:before {
+    content: "\e01d";
+}
+.if.if-backward:before {
+    content: "\e01e";
+}
+.if.if-forward:before {
+    content: "\e01f";
+}

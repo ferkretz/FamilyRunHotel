@@ -1,0 +1,60 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate($this->action == 'add' ? 'Add photo(s) to room' : 'Remove photo(s) from room')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-room bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item"><a href="<?= $this->url(null, ['action' => 'list'], ['query' => ['locale' => $this->locale]]) ?>"><?= $this->escapeHtml($this->translate('List of rooms')) ?></a></li>
+                <li class="breadcrumb-item"><a href="<?= $this->url(null, ['action' => 'edit', 'id' => $this->roomId], ['query' => ['locale' => $this->locale]]) ?>"><?= $this->escapeHtml($this->translate('Edit room')) ?></a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate($this->action == 'add' ? 'Add photo(s) to room' : 'Remove photo(s) from room')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="btn-group mb-2" role="group">
+            <a role="button" class="btn btn-sm btn-outline-primary" href="<?= $this->url(null, ['action' => 'edit-photos', 'id' => $this->roomId], ['query' => array_merge($this->photoQueryManager->getParams(), ['action' => $this->action == 'add' ? 'remove' : 'add'])]) ?>">
+                <span class="if if-list"></span><?= $this->escapeHtml($this->translate($this->action == 'add' ? 'List selected photos' : 'List available photos')) ?>
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="checkbox" data-target="[name='photos[]']">
+                <span class="if if-inverse"></span><?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </button>
+            <button type="submit" id="<?= $this->action ?>" name="<?= $this->action ?>" class="btn btn-sm btn-outline-primary" data-hide="[name='photos[]']" style="display: none">
+                <span class="if if-<?= $this->action ?>"></span><?= $this->escapeHtml($this->translate($this->action == 'add' ? 'Add selected' : 'Remove selected')) ?>
+            </button>
+        </div>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 15rem)">
+
+                <div class="d-flex align-content-start flex-wrap m-n1">
+                    <?php foreach ($this->photos as $photo) { ?>
+                        <div>
+                            <div class="card m-1">
+                                <img class="card-img-top px-2 pt-2 btn btn-outline-secondary border-0" src="<?= $this->url('index-photo', ['id' => $photo->getId()], ['query' => ['width' => $this->settingsManager->getSetting(SettingsManager::PHOTO_THUMBNAIL_WIDTH)]]) ?>" data-href="<?= $this->url(null, ['action' => 'view', 'id' => $photo->getId()]) ?>">
+                                <div class="card-body p-2 m-0">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="photo<?= $photo->getId() ?>" name="photos[]" value="<?= $photo->getId() ?>">
+                                        <label class="custom-control-label" for="photo<?= $photo->getId() ?>"><?= $photo->getId() ?></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+
+            </div>
+        </div>
+
+        <?= $this->form()->closeTag() ?>
+
+        <?= $this->paginationControl($this->photos, 'Sliding', 'paginator/paginator', ['urlParams' => [null, [], ['query' => $this->photoQueryManager->getParams()]]]) ?>
+
+    </div>
+</div>

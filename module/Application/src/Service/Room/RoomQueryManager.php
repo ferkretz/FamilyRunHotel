@@ -4,42 +4,78 @@ namespace Application\Service\Room;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
-use Application\Entity\Room\RoomEntity;
-use Application\Service\AbstractQueryManager;
+use Application\Entity\Room\Room;
+use Application\Service\Common\AbstractQueryManager;
+use Application\Service\Option\SettingsManager;
 
 class RoomQueryManager extends AbstractQueryManager {
 
-    const ORDER_BY_ID = 'id';
-    const ORDER_BY_PRICE = 'price';
-    const ORDER_BY_SUMMARY = 'translation.summary';
+    const PRICE = 1;
+    const SUMMARY = 2;
 
-    protected $localeId;
+    protected $settingsManager;
+    protected $locale;
     protected $minPrice;
     protected $maxPrice;
 
-    public function __construct(EntityManager $entityManager) {
-        parent::__construct($entityManager);
-        $this->localeId = 1;
-        $this->minPrice = NULL;
-        $this->maxPrice = NULL;
+    public function __construct(EntityManager $entityManager,
+                                SettingsManager $settingsManager) {
+        parent::__construct(
+                $entityManager,
+                ['price', 'translation.summary'],
+                ['Price', 'Summary']
+        );
+        $this->settingsManager = $settingsManager;
+        $this->locale = $this->settingsManager->getSetting(SettingsManager::LOCALE, true);
+        $this->minPrice = null;
+        $this->maxPrice = null;
     }
 
-    public function getQuery() {
-        $queryBuilder = $this->entityManager->getRepository(RoomEntity::class)->createQueryBuilder('room');
-        if (($this->orderBy == self::ORDER_BY_SUMMARY) && ($this->localeId)) {
-            $queryBuilder->addSelect('translation')
-                    ->leftJoin('room.translations', 'translation', Join::WITH, 'translation.localeId = :localeId')
-                    ->setParameter('localeId', $this->localeId);
+    public function setLocale(?string $locale) {
+        $this->locale = in_array($locale, $this->settingsManager->getSetting(SettingsManager::LOCALES)) ? $locale : $this->settingsManager->getSetting(SettingsManager::LOCALE, true);
+    }
+
+    public function setMinPrice(?float $minPrice) {
+        $this->minPrice = $minPrice;
+    }
+
+    public function setMaxPrice(?float $maxPrice) {
+        $this->maxPrice = $maxPrice;
+    }
+
+    public function getLocale(): ?string {
+        return $this->locale;
+    }
+
+    public function getMinPrice(): ?float {
+        return $this->minPrice;
+    }
+
+    public function getMaxPrice(): ?float {
+        return $this->maxPrice;
+    }
+
+    public function getCriteria(): Criteria {
+        $criteria = new Criteria();
+
+        if ($this->orderBy) {
+            $criteria->orderBy([$this->orderBy => $this->order]);
         }
-        $queryBuilder->addCriteria($this->getCriteria());
 
-        return $queryBuilder->getQuery();
-    }
+        if ($this->firstResult) {
+            $criteria->setFirstResult($this->firstResult);
+        }
+        if ($this->maxResults) {
+            $criteria->setMaxResults($this->maxResults);
+        }
 
-    public function getCriteria() {
-        $criteria = parent::getCriteria();
-
+        if (($this->minPrice) && ($this->maxPrice)) {
+            if ($this->minPrice > $this->maxPrice) {
+                list($this->minPrice, $this->maxPrice) = [$this->maxPrice, $this->minPrice];
+            }
+        }
         if ($this->minPrice) {
             $criteria->andWhere(Criteria::expr()->gte('price', $this->minPrice));
         }
@@ -50,42 +86,58 @@ class RoomQueryManager extends AbstractQueryManager {
         return $criteria;
     }
 
-    public function getLocaleId() {
-        return $this->localeId;
-    }
-
-    public function getMinPrice() {
-        return $this->minPrice;
-    }
-
-    public function getMaxPrice() {
-        return $this->maxPrice;
-    }
-
-    public function getParams() {
-        return ['orderBy' => $this->getOrderBy(), 'order' => $this->getOrder(), 'localeId' => $this->getLocaleId()];
-    }
-
-    public function setPrices($minPrice,
-                              $maxPrice) {
-        $this->minPrice = $minPrice < 0 ? 0 : $minPrice;
-        $this->maxPrice = $maxPrice < 0 ? 0 : $maxPrice;
-
-        if ($this->minPrice > $this->maxPrice) {
-            list($this->minPrice, $this->maxPrice) = [$this->maxPrice, $this->minPrice];
+    public function getQuery(): Query {
+        $queryBuilder = $this->entityManager->getRepository(Room::class)->createQueryBuilder('room');
+        if (($this->orderBy == $this->orderByList[self::SUMMARY]) && ($this->locale)) {
+            $queryBuilder->addSelect('translation')
+                    ->leftJoin('room.translations', 'translation', Join::WITH, 'translation.locale = :locale')
+                    ->setParameter('locale', $this->locale);
         }
+        $queryBuilder->addCriteria($this->getCriteria());
+
+        return $queryBuilder->getQuery();
     }
 
-    public function setOrderBy($orderBy) {
-        $this->orderBy = in_array($orderBy, [self::ORDER_BY_ID, self::ORDER_BY_PRICE, self::ORDER_BY_SUMMARY]) ? $orderBy : self::ORDER_BY_ID;
-    }
+    public function getParams(?array $overrides = NULL): array {
+        if ($overrides) {
+            $params = $this->getParams();
 
-    public function setLocaleId($localeId,
-                                $validLocaleIds = NULL) {
-        if ($validLocaleIds) {
-            $this->localeId = in_array($localeId, $validLocaleIds) ? $localeId : 1;
+            if (!empty($overrides['orderBy'])) {
+                switch ($overrides['orderBy']) {
+                    case '%DEFAULT%':
+                        $params['orderBy'] = $this->orderByList[self::ID];
+                        break;
+                    default:
+                        $params['orderBy'] = in_array($overrides['orderBy'], $this->orderByList) ? $overrides['orderBy'] : $this->orderByList[self::ID];
+                }
+            }
+
+            if (!empty($overrides['order'])) {
+                switch ($overrides['order']) {
+                    case '%DEFAULT%':
+                        $params['order'] = $this->orderList[self::ASC];
+                        break;
+                    case '%INVERSE%':
+                        $params['order'] = $this->order == $this->orderList[self::ASC] ? $this->orderList[self::DESC] : $this->orderList[self::ASC];
+                        break;
+                    default:
+                        $params['order'] = in_array($overrides['order'], $this->orderList) ? $overrides['order'] : $this->orderList[self::ASC];
+                }
+            }
+
+            if (!empty($overrides['locale'])) {
+                switch ($overrides['locale']) {
+                    case '%DEFAULT%':
+                        $params['locale'] = $this->settingsManager->getSetting(SettingsManager::LOCALE, true);
+                        break;
+                    default:
+                        $params['locale'] = in_array($overrides['locale'], $this->settingsManager->getSetting(SettingsManager::LOCALES)) ? $overrides['locale'] : $this->settingsManager->getSetting(SettingsManager::LOCALE, true);
+                }
+            }
+
+            return $params;
         } else {
-            $this->localeId = $localeId;
+            return ['orderBy' => $this->orderBy, 'order' => $this->order, 'locale' => $this->locale];
         }
     }
 

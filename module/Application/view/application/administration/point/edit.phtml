@@ -1,0 +1,100 @@
+<?php
+
+use Application\Service\Option\SettingsManager;
+
+$this->headTitle($this->escapeHtml($this->translate('Edit POI')));
+?>
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-poi bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item"><a href="<?= $this->url(null, ['action' => 'list'], ['query' => ['locale' => $this->locale]]) ?>"><?= $this->escapeHtml($this->translate('List of POIs')) ?></a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('Edit POI')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 13rem)">
+
+                <div class="border-bottom pb-1 mb-3">
+                    <?= $this->escapeHtml($this->translate('Translatable properties')) ?>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-12">
+                        <div class="btn-group">
+                            <button typy="button" class="btn btn-sm btn-outline-primary dropdown-toggle" id="localeDropdown" data-toggle="dropdown">
+                                <span class="if if-locale"></span><?= $this->escapeHtml($this->settingsManager->getSetting(SettingsManager::LOCALE_NAMES)[$this->locale]) ?> <span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="localeDropdown" style="max-height: 10em; overflow: auto">
+                                <?php foreach ($this->settingsManager->getSetting(SettingsManager::LOCALE_NAMES) as $locale => $localeName) { ?>
+                                    <?php if ($locale != $this->locale) { ?>
+                                        <a class="dropdown-item" href="<?= $this->url(null, ['action' => 'edit', 'id' => $this->id], ['query' => ['locale' => $locale]]) ?>"><?= $this->escapeHtml($localeName) ?></a>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                            <div class="pl-1 d-flex align-items-center">
+                                <?= $this->escapeHtml($this->translate('You can change language now.')) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('summary')) ?>
+                        <?= $this->formElement($form->get('summary')) ?>
+                        <?= $this->formElementErrors($form->get('summary'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('description')) ?>
+                        <?= $this->formElement($form->get('description')) ?>
+                        <?= $this->formElementErrors($form->get('description'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+                <div class="border-bottom pb-1 mb-3">
+                    <?= $this->escapeHtml($this->translate('Non translatable properties')) ?>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('latitude')) ?>
+                        <?= $this->formElement($form->get('latitude')) ?>
+                        <?= $this->formElementErrors($form->get('latitude'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <?= $this->formLabel($form->get('longitude')) ?>
+                        <?= $this->formElement($form->get('longitude')) ?>
+                        <?= $this->formElementErrors($form->get('longitude'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+
+                <div class="form-row px-3">
+                    <div class="form-group col-md-12">
+                        <?= $this->formLabel($form->get('icon')) ?>
+                        <div role="select" class="if if-picker">
+                            <?= $this->formElement($form->get('icon')) ?>
+                            <?php for ($x = 0; $x <= 30; $x++) { ?>
+                                <span role="option"><?= mb_chr(0xe001 + $x) ?></span>
+                            <?php } ?>
+                        </div>
+                        <?= $this->formElementErrors($form->get('icon'), ['class' => 'alert alert-warning border mb-0 p-2 pl-4']) ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <button type="submit" id="add" name="add" class="btn btn-primary">
+            <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Edit poi')) ?>
+        </button>
+
+        <?= $this->form()->closeTag() ?>
+
+    </div>
+</div>

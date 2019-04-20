@@ -1,0 +1,100 @@
+<?php $this->headTitle($this->escapeHtml($this->translate('List of users'))) ?>
+
+<div class="card shadow rounded mb-2 bg-default">
+    <div class="card-body">
+
+        <?= $this->form()->openTag($form) ?>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb border border-primary shadow-sm mb-2 p-2">
+                <li class="mr-2"><span class="if if-user bg-default border border-primary rounded-circle p-2 m-n1"></span></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $this->escapeHtml($this->translate('List of users')) ?></li>
+            </ol>
+        </nav>
+
+        <div class="modal fade" id="delection-confirm" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content text-center bg-default">
+                    <div class="modal-header text-center text-white bg-warning">
+                        <h5 class="modal-title w-100 font-weight-bold">
+                            <?= $this->escapeHtml($this->translate('Confirm deletion!')) ?>
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <?= $this->escapeHtml($this->translate('Do you really want to delete user(s)?')) ?>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" id="remove" name="remove" class="btn btn-primary mr-2">
+                            <span class="if if-yes"></span><?= $this->escapeHtml($this->translate('Yes')) ?>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <span class="if if-no"></span><?= $this->escapeHtml($this->translate('No')) ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group mb-2" role="group">
+            <?php if ($this->accessManager->currentUserCan('add.users')) { ?>
+                <a role="button" class="btn btn-sm btn-outline-primary" href="<?= $this->url(null, ['action' => 'add']) ?>">
+                    <span class="if if-add"></span><?= $this->escapeHtml($this->translate('Add new user')) ?>
+                </a>
+            <?php } ?>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="checkbox" data-target="[name='users[]']">
+                <span class="if if-inverse"></span><?= $this->escapeHtml($this->translate('Inverse select')) ?>
+            </button>
+            <?php if ($this->accessManager->currentUserCan('delete.users')) { ?>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#delection-confirm" data-hide="[name='users[]']" style="display: none">
+                    <span class="if if-remove"></span><?= $this->escapeHtml($this->translate('Remove selected')) ?>
+                </button>
+            <?php } ?>
+        </div>
+
+        <div class="card mb-2 bg-default">
+            <div class="card-body" style="overflow: auto; height: calc(100vh - 15rem)">
+
+                <table id="user-table" class="table table-hover table-sm" style="min-width: 50rem">
+                    <thead>
+                        <tr>
+                            <th scope="col">&nbsp</th>
+                            <?php foreach ($this->userQueryManager->getColumnNameList() as $idx => $columnName) { ?>
+                                <?php
+                                $orderBy = $this->userQueryManager->getOrderByList()[$idx];
+                                $order = $this->userQueryManager->getOrderBy() == $orderBy ? '%INVERSE%' : '%DEFAULT%';
+                                $icon = $this->userQueryManager->getOrderBy() == $orderBy ? strtolower($this->userQueryManager->getOrder()) : 'blank';
+                                ?>
+                                <th scope="col" data-href="<?= $this->url(null, ['action' => 'list'], ['query' => $this->userQueryManager->getParams(['orderBy' => $orderBy, 'order' => $order])]) ?>">
+                                    <?= $this->escapeHtml($this->translate($columnName)) ?><span class="if if-<?= $icon ?> ml-1"></span>
+                                </th>
+                            <?php } ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->users as $user) { ?>
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="user<?= $user->getId() ?>" name="users[]" value="<?= $user->getId() ?>"<?= $user->getId() == 1 ? ' disabled' : '' ?>>
+                                        <label class="custom-control-label" for="user<?= $user->getId() ?>"></label>
+                                    </div>
+                                </td>
+                                <?php foreach ($this->userQueryManager->getColumnIdList() as $columnId) { ?>
+                                    <td data-href="<?= $this->url(null, ['action' => 'edit', 'id' => $user->getId()]) ?>">
+                                        <?= $this->escapeHtml($user->get($columnId)) ?>
+                                    </td>
+                                <?php } ?>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <?= $this->form()->closeTag() ?>
+
+        <?= $this->paginationControl($this->users, 'Sliding', 'paginator/paginator', ['urlParams' => [null, [], ['query' => $this->userQueryManager->getParams()]]]) ?>
+
+    </div>
+</div>
